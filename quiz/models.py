@@ -5,7 +5,7 @@ from django.template.defaultfilters import slugify
 class Quiz(models.Model):
     name = models.CharField(unique=True, max_length=50)
     # Course represents class model
-    #course = models.ManyToManyField(Class)
+    course = models.ManyToManyField(Class)
     description = models.CharField(max_length=255)
     due_date = models.DateTimeField(auto_now_add=False)
     question_count = models.IntegerField(default=0)
@@ -21,13 +21,6 @@ class Quiz(models.Model):
 class Question(models.Model):
     text = models.CharField(unique=True, max_length=50)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-
-    '''
-    # Increment question counter on associated quiz
-    def save(self, *args, **kwargs):
-        self.quiz.question_count +=1
-        super(Question, self).save(*args, **kwargs)
-    '''
      
     def __str__(self):
         return self.text
@@ -43,7 +36,7 @@ class Option(models.Model):
 
 # QuizTaker model
 class QuizTaker(models.Model):
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     correctAnswers = models.IntegerField(default=0)
     is_completed = models.BooleanField(default=False)
