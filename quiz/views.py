@@ -4,3 +4,6 @@ from django.http import HttpResponse
 
 def index(request):
     return render(request, 'index.html')
+
+def dashboardStudent(request):
+    return render(request, 'dashboard-student.html')
