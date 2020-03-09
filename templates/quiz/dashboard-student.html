@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static%}
+
+{% block title_block %}
+        Student Dashboard
+{% endblock %}
+
+{% block header_buttons %}
+    <button class="btn btn-quizBuddy-4 mr-2" type="button">About</button>
+    <button class="btn btn-quizBuddy-3 mr-2" type="button">Preferences</button>
+    <button class="btn btn-quizBuddy-5 mr-2" type="button">Next Deadline placeholder</button>
+{% endblock %}
+
+{% block body_block%}
+<div class="container-fluids">
+    <div class="row">
+        <div class = "col-8">
+            <ul class="nav nav-tabs mt-1 mr-1 ml-3">
+                <li class="nav-item">
+                    <a class="btn btn-quizBuddy-4" href="#">Class 1</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Class 2</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Class 3</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Class 4</a>
+                </li>
+            </ul>
+                body
+        </div>
+        <div class="col-4 ">
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src= "{%static 'images/character/characterProfileLev1.jpg'%}" alt="Card image cap"/>
+                    <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

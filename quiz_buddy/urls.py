@@ -1,5 +1,4 @@
 """quiz_buddy URL Configuration
-
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.0/topics/http/urls/
 Examples:
@@ -15,7 +14,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls import include
+from quiz import views
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-]
+urlpatterns = [ path('', views.user_login, name='index'),
+                path('admin/', admin.site.urls),
+                path('quizBuddy/', include('quiz.urls')),
+                path('about/', views.about, name='about'),
+                path('dashboardStudent/', views.dashboardStudent, name='dashboardStudent'),
+                path('registerStudent/', views.registerStudent, name='registerStudent'),
+                path('registerTeacher/', views.registerTeacher, name='registerTeacher'),
+            ]
