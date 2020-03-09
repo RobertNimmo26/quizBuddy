@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static%}
+
+{% block title_block %}
+        Student Dashboard
+{% endblock %}
+
+{% block header_buttons %}
+    <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href='about/'">About</button>
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href='preferences/'">Preferences</button>
+    <button class="btn btn-quizBuddy-1-dark mr-2" type="button">Create quiz</button>
+    <button class="btn btn-quizBuddy-5 mr-2" type="button">Create quiz</button>
+{% endblock %}
+
+{% block body_block%}
+<div class="container-fluids">
+    <div class="row">
+        <div class = "col">
+            <ul class="nav nav-tabs mt-1 mr-1 ml-3">
+                <li class="nav-item">
+                    <a class="btn btn-quizBuddy-4" href="#">Class 1</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Class 2</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Class 3</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Class 4</a>
+                </li>
+            </ul>
+                body
+        </div>
+    </div>
+</div>
+{% endblock %}
