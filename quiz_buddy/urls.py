@@ -19,7 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from quiz import views
 
-urlpatterns = [ path('', views.index, name='index'),
+urlpatterns = [ path('', views.user_login, name='index'),
                 path('admin/', admin.site.urls),
                 path('quiz/', include('quiz.urls')),
                 path('about/', views.about, name='about'),

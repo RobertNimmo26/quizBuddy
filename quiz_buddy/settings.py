@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'quiz',
 ]
 
 MIDDLEWARE = [
@@ -123,5 +124,3 @@ STATICFILES_DIRS = [STATIC_DIR, ]
 # User model
 
 AUTH_USER_MODEL = 'quiz.User'
-
-
