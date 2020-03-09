@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from .managers import CustomUserManager
 
-# Character model
+# Character Model
 class Character(models.Model):
     characterType = models.IntegerField(_("type"),default=1)
     evolutionStage = models.IntegerField(_("stage"),default=1)
@@ -16,7 +16,7 @@ class Character(models.Model):
     def __str__(self):
         return str(self.characterType)
 
-# User model
+# User Model
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(_("user name"), max_length=50, unique=True)
     email = models.EmailField(_('email address'), unique=True)
@@ -39,6 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+# Class Model
 class Class(models.Model):
     classId = models.AutoField(primary_key=True,verbose_name=_("id"))
     name = models.CharField(_("name"), max_length=50)
@@ -74,7 +75,7 @@ class Quiz(models.Model):
         # Fix pluralization of model name
         verbose_name_plural = 'Quizzes'
 
-# Question model
+# Question Model
 class Question(models.Model):
     text = models.CharField(unique=True, max_length=50)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
@@ -91,7 +92,7 @@ class Option(models.Model):
     def __str__(self):
         return self.text
 
-# QuizTaker model
+# QuizTaker Model
 class QuizTaker(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
