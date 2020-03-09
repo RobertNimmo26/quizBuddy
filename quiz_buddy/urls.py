@@ -1,5 +1,4 @@
 """quiz_buddy URL Configuration
-
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.0/topics/http/urls/
 Examples:
@@ -26,6 +25,7 @@ urlpatterns = [ path('', views.index, name='index'),
                 path('about/', views.about, name='about'),
                 path('dashboardStudent/', views.dashboardStudent, name='dashboardStudent'),
                 path('dashboardTeacher/', views.dashboardTeacher, name='dashboardTeacher'),
+                path('registerStudent/', views.registerStudent, name='registerStudent'),
+                path('registerTeacher/', views.registerTeacher, name='registerTeacher'),
                 path('preferences/', views.preferences, name='preferences'),
-
-            ]
+]
