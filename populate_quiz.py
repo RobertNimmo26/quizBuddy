@@ -64,7 +64,7 @@ def populate():
     for quiz, ques in quiz__ques.items():
         for q in ques['questions']:
             add_ques(quiz,q['text'])
-            for opt in ques['options']:
+            for opt in q['options']:
                 add_option(q,opt['text'],opt['is_correct'])
 
     # Print out the classes we have added.
@@ -84,18 +84,20 @@ def add_class(name):
 
 def add_quiz(c,name,desc,ques_count):
     date_time = datetime.datetime.now() + datetime.timedelta(days=3)
-    q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)
-    c.quiz.add(q)
+    q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)[0]
+    q.course.add(c)
     q.save()
     return q
 
 def add_ques(q,text):
-    ques = Question.objects.get_or_create(quiz = q,text = text)
+    get_quiz = Quiz.objects.get(name = q)
+    ques = Question.objects.get_or_create(quiz = get_quiz,text = text)[0]
     ques.save()
     return ques
 
 def add_option(ques,text,is_correct):
-    opt = Option.objects.get_or_create(question = ques, text = text, is_correct = is_correct)
+    get_ques = Question.objects.get(text = ques['text'])
+    opt = Option.objects.get_or_create(question = get_ques, text = text, is_correct = is_correct)[0]
     opt.save()
     return opt
 
