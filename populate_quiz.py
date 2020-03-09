@@ -2,7 +2,8 @@ import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE','quiz_buddy.settings')
 import django
 django.setup()
-from rango.models import Class, Quiz, Question, Option
+import datetime
+from quiz.models import Class, Quiz, Question, Option
 
 def populate():
     #CREATE CLASSES AND ADD QUIZZES TO THE CLASSES
@@ -14,7 +15,7 @@ def populate():
 
     psyc_quiz = [{'name': 'Psych-Basics', 'description':'Covers the content covered in lectures','question_count':5}]
 
-    course = {'Maths': {'quiz':math_quiz}, 'Computing': {computing_quiz}, 'Psychology':{'quiz':psyc_quiz}}
+    course = {'Maths': {'quiz':math_quiz}, 'Computing': {'quiz':computing_quiz}, 'Psychology':{'quiz':psyc_quiz}}
     #for every course add a quiz
     for course, course_data in course.items():
         c = add_class(course)
@@ -82,7 +83,9 @@ def add_class(name):
     return c 
 
 def add_quiz(c,name,desc,ques_count):
-    q = Quiz.objects.get_or_create(course = c,name=name,description = desc,question_count=ques_count)[0]
+    date_time = datetime.datetime.now() + datetime.timedelta(days=3)
+    q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)
+    c.quiz.add(q)
     q.save()
     return q
 
