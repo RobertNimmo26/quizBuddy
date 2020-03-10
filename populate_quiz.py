@@ -2,10 +2,11 @@ import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE','quiz_buddy.settings')
 import django
 django.setup()
-import datetime
+from django.utils import timezone
 from quiz.models import Class, Quiz, Question, Option
 
 def populate():
+    
     #CREATE CLASSES AND ADD QUIZZES TO THE CLASSES
     #------------------------------------------------------------------------------------------------------------------------------------
     math_quiz = [{'name':'MCQSet1', 'description':'A quiz that covers basic arithmetic operations','question_count':3},
@@ -59,7 +60,7 @@ def populate():
     'options':[{'text':'behaviour','is_correct':True},{'text':'body','is_correct':False}]}]
 
     quiz__ques = {'MCQSet1':{'questions':questions1},'MCQSet2':{'questions':questions2},
-    'Programming':{'question':programming},'Psychology-Basics':{'questions':psych_basics}}
+    'Programming':{'questions':programming},'Psych-Basics':{'questions':psych_basics}}
 
     for quiz, ques in quiz__ques.items():
         for q in ques['questions']:
@@ -70,11 +71,11 @@ def populate():
     # Print out the classes we have added.
     for c in Class.objects.all():
         for q in Quiz.objects.filter(course=c):
-            print(f'- {c}: {q}')
+            print(f'{c}: {q}')
             for ques in Question.objects.filter(quiz = q):
-                print(f'-{q}:{ques}')
+                print(f'-:{ques}')
                 for opt in Option.objects.filter(question = ques):
-                    print(f'-{ques}:{opt}')
+                    print(f'--:{opt}')
 
 
 def add_class(name):
@@ -83,7 +84,7 @@ def add_class(name):
     return c 
 
 def add_quiz(c,name,desc,ques_count):
-    date_time = datetime.datetime.now() + datetime.timedelta(days=3)
+    date_time = timezone.now() + timezone.timedelta(days=3)
     q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)[0]
     q.course.add(c)
     q.save()
