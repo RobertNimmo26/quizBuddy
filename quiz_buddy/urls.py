@@ -15,13 +15,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import include
+from django.conf import settings
+from django.conf.urls.static import static
 from quiz import views
 
 urlpatterns = [ path('', views.user_login, name='index'),
                 path('admin/', admin.site.urls),
-                path('quizBuddy/', include('quiz.urls')),
+                path('quiz/', include('quiz.urls')),
                 path('about/', views.about, name='about'),
                 path('dashboardStudent/', views.dashboardStudent, name='dashboardStudent'),
+                path('dashboardTeacher/', views.dashboardTeacher, name='dashboardTeacher'),
                 path('registerStudent/', views.registerStudent, name='registerStudent'),
                 path('registerTeacher/', views.registerTeacher, name='registerTeacher'),
-            ]
+                path('preferences/', views.preferences, name='preferences'),
+]
