@@ -54,7 +54,10 @@ def registerTeacher(request):
 
 def createQuiz(request):   
     context_dict= {}
-    return render(request, 'create-quiz.html', context=context_dict)
+    if request.method == 'POST':
+        return redirect(reverse('quiz:teacherIndex'))
+    else:
+        return render(request, 'create-quiz.html', context=context_dict)
     
 def user_login(request):
     context_dict = {}
