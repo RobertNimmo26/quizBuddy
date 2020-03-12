@@ -26,11 +26,11 @@ def populate():
     #ADD QUESTIONS TO THE QUIZZES AND THEN ADD OPTIONS TO THE QUESTIONS
     #------------------------------------------------------------------------------------------------------------------------------------
     questions1 = [{'text': 'What is 3+8*11 ?',
-    'options':[{'text': '121','is_correct': False},{'text':'91','is_correct':True}]},
+    'options':[{'text': '121','is_correct': False},{'text':'91','is_correct':True},{'text':'-91','is_correct':False}]},
     {'text':'What is the next number in the series: 2, 9, 30, 93, …?',
-    'options':[{'text': '282','is_correct':True},{'text':'102','is_correct':False}]},
+    'options':[{'text': '282','is_correct':True},{'text':'102','is_correct':False},{'text':'39','is_correct':False}]},
     {'text':'What is nine-tenths of 2000?',
-    'options':[{'text':'2222','is_correct':False},{'text':'1800','is_correct':True}]}]
+    'options':[{'text':'2222','is_correct':False},{'text':'1800','is_correct':True},{'text':'20','is_correct':False}]}]
 
     questions2 = [{'text': 'What is sum of angles in a triangle?',
     'options':[{'text': '360','is_correct': False},{'text':'180','is_correct':True},{'text':'Do not know','is_correct':False}]},
@@ -42,11 +42,11 @@ def populate():
     'options':[{'text':'7','is_correct':False},{'text':'6','is_correct':True},{'text':'Hexagon does not exits','is_correct':False}]}]
 
     programming = [{'text':'A syntax error means:',
-    'options':[{'text':'Breaking the language rules','is_correct':True},{'text':'Error with the logic','is_correct':False}]},
+    'options':[{'text':'Breaking the language rules','is_correct':True},{'text':'Error with the logic','is_correct':False},{'text':'Dont Know','is_correct':False}]},
     {'text':'What symbol is used in Java for "AND"',
-    'options':[{'text':'$$','is_correct':False},{'text':'&&','is_correct':True}]},
+    'options':[{'text':'$$','is_correct':False},{'text':'&&','is_correct':True},{'text':'&','is_correct':False}]},
     {'text':'Which symbol is used to denote single line comments in Python',
-    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False}]}]
+    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False},{'text':'\','is_correct':False}]}]
 
     psych_basics = [{'text': 'Pavlov is famous for conducting experiments on ?',
     'options':[{'text': 'Birds','is_correct': False},{'text':'Rats','is_correct':False},{'text':'Dogs','is_correct':True}]},
