@@ -85,7 +85,7 @@ class Question(models.Model):
 
 # Option Model
 class Option(models.Model):
-    text = models.CharField(unique=True, max_length=50)
+    text = models.CharField(max_length=50)
     is_correct = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
