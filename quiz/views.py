@@ -52,6 +52,10 @@ def registerStudent(request):
 def registerTeacher(request):
     return render(request, 'register-teacher.html')
 
+def createQuiz(request):   
+    context_dict= {}
+    return render(request, 'create-quiz.html', context=context_dict)
+    
 def user_login(request):
     context_dict = {}
     # If the request is a HTTP POST, try to pull out the relevant information.
