@@ -27,10 +27,11 @@ def user_login(request):
     # If the request is a HTTP POST, try to pull out the relevant information.
     if request.method == 'POST':
         # get username and password from form
+        print(request.body)
         username = request.POST.get('username')
         password = request.POST.get('password')
         # Django's auth
-        user = authenticate(username=username, password=password)
+        user = authenticate(email=username, password=password)
         # If there's a match
         if user:
             if user.is_active:
