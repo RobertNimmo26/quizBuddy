@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title_block %}
+        Preferences
+{% endblock %}
+
+{% block header_buttons %}
+    <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href='/'">Dashboard</button>
+{% endblock %}
+{% block body_block %}
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card" style="width: 18rem;">
+                <img src = "{%static 'images/character/characterProfileLev1.jpg'%}" class="card-img-top" alt="avatar">
+                <div class="card-body">
+                <h5 class="card-title">Username: {{user.username}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
