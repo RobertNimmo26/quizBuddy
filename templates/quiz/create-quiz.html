@@ -10,7 +10,15 @@
 {% endblock %}
 
 {% block body_block%}
-    <form action="/submit" method="POST">
-        
+    <form id="quiz_creation_form" action="{% url 'dashboardTeacher' %}" method="POST">
+        {% csrf_token %}
+        Quiz Title: <input type="text" name="quiz_title" value="" size="50" />
+        <br /> 
+        Class: <input type="text" name="class" value="" size="50" />
+        <br /> 
+        Question: <input type="text" name="question_title" value="" size="50" />
+        <br /> 
+        <input type="submit" value="submit" />
+        <button class="btn btn-quizBuddy-1" onclick="">+</button>
     </form>
 {% endblock %}
