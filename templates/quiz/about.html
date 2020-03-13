@@ -1,8 +1,10 @@
+ <!-- fonts n stuff to be changed once we can move on to details -->
+
 {% extends 'base.html' %}
 {% load static%}
 
 {% block title_block %}
-        Homepage
+        About
 {% endblock %}
 
 {% block header_buttons %}
@@ -10,10 +12,12 @@
     <a href={% url 'registerStudent' %} class="btn btn-quizBuddy-1 mr-2" role="button">Sign up, Student</a>
     <a href={% url 'registerTeacher' %} class="btn btn-quizBuddy-1-dark mr-2" role="button">Sign up, Teacher</a>
 {% endblock %}
-
 {% block body_block%}
+ <!-- makes the whole thing full screen -->
+<div class="jumbotron jumbotron-fluid bg-white" align="center" style="height:100vh;">
+ <!-- 1st slideshow will be about the website itself (screenshots about certain parts ex. the quiz taking) and then the description -->
 <div class="row justify-content-center">
-		<div class="col-md-4">
+		<div class="col-md-4"  style="padding-right:0px; padding-left:0px">
       <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
   <ol class="carousel-indicators">
     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -22,17 +26,13 @@
   </ol>
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>..fwfwfwgfw.</h5>
-        <p>...</p>
-      </div>
-      <img class="d-block w-100" src="https://66.media.tumblr.com/42d34c3dc54a7c48893e6e3cdcd28591/tumblr_ognywu1LRu1te3ceto1_400.png" alt="First slide">
+      <img class="d-block w-100" src="{%static 'images/character/char3.jpg'%}" alt="First slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src=".../800x400?auto=yes&bg=666&fg=444&text=Second slide" alt="Second slide">
+      <img class="d-block w-100" src="{%static 'images/character/char3.jpg'%}" alt="Second slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src=".../800x400?auto=yes&bg=555&fg=333&text=Third slide" alt="Third slide">
+      <img class="d-block w-100" src="{%static 'images/character/char3.jpg'%}" alt="Third slide">
     </div>
   </div>
   <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
@@ -45,31 +45,27 @@
   </a>
 </div>
 		</div>
-		<div class="col-md-4">
+		<div class="col-md-4" align="left">
 			<h2>
 				Heading
 			</h2>
 			<p>
 				Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
 			</p>
-			<p>
-				<a class="btn" href="#">View details »</a>
-			</p>
 		</div>
 		</div>
+
+ <!-- 2st slideshow will be about the possibly characters people can choose and then the description -->
 <div class="row justify-content-center">
-  <div class="col-md-4">
+  <div class="col-md-4 bg-white" style="padding-right:10px; padding-left:0px" align="right">
     <h2>
       Heading
     </h2>
     <p>
       Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
     </p>
-    <p>
-      <a class="btn" href="#">View details »</a>
-    </p>
   </div>
-		<div class="col-md-4">
+		<div class="col-md-4" style="padding:0px">
       <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
   <ol class="carousel-indicators">
     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -78,17 +74,13 @@
   </ol>
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>..fwfwfwgfw.</h5>
-        <p>...</p>
-      </div>
-      <img class="d-block w-100" src="https://66.media.tumblr.com/42d34c3dc54a7c48893e6e3cdcd28591/tumblr_ognywu1LRu1te3ceto1_400.png" alt="First slide">
+      <img class="d-block w-100" src="{%static 'images/temporary.jpg'%}" alt="First slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src=".../800x400?auto=yes&bg=666&fg=444&text=Second slide" alt="Second slide">
+      <img class="d-block w-100" src="{%static 'images/temporary.jpg'%}" alt="Second slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src=".../800x400?auto=yes&bg=555&fg=333&text=Third slide" alt="Third slide">
+      <img class="d-block w-100" src="{%static 'images/temporary.jpg'%}" alt="Third slide">
     </div>
   </div>
   <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
@@ -102,4 +94,5 @@
 </div>
 		</div>
 		</div>
+</div>
 {% endblock %}

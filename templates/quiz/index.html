@@ -14,6 +14,7 @@
 {% block body_block%}
 <div class="container">
 <div class="row align-items-center">
+ <!-- short description part -->
 <div class="col-sm">
   <div class="card" style="width: 34rem;">
   <div class="card-body">
@@ -24,6 +25,7 @@
   </div>
 </div>
 </div>
+ <!-- login part -->
 <div class="col-sm">
   <form id="login_form" method="post" action="{% url 'index' %}">
     {% csrf_token %}

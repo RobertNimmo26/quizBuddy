@@ -1,3 +1,5 @@
+<!-- currently there's no difference between this and the teacher one until we add the character choosing -->
+
 {% extends 'base.html' %}
 
 {% block title_block %}
@@ -11,30 +13,32 @@
 {% endblock %}
 
 {% block body_block%}
-<div class="container">
-<div class="row d-flex justify-content-center">
-<div class="col-xl-5 col-lg-6 col-md-8 col-sm-10 mx-auto text-center form p-4">
+<div class="jumbotron jumbotron-fluid bg-white" align="center" style="height:100vh;">
   <h3 class="title" align="center" style="width: 34rem;">Register as Student</h3>
   <div class="card" style="width: 34rem;">
-  <div class="card-body">
+  <div class="card-body bg-light">
     {% if registered %}
     <strong>thank you for registering!</strong>
     <a href="{% url 'index' %}">Return to the homepage.</a><br />
     {% else %}
-    <strong>register here!</strong><br />
     <form id="user_form" method="post" action="{% url 'registerStudent' %}" enctype="multipart/form-data">
 
       {% csrf_token %}
 
-      <!-- Display each form -->
-      {{ user_form.as_p}}
+      <!-- Displays form neatly instead of having the label n field next to eachother -->
+      {% for field in user_form.visible_fields %}
+        <div class="mydiv">
+
+            <label class="mylabel">{{ field.label }}</label><br>
+            {{ field }}
+        </div>
+      {% endfor %}
 
       <!-- Provide a button to click to submit the form. -->
+      <br>
       <input type="submit" name="submit" value="Register" />
     </form>
     {% endif %}
-  </div>
-  </div>
   </div>
   </div>
 </div>
