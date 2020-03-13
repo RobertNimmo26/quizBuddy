@@ -2,10 +2,11 @@ import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE','quiz_buddy.settings')
 import django
 django.setup()
-import datetime
+from django.utils import timezone
 from quiz.models import Class, Quiz, Question, Option
 
 def populate():
+    
     #CREATE CLASSES AND ADD QUIZZES TO THE CLASSES
     #------------------------------------------------------------------------------------------------------------------------------------
     math_quiz = [{'name':'MCQSet1', 'description':'A quiz that covers basic arithmetic operations','question_count':3},
@@ -25,11 +26,11 @@ def populate():
     #ADD QUESTIONS TO THE QUIZZES AND THEN ADD OPTIONS TO THE QUESTIONS
     #------------------------------------------------------------------------------------------------------------------------------------
     questions1 = [{'text': 'What is 3+8*11 ?',
-    'options':[{'text': '121','is_correct': False},{'text':'91','is_correct':True}]},
+    'options':[{'text': '121','is_correct': False},{'text':'91','is_correct':True},{'text':'-91','is_correct':False}]},
     {'text':'What is the next number in the series: 2, 9, 30, 93, …?',
-    'options':[{'text': '282','is_correct':True},{'text':'102','is_correct':False}]},
+    'options':[{'text': '282','is_correct':True},{'text':'102','is_correct':False},{'text':'39','is_correct':False}]},
     {'text':'What is nine-tenths of 2000?',
-    'options':[{'text':'2222','is_correct':False},{'text':'1800','is_correct':True}]}]
+    'options':[{'text':'2222','is_correct':False},{'text':'1800','is_correct':True},{'text':'20','is_correct':False}]}]
 
     questions2 = [{'text': 'What is sum of angles in a triangle?',
     'options':[{'text': '360','is_correct': False},{'text':'180','is_correct':True},{'text':'Do not know','is_correct':False}]},
@@ -41,11 +42,11 @@ def populate():
     'options':[{'text':'7','is_correct':False},{'text':'6','is_correct':True},{'text':'Hexagon does not exits','is_correct':False}]}]
 
     programming = [{'text':'A syntax error means:',
-    'options':[{'text':'Breaking the language rules','is_correct':True},{'text':'Error with the logic','is_correct':False}]},
+    'options':[{'text':'Breaking the language rules','is_correct':True},{'text':'Error with the logic','is_correct':False},{'text':'Dont Know','is_correct':False}]},
     {'text':'What symbol is used in Java for "AND"',
-    'options':[{'text':'$$','is_correct':False},{'text':'&&','is_correct':True}]},
+    'options':[{'text':'$$','is_correct':False},{'text':'&&','is_correct':True},{'text':'&','is_correct':False}]},
     {'text':'Which symbol is used to denote single line comments in Python',
-    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False}]}]
+    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False},{'text':'\','is_correct':False}]}]
 
     psych_basics = [{'text': 'Pavlov is famous for conducting experiments on ?',
     'options':[{'text': 'Birds','is_correct': False},{'text':'Rats','is_correct':False},{'text':'Dogs','is_correct':True}]},
@@ -59,22 +60,22 @@ def populate():
     'options':[{'text':'behaviour','is_correct':True},{'text':'body','is_correct':False}]}]
 
     quiz__ques = {'MCQSet1':{'questions':questions1},'MCQSet2':{'questions':questions2},
-    'Programming':{'question':programming},'Psychology-Basics':{'questions':psych_basics}}
+    'Programming':{'questions':programming},'Psych-Basics':{'questions':psych_basics}}
 
     for quiz, ques in quiz__ques.items():
         for q in ques['questions']:
             add_ques(quiz,q['text'])
-            for opt in ques['options']:
+            for opt in q['options']:
                 add_option(q,opt['text'],opt['is_correct'])
 
     # Print out the classes we have added.
     for c in Class.objects.all():
         for q in Quiz.objects.filter(course=c):
-            print(f'- {c}: {q}')
+            print(f'{c}: {q}')
             for ques in Question.objects.filter(quiz = q):
-                print(f'-{q}:{ques}')
+                print(f'-:{ques}')
                 for opt in Option.objects.filter(question = ques):
-                    print(f'-{ques}:{opt}')
+                    print(f'--:{opt}')
 
 
 def add_class(name):
@@ -83,19 +84,21 @@ def add_class(name):
     return c 
 
 def add_quiz(c,name,desc,ques_count):
-    date_time = datetime.datetime.now() + datetime.timedelta(days=3)
-    q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)
-    c.quiz.add(q)
+    date_time = timezone.now() + timezone.timedelta(days=3)
+    q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)[0]
+    q.course.add(c)
     q.save()
     return q
 
 def add_ques(q,text):
-    ques = Question.objects.get_or_create(quiz = q,text = text)
+    get_quiz = Quiz.objects.get(name = q)
+    ques = Question.objects.get_or_create(quiz = get_quiz,text = text)[0]
     ques.save()
     return ques
 
 def add_option(ques,text,is_correct):
-    opt = Option.objects.get_or_create(question = ques, text = text, is_correct = is_correct)
+    get_ques = Question.objects.get(text = ques['text'])
+    opt = Option.objects.get_or_create(question = get_ques, text = text, is_correct = is_correct)[0]
     opt.save()
     return opt
 
