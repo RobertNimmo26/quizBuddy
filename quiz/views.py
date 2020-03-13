@@ -11,6 +11,10 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 
+from quiz.models import Class
+from quiz.models import Quiz
+
+
 
 
 def about(request):
@@ -22,11 +26,18 @@ def about(request):
     return render(request, 'about.html', context=context_dict)
 
 def dashboardStudent(request):
-    context_dict= {}
+    #Getting the Class and Quiz objects to display
+    class_list = Class.objects.all()
+    context_dict = {}
+
+    context_dict["classes"] = class_list
+    # context_dict["quizes"] = quiz_list
+
     # prints out whether the method is a GET or a POST
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
+
     return render(request, 'dashboard-student.html', context=context_dict)
 
 def dashboardTeacher(request):

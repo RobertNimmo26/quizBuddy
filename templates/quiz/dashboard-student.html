@@ -15,21 +15,19 @@
 <div class="container-fluids">
     <div class="row">
         <div class = "col-8">
+            {% if classes %}
             <ul class="nav nav-tabs mt-1 mr-1 ml-3">
-                <li class="nav-item">
-                    <a class="btn btn-quizBuddy-4" href="#">Class 1</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Class 2</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Class 3</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Class 4</a>
-                </li>
+                {% for class in classes %}
+                    <li class="nav-item">
+                        <a class="btn btn-quizBuddy-4" href="#">{{ class.name }}</a>
+                    </li>
+                {% endfor %}
             </ul>
-                body
+            {% else %}
+                <div class="alert alert-danger" role="alert">
+                    You are not enrolled into any classes, contact your teacher.
+                </div>
+            {% endif %}
         </div>
         <div class="col-4 ">
             <div class="card" style="width: 18rem;">
