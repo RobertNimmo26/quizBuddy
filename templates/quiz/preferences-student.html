@@ -1,21 +1,66 @@
-{% extends 'prefernces.html' %}
+{% extends 'base.html' %}
+{% load static%}
 
 {% block title_block %}
-        Preferences
+        Homepage
 {% endblock %}
 
 {% block header_buttons %}
     <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href='/'">Dashboard</button>
 {% endblock %}
-{% block body_block %}
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card" style="width: 18rem;">
-                <img src = "{%static 'images/character/characterProfileLev1.jpg'%}" class="card-img-top" alt="avatar">
-                <div class="card-body">
-                <h5 class="card-title">Username: {{user.username}}</h5>
+
+{% block body_block%}
+    <div class="container">
+        <h1>Edit Profile</h1>
+  	    <hr>     
+      <div class="col-md-9 personal-info">
+        <h3>Personal info</h3>     
+        <form class="form-horizontal" method = 'post' action = "{%url 'quiz:index' %}" role="form"> 
+          <div class="row">
+            <div class="col-md-3">
+              <div class="text-center">
+                <div class="card" style="width: 18rem;">
+                    <img src = "{%static 'images/character/characterProfileLev1.jpg'%}" class="card-img-top" alt="avatar">
+                    <div class="card-body">
+                    <h5 class="card-title">Username: {{user.username}}</h5>
+                    </div>
+                </div>
                 </div>
             </div>
         </div>
-    </div>
-{% endblock %}
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Email:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" value="{{user.email}}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label">Username:</label>
+            <div class="col-md-8">
+              <input class="form-control" type="text" value="{{user.username}}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label">Password:</label>
+            <div class="col-md-8">
+              <input class="form-control" type="password" value="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label">Confirm password:</label>
+            <div class="col-md-8">
+              <input class="form-control" type="password" value="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label"></label>
+            <div class="col-md-8">
+              <input type="submit" class="btn btn-primary" value="Save Changes">
+              <span></span>
+              <input type="reset" class="btn btn-default" value="Cancel">
+            </div>
+          </div>
+        </form>
+      </div>
+  </div>
+{%endblock%}

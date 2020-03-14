@@ -37,13 +37,19 @@ def dashboardTeacher(request):
     print(request.user)
     return render(request, 'dashboard-teacher.html', context=context_dict)
 
-def preferences(request):
+#@login_required
+def preferencesStudent(request):
     context_dict= {}
     # prints out whether the method is a GET or a POST
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
-    return render(request, 'preferences.html', context=context_dict)
+    return render(request, 'preferences-student.html', context=context_dict)
+
+@login_required
+def preferencesTeacher(request):
+    return render(request, 'preferences-teacher.html')
+
 
 
 def registerStudent(request):
