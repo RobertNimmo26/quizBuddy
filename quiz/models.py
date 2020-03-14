@@ -21,7 +21,7 @@ class Character(models.Model):
 
 # User Model
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(_("user name"), max_length=50, unique=True)
+    username = models.CharField(_("user name"), max_length=50)
     email = models.EmailField(_('email address'), unique=True)
     name = models.CharField(_("name"), max_length=50)
     evolveScore = models.IntegerField(_("score"),default=0)
@@ -29,6 +29,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_teacher = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
     character = models.ForeignKey("Character", blank=True, null=True, on_delete=models.SET_NULL)
+    evolveScore = models.IntegerField(_("score"),blank = True, null = True,default=0)
+
 
     #Required django User fields
     is_staff = models.BooleanField(default=False)
