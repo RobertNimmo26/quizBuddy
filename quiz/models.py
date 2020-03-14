@@ -17,7 +17,7 @@ class Character(models.Model):
 
 # User Model
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(_("user name"), max_length=50, unique=True)
+    username = models.CharField(_("user name"), max_length=50)
     email = models.EmailField(_('email address'), unique=True)
     name = models.CharField(_("name"), max_length=50)
     is_admin = models.BooleanField(default=False)
