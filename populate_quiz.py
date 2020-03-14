@@ -157,7 +157,7 @@ def add_admin(email,password,name):
 def add_class(name):
     c = Class.objects.get_or_create(name=name)[0]
     c.save()
-    return c 
+    return c
 
 def add_quiz(c,name,desc,ques_count):
     date_time = timezone.now() + timezone.timedelta(days=3)
