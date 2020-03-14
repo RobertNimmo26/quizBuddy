@@ -14,6 +14,7 @@ from django.urls import reverse
 from quiz.models import Class
 from quiz.models import Quiz
 
+from quiz.forms import UserFormStudent, UserFormTeacher
 
 
 
@@ -124,20 +125,63 @@ def preferencesTeacher(request):
 
 
 def registerStudent(request):
-    return render(request, 'register-student.html')
+    registered = False
+
+    # means they are trying to register so we have to save the data
+    if request.method == 'POST':
+
+        # grabs data from form
+        user_form = UserFormStudent(request.POST)
+
+        if user_form.is_valid():
+            # save the user's form data to the database
+            user = user_form.save()
+
+            # hash the password with the set_password method and update the user object
+            user.set_password(user.password)
+            user.save()
+
+            registered = True
+        else:
+            # invalid form, print error
+            print(user_form.errors)
+    else:
+        user_form = UserFormStudent()
+
+    return render(request, 'register-student.html', context = {'user_form': user_form, 'registered': registered})
+
 
 def registerTeacher(request):
-    return render(request, 'register-teacher.html')
+    registered = False
+
+    if request.method == 'POST':
+
+        user_form = UserFormTeacher(request.POST)
+
+        if user_form.is_valid():
+
+            user = user_form.save()
+
+            user.set_password(user.password)
+            user.save()
+
+            registered = True
+        else:
+            print(user_form.errors)
+    else:
+        user_form = UserFormTeacher()
+
+    return render(request, 'register-teacher.html', context = {'user_form': user_form, 'registered': registered})
 
 def user_login(request):
     context_dict = {}
-    # If the request is a HTTP POST, try to pull out the relevant information.
+    # if post, means they are logging in
     if request.method == 'POST':
-        # get username and password from form
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
+
         # Django's auth
-        user = authenticate(username=username, password=password)
+        user = authenticate(email=email, password=password)
         # If there's a match
         if user:
             if user.is_active:
@@ -148,10 +192,9 @@ def user_login(request):
                 return render(request, 'index.html', context=context_dict)
         else:
             # Bad login details were provided
-            print(f"Invalid login details: {username}, {password}")
+            print(f"Invalid login details: {email}, {password}")
             context_dict['error'] = "Invalid login details supplied."
             return render(request, 'index.html', context=context_dict)
-    # The request is not a HTTP POST, so display the login form.
-    # This scenario would most likely be a HTTP GET.
+
     else:
         return render(request, 'index.html', context=context_dict)

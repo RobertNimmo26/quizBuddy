@@ -1,3 +1,5 @@
+<!-- currently there's no difference between this and the teacher one until we add the character choosing -->
+
 {% extends 'base.html' %}
 
 {% block title_block %}
@@ -11,46 +13,32 @@
 {% endblock %}
 
 {% block body_block%}
-<div class="container">
-<div class="row d-flex justify-content-center">
-<div class="col-xl-5 col-lg-6 col-md-8 col-sm-10 mx-auto text-center form p-4">
+<div class="jumbotron jumbotron-fluid bg-white" align="center" style="height:100vh;">
   <h3 class="title" align="center" style="width: 34rem;">Register as Student</h3>
   <div class="card" style="width: 34rem;">
-  <div class="card-body">
-    <form id="login_form" method="post" action="{% url 'quiz:index' %}">
+  <div class="card-body bg-light">
+    {% if registered %}
+    <strong>thank you for registering!</strong>
+    <a href="{% url 'index' %}">Return to the homepage.</a><br />
+    {% else %}
+    <form id="user_form" method="post" action="{% url 'registerStudent' %}" enctype="multipart/form-data">
+
       {% csrf_token %}
-    <div class="form-group">
-      <div class="form-group">
-        <label for="inputUsername">Username</label>
-        <input type="username" name="password" value="" class="form-control" id="inputUsername">
-      </div>
-      <label for="inputEmail">Email address</label>
-      <input type="email" name="email" value="" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" >
-      <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-    </div>
-    <div class="form-group">
-      <label for="inputPassword">Password</label>
-      <input type="password" name="password" value="" class="form-control" id="inputPassword">
-      <small id="passwordHelp" class="form-text text-muted">You would not want someone to ruin your grade, would you? Choose your password wisely.</small>
-    </div>
-    <div class="custom-control custom-radio custom-control-inline">
-      <input type="radio" id="char" name="char1" class="custom-control-input">
-      <label class="custom-control-label" for="customRadioInline1">Character 1</label>
-    </div>
-    <div class="custom-control custom-radio custom-control-inline">
-      <input type="radio" id="char" name="char2" class="custom-control-input">
-      <label class="custom-control-label" for="customRadioInline2">Character 2</label>
-    </div>
-    <div class="custom-control custom-radio custom-control-inline">
-      <input type="radio" id="char" name="char3" class="custom-control-input">
-      <label class="custom-control-label" for="customRadioInline3">Character 3</label>
-    </div>
-    <div style="padding-top: 30px">
-    <button type="submit" value="submit" class="btn btn-primary">Submit</button>
-    </div>
-  </form>
-  </div>
-  </div>
+
+      <!-- Displays form neatly instead of having the label n field next to eachother -->
+      {% for field in user_form.visible_fields %}
+        <div class="mydiv">
+
+            <label class="mylabel">{{ field.label }}</label><br>
+            {{ field }}
+        </div>
+      {% endfor %}
+
+      <!-- Provide a button to click to submit the form. -->
+      <br>
+      <input type="submit" name="submit" value="Register" />
+    </form>
+    {% endif %}
   </div>
   </div>
 </div>
