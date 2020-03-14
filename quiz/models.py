@@ -11,7 +11,8 @@ from .managers import CustomUserManager
 class Character(models.Model):
     characterType = models.IntegerField(_("type"),default=1)
     evolutionStage = models.IntegerField(_("stage"),default=1)
-    evolveScore = models.IntegerField(_("score"),default=0)
+    # Users can change their character once
+    can_change = models.BooleanField(_("can change"), default=True)
 
     def __str__(self):
         return str(self.characterType)
@@ -21,6 +22,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(_("user name"), max_length=50, unique=True)
     email = models.EmailField(_('email address'), unique=True)
     name = models.CharField(_("name"), max_length=50)
+    evolveScore = models.IntegerField(_("score"),default=0)
     is_admin = models.BooleanField(default=False)
     is_teacher = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
@@ -61,12 +63,14 @@ class Class(models.Model):
 
 # Quiz Model
 class Quiz(models.Model):
-    name = models.CharField(unique=True, max_length=50)
+    quizId = models.AutoField(primary_key=True,verbose_name=_("id"))
+    name = models.CharField(max_length=50)
     # Course represents class model
     course = models.ManyToManyField(Class)
     description = models.CharField(max_length=255)
     due_date = models.DateTimeField(auto_now_add=False)
     question_count = models.IntegerField(default=0)
+
 
     def __str__(self):
         return self.name
@@ -77,7 +81,7 @@ class Quiz(models.Model):
 
 # Question Model
 class Question(models.Model):
-    text = models.CharField(unique=True, max_length=50)
+    text = models.CharField(max_length=50)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
 
     def __str__(self):

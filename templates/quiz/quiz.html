@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load quiz_template_tags %}
+
+{% block head_block %}
+    <style> ul {
+        list-style-type: none;
+    }
+    </style>
+{% endblock %}
+
+{% block title_block %}
+    Quiz
+{% endblock %}
+
+{% block header_buttons %}
+    <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href='/'">Dashboard</button
+{% endblock %}
+
+{% block body_block%}
+    <div class="container">
+    <h3>
+    {{form.formQuiz.value}}
+    <small class="text-muted"> {{form.count.value}} questions</small>
+    </h3>
+    
+    <form method="post" >
+        {% csrf_token%}
+
+        {{form}}
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    </div>
+{% endblock %}
+        {% comment %} {% for i in form.count.value|times %}
+        {% comment %} {{form.formQuestion+{{i|stringformat}}}} {% endcomment %}
+        {% comment %} {% for radio in (var()[form.formOption+{{i|stringformat}}]) %}
+
+            <label for="{{ radio.id_for_label }}">
+                {{ radio.choice_label }}
+                <span class="radio">{{ radio.tag }}</span>
+            </label>
+
+        {% endfor %} 
+        {% endfor %} {% endcomment %}
+
+        
+    {% comment %} <form id="quiz_taking" method="post">
+    {% csrf_token %}
+    {% for question in questions %}
+    <div class="form-group">
+        <label for={{option.text}}>{{question}}</label>
+        <ul<
+        <div class="form-check">
+            {% for option in options %}
+            <li>
+            <input class="form-check-input" type="radio" name={{option.text}} id="option" value={{ option.is_correct }}>
+            <label class="form-check-label" for="option"> {{ option.text }}</label>
+            {% endfor %}
+        </div>
+        </ul>
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Submit</button>
+    </form> {% endcomment %}
+

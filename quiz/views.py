@@ -11,6 +11,8 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 
+from quiz.models import Quiz, Question, Option
+from quiz.forms import QuizTakingForm
 
 
 def about(request):
@@ -51,6 +53,30 @@ def registerStudent(request):
 
 def registerTeacher(request):
     return render(request, 'register-teacher.html')
+
+def quiz(request):
+    print(request)
+    if request.method =='POST':
+        return render(request, 'about.html')
+    else:
+        # context_dict = {}
+        # countQuestions=0
+        # quiz = Quiz.objects.get(quizId = 1)
+        # question_list = Question.objects.filter(quiz = quiz)
+        # for question in question_list:
+        #     option_list = Option.objects.filter(question=question_list[index])
+        #     context_dict[question]=option_list
+        #     countQuestions+=1
+        # print(countQuestions)
+        
+
+
+        context_dict = {}
+        form=QuizTakingForm()
+        context_dict["form"]=form
+
+        return render(request, 'quiz.html', context=context_dict)
+
 
 def user_login(request):
     context_dict = {}

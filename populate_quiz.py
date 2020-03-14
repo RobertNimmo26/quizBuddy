@@ -46,7 +46,7 @@ def populate():
     {'text':'What symbol is used in Java for "AND"',
     'options':[{'text':'$$','is_correct':False},{'text':'&&','is_correct':True},{'text':'&','is_correct':False}]},
     {'text':'Which symbol is used to denote single line comments in Python',
-    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False},{'text':'\','is_correct':False}]}]
+    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False},{'text':"\\","is_correct":False}]}]
 
     psych_basics = [{'text': 'Pavlov is famous for conducting experiments on ?',
     'options':[{'text': 'Birds','is_correct': False},{'text':'Rats','is_correct':False},{'text':'Dogs','is_correct':True}]},

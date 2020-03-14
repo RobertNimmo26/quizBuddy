@@ -2,7 +2,7 @@ from django.contrib import admin
 from quiz.models import User,QuizTaker,Character, Quiz, Question, Class, Option
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('email','username','name','is_teacher','is_student')
+    list_display = ('email','username','name','is_teacher','is_student','evolveScore')
 
 class ClassAdmin(admin.ModelAdmin):
     list_display = ('classId','name','get_teachers','get_students')
@@ -11,10 +11,10 @@ class QuizTakerAdmin(admin.ModelAdmin):
     list_display = ('correctAnswers','is_completed')
 
 class CharacterAdmin(admin.ModelAdmin):
-    list_display = ('characterType','evolutionStage','evolveScore')
+    list_display = ('characterType','evolutionStage','can_change')
 
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'due_date')
+    list_display = ('quizId', 'name', 'description', 'due_date')
 
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ('text', 'quiz')
