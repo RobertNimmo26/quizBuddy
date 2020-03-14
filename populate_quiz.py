@@ -3,9 +3,28 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE','quiz_buddy.settings')
 import django
 django.setup()
 from django.utils import timezone
-from quiz.models import Class, Quiz, Question, Option
+from quiz.models import Character,User,Class, Quiz, Question, Option
+from quiz.managers import CustomUserManager
 
 def populate():
+    #CREATE USERS
+    student_users = {'Alice':{'email':'alice@test.com', 'username':'alice9','password':'12364','is_student':True, 'character':1,'evolve_score':2},
+     'Tom':{'email':'tom@test.com', 'username':'tom','password':'password','is_student':True,'character':2,'evolve_score':3}}
+
+    teacher_users = {'David':{'email':'david@staff.com', 'username':'david','password':'2856','is_teacher':True,'is_staff':True},
+     'Anna':{'email':'anna@testteacher.com', 'username':'anna','password':'anna123','is_teacher':True,'is_staff':True}}
+
+    characters = [{'type':1,'evolutionStage':1},{'type':1,'evolutionStage':2},{'type':1,'evolutionStage':3},
+    {'type':2,'evolutionStage':1},{'type':2,'evolutionStage':2},{'type':2,'evolutionStage':3},
+    {'type':3,'evolutionStage':1},{'type':3,'evolutionStage':2},{'type':3,'evolutionStage':3}]
+
+    for c in characters:
+        add_character(c['type'],c['evolutionStage'])
+
+    for s, s_data in student_users.items():
+        add_user(s,s_data['username'],s_data['email'],s_data['password'],s_data['is_student'],s_data['character'],s_data['evolve_score'])
+       
+
     
     #CREATE CLASSES AND ADD QUIZZES TO THE CLASSES
     #------------------------------------------------------------------------------------------------------------------------------------
@@ -46,7 +65,7 @@ def populate():
     {'text':'What symbol is used in Java for "AND"',
     'options':[{'text':'$$','is_correct':False},{'text':'&&','is_correct':True},{'text':'&','is_correct':False}]},
     {'text':'Which symbol is used to denote single line comments in Python',
-    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False},{'text':'\','is_correct':False}]}]
+    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False},{'text':'\\','is_correct':False}]}]
 
     psych_basics = [{'text': 'Pavlov is famous for conducting experiments on ?',
     'options':[{'text': 'Birds','is_correct': False},{'text':'Rats','is_correct':False},{'text':'Dogs','is_correct':True}]},
@@ -68,7 +87,20 @@ def populate():
             for opt in q['options']:
                 add_option(q,opt['text'],opt['is_correct'])
 
+    #PRINT
+    #----------------------------------------------------------------------------------------------------------------------------------
+    print('Characters...')
+    print('--------------------')
+    for charac in Character.objects.all():
+        print(f' Character:{charac} Evolution Stage:{charac.evolutionStage}')
+
+    print('\nStudents')
+    print('------------------')
+    for student in User.objects.all():
+        print(f'{student}')
+
     # Print out the classes we have added.
+    print('CLASS, QUIZ, QUESTION, OPTIONS ADDED')
     for c in Class.objects.all():
         for q in Quiz.objects.filter(course=c):
             print(f'{c}: {q}')
@@ -76,6 +108,15 @@ def populate():
                 print(f'-:{ques}')
                 for opt in Option.objects.filter(question = ques):
                     print(f'--:{opt}')
+
+    #-----------------------------------------------------------------------------------------------------------------------------------
+
+def add_user(name,username,email,password,is_student,charac,evol_score):
+    manager = CustomUserManager()
+    u = manager.create_user(email = email, password = password, name = name,
+                                                username = username,is_student = is_student,charac = charac,evol_score = evol_score )
+    u.save()
+    return u
 
 
 def add_class(name):
@@ -101,6 +142,11 @@ def add_option(ques,text,is_correct):
     opt = Option.objects.get_or_create(question = get_ques, text = text, is_correct = is_correct)[0]
     opt.save()
     return opt
+
+def add_character(charac_type, evolStage ):
+    charac = Character.objects.get_or_create(characterType= charac_type, evolutionStage = evolStage)[0]
+    charac.save()
+    return charac
 
 if __name__ == '__main__':
     print('Starting Quiz population script...')
