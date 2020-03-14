@@ -11,9 +11,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from quiz.models import Class
-from quiz.models import Quiz
-
+from quiz.models import Class,Quiz,User
 from quiz.forms import UserFormStudent, UserFormTeacher
 
 
@@ -117,11 +115,26 @@ def preferencesStudent(request):
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
+    context_dict['username'] = request.user
+    if request.user.is_student == False:
+        return render (request, 'preferences-teacher.html')
     return render(request, 'preferences-student.html', context=context_dict)
 
 @login_required
 def preferencesTeacher(request):
-    return render(request, 'preferences-teacher.html')
+    user = User.objects.get(email = request.user) 
+
+    if request.method == 'POST':
+        if request.POST['username']:
+            user.username = request.POST['username']
+        if request.POST['name']:
+            user.name = request.POST['name']
+        if request.POST['email']:
+            user.email = request.POST['email']
+        if request.POST['password']:
+            user.password = request.POST['password']
+        user.save()
+        return render(request, 'preferences-teacher.html')
 
 
 def registerStudent(request):

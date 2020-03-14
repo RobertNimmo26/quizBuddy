@@ -48,7 +48,7 @@ class Class(models.Model):
     name = models.CharField(_("name"), max_length=50)
     teacher = models.ManyToManyField("User", verbose_name=_("teacher"),related_name="teachers")
     student = models.ManyToManyField("User", verbose_name=_("student"),related_name="students")
-    slug = models.SlugField(unique = True)
+    slug = models.SlugField(unique = True,null = True, blank = True)
 
     def get_teachers(self):
         return ",".join([str(t) for t in self.teacher.all()])

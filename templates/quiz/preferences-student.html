@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block header_buttons %}
-    <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href='/'">Dashboard</button>
+  <a href={% url 'dashboardStudent' %} class="btn btn-quizBuddy-4 mr-2" role="button">Dashboard</a>
 {% endblock %}
 
 {% block body_block%}
@@ -22,7 +22,6 @@
                     <div class="card-body">
                     <h5 class="card-title">Username: {{user.username}}</h5>
                     </div>
-                
                 </div>
             </div>
         </div>

@@ -31,5 +31,6 @@ urlpatterns = [ path('', views.user_login, name='index'),
                 path('dashboardTeacher/', views.dashboardTeacher, name='dashboardTeacher'),
                 path('registerStudent/', views.registerStudent, name='registerStudent'),
                 path('registerTeacher/', views.registerTeacher, name='registerTeacher'),
-                path('preferencesStudent/',views.preferencesStudent, name = 'preferencesStudent')
+                path('preferencesStudent/',views.preferencesStudent, name = 'preferencesStudent'),
+                path('preferencesTeacher/', views.preferencesTeacher, name = 'preferencesTeacher'),
 ]
