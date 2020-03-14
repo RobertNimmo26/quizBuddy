@@ -1,11 +1,12 @@
 from django.contrib import admin
-from quiz.models import User,QuizTaker,Character, Quiz, Question, Class, Option
+from quiz.models import User, QuizTaker, Character, Quiz, Question, Class, Option
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ('email','username','name','is_teacher','is_student')
 
 class ClassAdmin(admin.ModelAdmin):
     list_display = ('classId','name','get_teachers','get_students')
+    prepopulated_fields = {'slug':('classId',)}
 
 class QuizTakerAdmin(admin.ModelAdmin):
     list_display = ('correctAnswers','is_completed')

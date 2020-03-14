@@ -3,11 +3,14 @@
 
 {% block title_block %}
         Student Dashboard
+            {% block classTitle %}
+
+            {% endblock %}
 {% endblock %}
 
 {% block header_buttons %}
-    <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href='about/'">About</button>
-    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href='preferences/'">Preferences</button>
+    <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'about' %}">About</button>
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferences' %}">Preferences</button>
     <button class="btn btn-quizBuddy-5 mr-2" type="button">Next Deadline placeholder</button>
 {% endblock %}
 
@@ -19,12 +22,17 @@
             <ul class="nav nav-tabs mt-1 mr-1 ml-3">
                 {% for class in classes %}
                     <li class="nav-item">
-                        <a class="btn btn-quizBuddy-4" href="#">{{ class.name }}</a>
+                        <a href={% url 'classStudent' class.slug %} class="btn btn-quizBuddy-4 mr-2" role="button">{{ class.name }}</a>
                     </li>
                 {% endfor %}
             </ul>
+            <div>
+                {% block classBodyBlock %}
+
+                {% endblock %}
+            </div>
             {% else %}
-                <div class="alert alert-danger" role="alert">
+                <div class="alert alert-danger mt-1 mr-1 ml-3" role="alert">
                     You are not enrolled into any classes, contact your teacher.
                 </div>
             {% endif %}
