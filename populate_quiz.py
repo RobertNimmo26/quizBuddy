@@ -6,7 +6,7 @@ from django.utils import timezone
 from quiz.models import Class, Quiz, Question, Option
 
 def populate():
-    
+
     #CREATE CLASSES AND ADD QUIZZES TO THE CLASSES
     #------------------------------------------------------------------------------------------------------------------------------------
     math_quiz = [{'name':'MCQSet1', 'description':'A quiz that covers basic arithmetic operations','question_count':3},
@@ -46,7 +46,7 @@ def populate():
     {'text':'What symbol is used in Java for "AND"',
     'options':[{'text':'$$','is_correct':False},{'text':'&&','is_correct':True},{'text':'&','is_correct':False}]},
     {'text':'Which symbol is used to denote single line comments in Python',
-    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False},{'text':"\\","is_correct":False}]}]
+    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False},{'text':'\\','is_correct':False}]}]
 
     psych_basics = [{'text': 'Pavlov is famous for conducting experiments on ?',
     'options':[{'text': 'Birds','is_correct': False},{'text':'Rats','is_correct':False},{'text':'Dogs','is_correct':True}]},
@@ -81,7 +81,7 @@ def populate():
 def add_class(name):
     c = Class.objects.get_or_create(name=name)[0]
     c.save()
-    return c 
+    return c
 
 def add_quiz(c,name,desc,ques_count):
     date_time = timezone.now() + timezone.timedelta(days=3)

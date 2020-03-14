@@ -21,6 +21,10 @@ from quiz import views
 
 urlpatterns = [ path('', views.user_login, name='index'),
                 path('admin/', admin.site.urls),
+                path('dashboardStudent/classStudent/<slug:class_name_slug>/',
+                    views.show_classStudent, name='classStudent'),
+                path('dashboardTeacher/classTeacher/<slug:class_name_slug>/',
+                    views.show_classTeacher, name='classTeacher'),
                 path('quiz/', include('quiz.urls')),
                 path('about/', views.about, name='about'),
                 path('dashboardStudent/', views.dashboardStudent, name='dashboardStudent'),
