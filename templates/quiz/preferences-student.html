@@ -2,7 +2,7 @@
 {% load static%}
 
 {% block title_block %}
-        Homepage
+        Preferences
 {% endblock %}
 
 {% block header_buttons %}
@@ -12,19 +12,17 @@
 {% block body_block%}
     <div class="container">
         <h1>Edit Profile</h1>
-  	    <hr>     
-      <div class="col-md-9 personal-info">
-        <h3>Personal info</h3>     
-        <form class="form-horizontal" method = 'post' action = "{%url 'quiz:index' %}" role="form"> 
-          <div class="row">
-            <div class="col-md-3">
-              <div class="text-center">
-                <div class="card" style="width: 18rem;">
+        <div class="col-md-9 personal-info">
+          <form class="form-horizontal" method = 'post' action = "{%url 'preferencesStudent' %}" role="form"> 
+           {%csrf_token%}
+            <div class="row">
+              <div class="col-md-3">
+                <div class="text-center">
                     <img src = "{%static 'images/character/characterProfileLev1.jpg'%}" class="card-img-top" alt="avatar">
                     <div class="card-body">
                     <h5 class="card-title">Username: {{user.username}}</h5>
                     </div>
-                </div>
+                
                 </div>
             </div>
         </div>
