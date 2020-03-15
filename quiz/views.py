@@ -130,10 +130,13 @@ def preferencesStudent(request):
                 user.name = request.POST['name']
             if 'email' in request.POST:
                 user.email = request.POST['email']
-            if request.POST['password']:
-                user.set_password(request.POST['password'])
             if 'characterType' in request.POST:
                 user.character = Character.objects.get(characterType =request.POST['characterType'], evolutionStage = user.evolveScore)
+            if request.POST['password']:
+                user.set_password(request.POST['password'])
+                user.save()
+                #ask user to login again
+                return redirect('/')
             user.save()
             return redirect('dashboardStudent')
         return render(request, 'preferences-student.html')
@@ -153,6 +156,8 @@ def preferencesTeacher(request):
                 user.email = request.POST['email']
             if request.POST['password']:
                 user.set_password(request.POST['password'])
+                user.save()
+                return redirect('/')
             user.save()
             return redirect('dashboardTeacher')
         return render(request, 'preferences-teacher.html')
