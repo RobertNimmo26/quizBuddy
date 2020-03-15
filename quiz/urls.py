@@ -5,7 +5,6 @@ app_name = 'quiz'
 
 urlpatterns = [
         path('', views.user_login, name="index"),
-        #path('submited_quiz/',views.quiz,name='submitquiz'),
         path('dashboardStudent/classStudent/<slug:class_name_slug>/<slug:quiz_name_slug>/',views.quiz,name='quiz'),
 
         ]
