@@ -217,21 +217,29 @@ def registerTeacher(request):
     return render(request, 'register-teacher.html', context = {'user_form': user_form, 'registered': registered})
 
 
-
+@login_required
 def quiz(request,class_name_slug=None,quiz_name_slug=None):
-    #print(request.user)
-    print(request)
+
     if request.method =='POST':
+        #gets quiz object
         quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)
         correctAnswers=0
+
+        #for each form response checks if answer is true
         for key, value in request.POST.items():
             if value =='True':
                 correctAnswers+=1
+
+        #Creates a new quiztaker object
         quiz_taker= QuizTaker(user=request.user,quiz=quiz, correctAnswers=correctAnswers,is_completed=True,)
         quiz_taker.save()
+
+        #calculates new user evolvescore
         currentScore=request.user.evolveScore
         newScore=correctAnswers+currentScore
         request.user.evolveScore=newScore
+
+        #evolves character if points are equal or greater than points required and the user hasn't evolved already
         if (newScore>=70 and request.user.character.evolutionStage!=3):
             character= Character(characterType=request.user.character.characterType, can_change=request.user.character.characterType, evolutionStage=3)
             character.save()
@@ -241,20 +249,30 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
             character.save()
             request.user.character=character
         request.user.save()
+
+        #redirects user to student dashboard
         return redirect(reverse('classStudent',kwargs={'class_name_slug':class_name_slug}))
     else:
         context_dict = {}
+
+        #gets class object and adds class object to context_dict
         classObj = get_object_or_404(Class,slug=class_name_slug)
         context_dict['class'] = classObj
 
+        #gets quiz object and adds quiz object to context_dict
         quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)
         context_dict['quiz'] = quiz
 
+        #gets all the questions for that quiz
         question_list = Question.objects.filter(quiz = quiz)
         dictOfQuestion={}
+
+        #for each question in the quiz, adds all the options to a temp dict
         for index, question in enumerate(question_list):
                 option_list = {Option.objects.filter(question=question_list[index])}
                 dictOfQuestion[question]=option_list
+
+        #adds the temp dict of questions and options to context_dict
         context_dict['questions']=dictOfQuestion
 
         return render(request, 'quiz.html', context=context_dict)
