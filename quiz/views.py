@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -11,9 +11,8 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from quiz.models import Class,Quiz,User,Character
+from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
 from quiz.forms import UserFormStudent, UserFormTeacher
-
 
 
 def about(request):
@@ -43,6 +42,26 @@ def dashboardStudent(request):
     #Getting the Class and Quiz objects to display
     class_list = Class.objects.all()
     context_dict["classes"] = class_list
+
+
+    ####### this is not working. I was trying to get the quiz that is due next however the code doesn't seem to be working ########
+    try:
+        quiz = Quiz.objects.get(course=class_list[0])
+        nextQuiz= quiz.due_date
+        for i in range(1,len(class_list)):
+            print(i)
+            temp_quiz = Quiz.objects.get(course=class_list[i])
+            if temp_quiz.due_date<nextQuiz:
+                quiz=temp_quiz
+        context_dict['nextQuiz']=quiz.due_date
+        context_dict['nextQuizObject']=quiz
+
+    except:
+        context_dict['nextQuiz']="You have no quizzes!"
+    print(context_dict)
+
+    ##########################################################
+
     # context_dict["quizes"] = quiz_list
 
     # prints out whether the method is a GET or a POST
@@ -53,6 +72,7 @@ def dashboardStudent(request):
     return render(request, 'dashboard-student.html', context=context_dict)
 
 def show_classStudent(request, class_name_slug):
+    print(class_name_slug)
     context_dict = {}
 
     # Gets all class objects
@@ -68,7 +88,7 @@ def show_classStudent(request, class_name_slug):
     try:
         #Getting relevant class object
         #Not using 'class' as keyword
-        classObj = Class.objects.get(slug=class_name_slug)
+        classObj = get_object_or_404(Class,slug=class_name_slug)
         context_dict['class'] = classObj
 
         #Getting relevant quiz object
@@ -96,7 +116,7 @@ def show_classTeacher(request, class_name_slug):
     try:
         #Getting relevant class object
         #Not using 'class' as keyword
-        classObj = Class.objects.get(slug=class_name_slug)
+        classObj = get_object_or_404(Class,slug=class_name_slug)
         context_dict['class'] = classObj
 
         #Getting relevant quiz object
@@ -107,6 +127,14 @@ def show_classTeacher(request, class_name_slug):
         context_dict['quizzes'] = None
         context_dict['class'] = None
     return render(request, 'classTeacher.html', context = context_dict)
+
+def preferences(request):
+    context_dict= {}
+    # prints out whether the method is a GET or a POST
+    print(request.method)
+    # prints out the user name, if no one is logged in it prints `AnonymousUser`
+    print(request.user)
+    return render(request, 'preferences.html', context=context_dict)
 
 @login_required
 def preferencesStudent(request):
@@ -212,6 +240,68 @@ def registerTeacher(request):
         user_form = UserFormTeacher()
 
     return render(request, 'register-teacher.html', context = {'user_form': user_form, 'registered': registered})
+
+
+#@login_required
+def quiz(request,class_name_slug=None,quiz_name_slug=None):
+
+    if request.method =='POST':
+        #gets quiz object
+        quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)
+        correctAnswers=0
+
+        #for each form response checks if answer is true
+        for key, value in request.POST.items():
+            if value =='True':
+                correctAnswers+=1
+
+        #Creates a new quiztaker object
+        quiz_taker= QuizTaker(user=request.user,quiz=quiz, correctAnswers=correctAnswers,is_completed=True,)
+        quiz_taker.save()
+
+        #calculates new user evolvescore
+        currentScore=request.user.evolveScore
+        newScore=correctAnswers+currentScore
+        request.user.evolveScore=newScore
+
+        #evolves character if points are equal or greater than points required and the user hasn't evolved already
+        if (newScore>=70 and request.user.character.evolutionStage!=3):
+            character= Character(characterType=request.user.character.characterType, can_change=request.user.character.characterType, evolutionStage=3)
+            character.save()
+            request.user.character=character
+        elif (newScore>=30 and request.user.character.evolutionStage!=2):
+            character= Character(characterType=request.user.character.characterType, can_change=request.user.character.characterType, evolutionStage=2)
+            character.save()
+            request.user.character=character
+        request.user.save()
+
+        #redirects user to student dashboard
+        return redirect(reverse('classStudent',kwargs={'class_name_slug':class_name_slug}))
+    else:
+        context_dict = {}
+
+        #gets class object and adds class object to context_dict
+        classObj = get_object_or_404(Class,slug=class_name_slug)
+        context_dict['class'] = classObj
+
+        #gets quiz object and adds quiz object to context_dict
+        quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)
+        context_dict['quiz'] = quiz
+
+        #gets all the questions for that quiz
+        question_list = Question.objects.filter(quiz = quiz)
+        dictOfQuestion={}
+
+        #for each question in the quiz, adds all the options to a temp dict
+        for index, question in enumerate(question_list):
+                option_list = {Option.objects.filter(question=question_list[index])}
+                dictOfQuestion[question]=option_list
+
+        #adds the temp dict of questions and options to context_dict
+        context_dict['questions']=dictOfQuestion
+
+        return render(request, 'quiz.html', context=context_dict)
+
 
 def user_login(request):
     context_dict = {}
