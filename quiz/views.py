@@ -12,7 +12,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
-#from quiz.forms import QuizTakingForm
+from quiz.forms import UserFormStudent, UserFormTeacher
 
 
 def about(request):
@@ -116,25 +116,105 @@ def preferences(request):
     print(request.user)
     return render(request, 'preferences.html', context=context_dict)
 
-#@login_required
+@login_required
 def preferencesStudent(request):
-    context_dict= {}
-    # prints out whether the method is a GET or a POST
-    print(request.method)
-    # prints out the user name, if no one is logged in it prints `AnonymousUser`
-    print(request.user)
-    return render(request, 'preferences-student.html', context=context_dict)
+    #if user is not a student, redirect them to the teachersPreferences
+    if request.user.is_student:
+        #get the user who sent the request
+        user = User.objects.get(email = request.user) 
+        #if its a post method then update the fields
+        if request.method == 'POST':
+            if request.POST['username']:
+                user.username = request.POST['username']
+            if request.POST['name']:
+                user.name = request.POST['name']
+            if 'email' in request.POST:
+                user.email = request.POST['email']
+            if request.POST['password']:
+                user.set_password(request.POST['password'])
+            if 'characterType' in request.POST:
+                user.character = Character.objects.get(characterType =request.POST['characterType'], evolutionStage = user.evolveScore)
+            user.save()
+            return redirect('dashboardStudent')
+        return render(request, 'preferences-student.html')
+    else:
+        return redirect('preferencesTeacher')
 
 @login_required
 def preferencesTeacher(request):
-    return render(request, 'preferences-teacher.html')
+    if request.user.is_teacher or request.user.is_staff:
+        user = User.objects.get(email = request.user) 
+        if request.method == 'POST':
+            if request.POST['username']:
+                user.username = request.POST['username']
+            if request.POST['name']:
+                user.name = request.POST['name']
+            if request.POST['email']:
+                user.email = request.POST['email']
+            if request.POST['password']:
+                user.set_password(request.POST['password'])
+            user.save()
+            return redirect('dashboardTeacher')
+        return render(request, 'preferences-teacher.html')
+    else:
+        return redirect('dashboardStudent')
+
+@login_required
+def user_logout(request):
+    # Since we know the user is logged in, we can now just log them out.
+    logout(request)
+    # Take the user back to the homepage.
+    return redirect('/')
 
 
 def registerStudent(request):
-    return render(request, 'register-student.html')
+    registered = False
+
+    # means they are trying to register so we have to save the data
+    if request.method == 'POST':
+
+        # grabs data from form
+        user_form = UserFormStudent(request.POST)
+
+        if user_form.is_valid():
+            # save the user's form data to the database
+            user = user_form.save()
+
+            # hash the password with the set_password method and update the user object
+            user.set_password(user.password)
+            user.save()
+
+            registered = True
+        else:
+            # invalid form, print error
+            print(user_form.errors)
+    else:
+        user_form = UserFormStudent()
+
+    return render(request, 'register-student.html', context = {'user_form': user_form, 'registered': registered})
+
 
 def registerTeacher(request):
-    return render(request, 'register-teacher.html')
+    registered = False
+
+    if request.method == 'POST':
+
+        user_form = UserFormTeacher(request.POST)
+
+        if user_form.is_valid():
+
+            user = user_form.save()
+
+            user.set_password(user.password)
+            user.save()
+
+            registered = True
+        else:
+            print(user_form.errors)
+    else:
+        user_form = UserFormTeacher()
+
+    return render(request, 'register-teacher.html', context = {'user_form': user_form, 'registered': registered})
 
 
 
@@ -182,13 +262,13 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
 def user_login(request):
     context_dict = {}
-    # If the request is a HTTP POST, try to pull out the relevant information.
+    # if post, means they are logging in
     if request.method == 'POST':
-        # get username and password from form
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
+
         # Django's auth
-        user = authenticate(username=username, password=password)
+        user = authenticate(email=email, password=password)
         # If there's a match
         if user:
             if user.is_active:
@@ -199,10 +279,9 @@ def user_login(request):
                 return render(request, 'index.html', context=context_dict)
         else:
             # Bad login details were provided
-            print(f"Invalid login details: {username}, {password}")
+            print(f"Invalid login details: {email}, {password}")
             context_dict['error'] = "Invalid login details supplied."
             return render(request, 'index.html', context=context_dict)
-    # The request is not a HTTP POST, so display the login form.
-    # This scenario would most likely be a HTTP GET.
+
     else:
         return render(request, 'index.html', context=context_dict)

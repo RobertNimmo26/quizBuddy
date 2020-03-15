@@ -33,5 +33,7 @@ urlpatterns = [ path('', views.user_login, name='index'),
                 path('registerTeacher/', views.registerTeacher, name='registerTeacher'),
                 path('dashboardStudent/classStudent/<slug:class_name_slug>/<slug:quiz_name_slug>/',views.quiz,name='quiz'),
                 path('preferences/', views.preferences, name='preferences'),
+                path('user_logout/',views.user_logout,name = 'user_logout'),
                 path('preferencesStudent/',views.preferencesStudent, name = 'preferencesStudent'),
+                path('preferencesTeacher/', views.preferencesTeacher, name = 'preferencesTeacher'),
 ]
