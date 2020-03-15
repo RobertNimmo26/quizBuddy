@@ -226,7 +226,10 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request, user)
-                return redirect(reverse('quiz:index'))
+                if user.is_student:
+                    return redirect('dashboardStudent')
+                else:
+                    redirect('dashboardTeacher')
             else:
                 context_dict['error'] = "Your account is disabled."
                 return render(request, 'index.html', context=context_dict)
