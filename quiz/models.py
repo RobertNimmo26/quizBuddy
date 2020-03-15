@@ -4,7 +4,6 @@ from django.contrib.auth.models import PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.template.defaultfilters import slugify
 from django.utils import timezone
-from django.template.defaultfilters import slugify
 
 from .managers import CustomUserManager
 
@@ -79,14 +78,14 @@ class Quiz(models.Model):
     description = models.CharField(max_length=255)
     due_date = models.DateTimeField(auto_now_add=False)
     question_count = models.IntegerField(default=0)
-
+    slug = models.SlugField(unique = True)
 
     def __str__(self):
         return self.name
 
-    # def save(self, *args, **kwargs):
-    #     self.slug = slugify(self.name)
-    #     super(Class, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.quizId)
+        super(Quiz, self).save(*args, **kwargs)
 
     class Meta:
         # Fix pluralization of model name
@@ -94,6 +93,7 @@ class Quiz(models.Model):
 
 # Question Model
 class Question(models.Model):
+    questionId = models.AutoField(primary_key=True,verbose_name=_("id"))
     text = models.CharField(max_length=50)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
 
@@ -102,6 +102,7 @@ class Question(models.Model):
 
 # Option Model
 class Option(models.Model):
+    optionId = models.AutoField(primary_key=True,verbose_name=_("id"))
     text = models.CharField(max_length=50)
     is_correct = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)

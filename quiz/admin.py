@@ -18,10 +18,10 @@ class QuizAdmin(admin.ModelAdmin):
     list_display = ('quizId', 'name', 'description', 'due_date')
 
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'quiz')
+    list_display = ('questionId','text', 'quiz')
 
 class OptionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'question', 'is_correct')
+    list_display = ('optionId','text', 'question', 'is_correct')
 
 # Register your models here.
 

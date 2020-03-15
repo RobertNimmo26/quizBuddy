@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -12,7 +12,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from quiz.models import Quiz, Question, Option, Class
-from quiz.forms import QuizTakingForm
+#from quiz.forms import QuizTakingForm
 
 
 def about(request):
@@ -36,7 +36,7 @@ def dashboardTeacher(request):
     print(request.user)
 
     return render(request, 'dashboard-teacher.html', context=context_dict)
-
+@login_required
 def dashboardStudent(request):
     context_dict = {}
     #Getting the Class and Quiz objects to display
@@ -50,7 +50,7 @@ def dashboardStudent(request):
     print(request.user)
 
     return render(request, 'dashboard-student.html', context=context_dict)
-
+@login_required
 def show_classStudent(request, class_name_slug):
     context_dict = {}
 
@@ -67,7 +67,7 @@ def show_classStudent(request, class_name_slug):
     try:
         #Getting relevant class object
         #Not using 'class' as keyword
-        classObj = Class.objects.get(slug=class_name_slug)
+        classObj = get_object_or_404(Class,slug=class_name_slug)
         context_dict['class'] = classObj
 
         #Getting relevant quiz object
@@ -95,7 +95,7 @@ def show_classTeacher(request, class_name_slug):
     try:
         #Getting relevant class object
         #Not using 'class' as keyword
-        classObj = Class.objects.get(slug=class_name_slug)
+        classObj = get_object_or_404(Class,slug=class_name_slug)
         context_dict['class'] = classObj
 
         #Getting relevant quiz object
@@ -106,6 +106,14 @@ def show_classTeacher(request, class_name_slug):
         context_dict['quizzes'] = None
         context_dict['class'] = None
     return render(request, 'classTeacher.html', context = context_dict)
+
+def preferences(request):
+    context_dict= {}
+    # prints out whether the method is a GET or a POST
+    print(request.method)
+    # prints out the user name, if no one is logged in it prints `AnonymousUser`
+    print(request.user)
+    return render(request, 'preferences.html', context=context_dict)
 
 #@login_required
 def preferencesStudent(request):
@@ -127,26 +135,25 @@ def registerStudent(request):
 def registerTeacher(request):
     return render(request, 'register-teacher.html')
 
-def quiz(request):
+def quiz(request,class_name_slug=None,quiz_name_slug=None):
+
     print(request)
     if request.method =='POST':
-        return render(request, 'about.html')
+        return render(request, 'classStudent.html')
     else:
-        # context_dict = {}
-        # countQuestions=0
-        # quiz = Quiz.objects.get(quizId = 1)
-        # question_list = Question.objects.filter(quiz = quiz)
-        # for question in question_list:
-        #     option_list = Option.objects.filter(question=question_list[index])
-        #     context_dict[question]=option_list
-        #     countQuestions+=1
-        # print(countQuestions)
-        
-
-
         context_dict = {}
-        form=QuizTakingForm()
-        context_dict["form"]=form
+        classObj = get_object_or_404(Class,slug=class_name_slug)
+        context_dict['class'] = classObj
+
+        quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)
+        context_dict['quiz'] = quiz
+
+        question_list = Question.objects.filter(quiz = quiz)
+        dictOfQuestion={}
+        for index, question in enumerate(question_list):
+                option_list = {Option.objects.filter(question=question_list[index])}
+                dictOfQuestion[question]=option_list
+        context_dict['questions']=dictOfQuestion
 
         return render(request, 'quiz.html', context=context_dict)
 

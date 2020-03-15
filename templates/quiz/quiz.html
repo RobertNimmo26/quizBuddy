@@ -19,16 +19,29 @@
 {% block body_block%}
     <div class="container">
     <h3>
-    {{form.formQuiz.value}}
-    <small class="text-muted"> {{form.count.value}} questions</small>
+    {{quiz.name}}
+    <small class="text-muted"> {{quiz.question_count}} questions</small>
     </h3>
-    
-    <form method="post" >
+
+    <form action="{% url 'quiz:submitquiz' %}" method="post">
         {% csrf_token%}
+        {% for question, questionValues in questions.items %}
 
-        {{form}}
-
-        <button type="submit" class="btn btn-primary">Submit</button>
+            <h4>{{question}}</h4>
+            <div class="form-group">
+                {% for options in questionValues %}
+                    {% for option in options %}
+                    <div class="form-check">
+                        <input class="form-check-input" id="{{option.optionId}}" type="radio" name={{question.questionId}} value={{option.is_correct}}>
+                        <label class="form-check-label" for={{ question.questionId }}>
+                            {{option.text}}
+                        </label> 
+                    </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary" formmethod="post" formaction="{% url 'quiz:submitquiz' %}">Submit</button>
     </form>
     </div>
 {% endblock %}
