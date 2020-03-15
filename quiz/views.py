@@ -42,6 +42,26 @@ def dashboardStudent(request):
     #Getting the Class and Quiz objects to display
     class_list = Class.objects.all()
     context_dict["classes"] = class_list
+
+
+    ####### this is not working. I was trying to get the quiz that is due next however the code doesn't seem to be working ########
+    try:
+        quiz = Quiz.objects.get(course=class_list[0])
+        nextQuiz= quiz.due_date
+        for i in range(1,len(class_list)):
+            print(i)
+            temp_quiz = Quiz.objects.get(course=class_list[i])
+            if temp_quiz.due_date<nextQuiz:
+                quiz=temp_quiz
+        context_dict['nextQuiz']=quiz.due_date
+        context_dict['nextQuizObject']=quiz
+
+    except:
+        context_dict['nextQuiz']="You have no quizzes!"
+    print(context_dict)
+
+    ##########################################################
+
     # context_dict["quizes"] = quiz_list
 
     # prints out whether the method is a GET or a POST
@@ -222,7 +242,7 @@ def registerTeacher(request):
     return render(request, 'register-teacher.html', context = {'user_form': user_form, 'registered': registered})
 
 
-@login_required
+#@login_required
 def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
     if request.method =='POST':
