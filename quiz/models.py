@@ -1,11 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.template.defaultfilters import slugify
 from django.utils import timezone
-from django.template.defaultfilters import slugify
-
 from .managers import CustomUserManager
 
 
@@ -48,7 +45,7 @@ class Class(models.Model):
     name = models.CharField(_("name"), max_length=50)
     teacher = models.ManyToManyField("User", verbose_name=_("teacher"),related_name="teachers")
     student = models.ManyToManyField("User", verbose_name=_("student"),related_name="students")
-    slug = models.SlugField(unique = True,null = True, blank = True)
+    slug = models.SlugField(unique = True)
 
     def get_teachers(self):
         return ",".join([str(t) for t in self.teacher.all()])

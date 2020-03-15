@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from quiz.models import Class,Quiz,User
+from quiz.models import Class,Quiz,User,Character
 from quiz.forms import UserFormStudent, UserFormTeacher
 
 
@@ -108,33 +108,55 @@ def show_classTeacher(request, class_name_slug):
         context_dict['class'] = None
     return render(request, 'classTeacher.html', context = context_dict)
 
-#@login_required
+@login_required
 def preferencesStudent(request):
-    context_dict= {}
-    # prints out whether the method is a GET or a POST
-    print(request.method)
-    # prints out the user name, if no one is logged in it prints `AnonymousUser`
-    print(request.user)
-    context_dict['username'] = request.user
-    if request.user.is_student == False:
-        return render (request, 'preferences-teacher.html')
-    return render(request, 'preferences-student.html', context=context_dict)
+    #if user is not a student, redirect them to the teachersPreferences
+    if request.user.is_student:
+        #get the user who sent the request
+        user = User.objects.get(email = request.user) 
+        #if its a post method then update the fields
+        if request.method == 'POST':
+            if request.POST['username']:
+                user.username = request.POST['username']
+            if request.POST['name']:
+                user.name = request.POST['name']
+            if 'email' in request.POST:
+                user.email = request.POST['email']
+            if request.POST['password']:
+                user.set_password(request.POST['password'])
+            if 'characterType' in request.POST:
+                user.character = Character.objects.get(characterType =request.POST['characterType'], evolutionStage = user.evolveScore)
+            user.save()
+            return redirect('dashboardStudent')
+        return render(request, 'preferences-student.html')
+    else:
+        return redirect('preferencesTeacher')
 
 @login_required
 def preferencesTeacher(request):
-    user = User.objects.get(email = request.user) 
-
-    if request.method == 'POST':
-        if request.POST['username']:
-            user.username = request.POST['username']
-        if request.POST['name']:
-            user.name = request.POST['name']
-        if request.POST['email']:
-            user.email = request.POST['email']
-        if request.POST['password']:
-            user.password = request.POST['password']
-        user.save()
+    if request.user.is_teacher or request.user.is_staff:
+        user = User.objects.get(email = request.user) 
+        if request.method == 'POST':
+            if request.POST['username']:
+                user.username = request.POST['username']
+            if request.POST['name']:
+                user.name = request.POST['name']
+            if request.POST['email']:
+                user.email = request.POST['email']
+            if request.POST['password']:
+                user.set_password(request.POST['password'])
+            user.save()
+            return redirect('dashboardTeacher')
         return render(request, 'preferences-teacher.html')
+    else:
+        return redirect('dashboardStudent')
+
+@login_required
+def user_logout(request):
+    # Since we know the user is logged in, we can now just log them out.
+    logout(request)
+    # Take the user back to the homepage.
+    return redirect('/')
 
 
 def registerStudent(request):
