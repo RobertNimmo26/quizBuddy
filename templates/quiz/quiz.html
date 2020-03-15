@@ -23,7 +23,7 @@
     <small class="text-muted"> {{quiz.question_count}} questions</small>
     </h3>
 
-    <form action="{% url 'quiz:submitquiz' %}" method="post">
+    <form action="{% url 'quiz' class.slug quiz.slug %}" method="post">
         {% csrf_token%}
         {% for question, questionValues in questions.items %}
 
@@ -41,7 +41,7 @@
                 {% endfor %}
             </div>
         {% endfor %}
-        <button type="submit" class="btn btn-primary" formmethod="post" formaction="{% url 'quiz:submitquiz' %}">Submit</button>
+        <button type="submit" class="btn btn-primary" formmethod="post" formaction="{% url 'quiz' class.slug quiz.slug %}">Submit</button>
     </form>
     </div>
 {% endblock %}

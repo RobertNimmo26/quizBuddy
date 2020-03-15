@@ -116,7 +116,7 @@ class QuizTaker(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     correctAnswers = models.IntegerField(default=0)
     is_completed = models.BooleanField(default=False)
-    timestamp = models.DateTimeField()
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user

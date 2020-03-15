@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from quiz.models import Quiz, Question, Option, Class
+from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
 #from quiz.forms import QuizTakingForm
 
 
@@ -36,7 +36,7 @@ def dashboardTeacher(request):
     print(request.user)
 
     return render(request, 'dashboard-teacher.html', context=context_dict)
-@login_required
+
 def dashboardStudent(request):
     context_dict = {}
     #Getting the Class and Quiz objects to display
@@ -50,8 +50,9 @@ def dashboardStudent(request):
     print(request.user)
 
     return render(request, 'dashboard-student.html', context=context_dict)
-@login_required
+
 def show_classStudent(request, class_name_slug):
+    print(class_name_slug)
     context_dict = {}
 
     # Gets all class objects
@@ -135,11 +136,32 @@ def registerStudent(request):
 def registerTeacher(request):
     return render(request, 'register-teacher.html')
 
-def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
+
+def quiz(request,class_name_slug=None,quiz_name_slug=None):
+    #print(request.user)
     print(request)
     if request.method =='POST':
-        return render(request, 'classStudent.html')
+        quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)
+        correctAnswers=0
+        for key, value in request.POST.items():
+            if value =='True':
+                correctAnswers+=1
+        quiz_taker= QuizTaker(user=request.user,quiz=quiz, correctAnswers=correctAnswers,is_completed=True,)
+        quiz_taker.save()
+        currentScore=request.user.evolveScore
+        newScore=correctAnswers+currentScore
+        request.user.evolveScore=newScore
+        if (newScore>=70 and request.user.character.evolutionStage!=3):
+            character= Character(characterType=request.user.character.characterType, can_change=request.user.character.characterType, evolutionStage=3)
+            character.save()
+            request.user.character=character
+        elif (newScore>=30 and request.user.character.evolutionStage!=2):
+            character= Character(characterType=request.user.character.characterType, can_change=request.user.character.characterType, evolutionStage=2)
+            character.save()
+            request.user.character=character
+        request.user.save()
+        return redirect(reverse('classStudent',kwargs={'class_name_slug':class_name_slug}))
     else:
         context_dict = {}
         classObj = get_object_or_404(Class,slug=class_name_slug)
