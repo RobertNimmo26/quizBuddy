@@ -13,31 +13,162 @@ from django.urls import reverse
 
 from quiz.forms import UserFormStudent, UserFormTeacher
 
+from quiz.models import Class
+from quiz.models import Quiz
+from quiz.models import User
+
+
 
 
 def about(request):
+
+    #print(request.user.teachers.all())
+    #Class.objects.filter(name="Computing").get().teacher.add(User.objects.filter(name="hihi").get())
+    print(Class.objects.filter(name="Computing").get().get_students())
     context_dict= {}
     # prints out whether the method is a GET or a POST
     print(request.method)
+    print(Class.objects.filter(name="Computing").get().classId)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
-    print(request.user)
+    #print(request.user)
     return render(request, 'about.html', context=context_dict)
 
-def dashboardStudent(request):
-    context_dict= {}
+def dashboardTeacher(request):
+    context_dict = {}
+    #Getting the Class and Quiz objects to display
+    class_list = Class.objects.all()
+    context_dict["classes"] = class_list
+    # context_dict["quizes"] = quiz_list
+
     # prints out whether the method is a GET or a POST
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
+
+    return render(request, 'dashboard-teacher.html', context=context_dict)
+
+def dashboardStudent(request):
+    context_dict = {}
+    #Getting the Class and Quiz objects to display
+    class_list = Class.objects.all()
+    context_dict["classes"] = class_list
+    # context_dict["quizes"] = quiz_list
+
+    # prints out whether the method is a GET or a POST
+    print(request.method)
+    # prints out the user name, if no one is logged in it prints `AnonymousUser`
+    print(request.user)
+
     return render(request, 'dashboard-student.html', context=context_dict)
 
-def dashboardTeacher(request):
-    context_dict= {}
+def manageStudent(request):
+    context_dict = {}
+    class_list = {}
+    #Getting the Class and Quiz objects to display
+    for teacher_class in Class.objects.all():
+        student_names = []
+        class_name = teacher_class
+        print(teacher_class)
+        for student in teacher_class.teacher.all():
+            student_names.append(student.name)
+        class_list[class_name] = student_names
+    context_dict["classes"] = class_list
+
+
+    print(context_dict)
+    context_dict["hasClasses"] = bool(context_dict)
+    # context_dict["quizes"] = quiz_list
+
     # prints out whether the method is a GET or a POST
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
-    return render(request, 'dashboard-teacher.html', context=context_dict)
+
+    return render(request, 'manage-student.html', context=context_dict)
+
+def classList(request, class_name_slug):
+    context_dict = {}
+
+    # Gets all class objects
+    class_list = Class.objects.all()
+    context_dict["classes"] = class_list
+
+    # prints out whether the method is a GET or a POST
+    print(request.method)
+    # prints out the user name, if no one is logged in it prints `AnonymousUser`
+    print(request.user)
+
+    #Try loop to get all information about class and quiz objects
+    try:
+        #Getting relevant class object
+        #Not using 'class' as keyword
+        classObj = Class.objects.get(slug=class_name_slug)
+        context_dict['class'] = classObj
+
+        #Getting relevant quiz object
+        students = classObj.student.all()
+        context_dict['students'] = students
+
+    except Class.DoesNotExist:
+        context_dict['students'] = None
+        context_dict['class'] = None
+    return render(request, 'classList.html', context = context_dict)
+
+def show_classStudent(request, class_name_slug):
+    context_dict = {}
+
+    # Gets all class objects
+    class_list = Class.objects.all()
+    context_dict["classes"] = class_list
+
+    # prints out whether the method is a GET or a POST
+    print(request.method)
+    # prints out the user name, if no one is logged in it prints `AnonymousUser`
+    print(request.user)
+
+    #Try loop to get all information about class and quiz objects
+    try:
+        #Getting relevant class object
+        #Not using 'class' as keyword
+        classObj = Class.objects.get(slug=class_name_slug)
+        context_dict['class'] = classObj
+
+        #Getting relevant quiz object
+        quizzes = Quiz.objects.filter(course = classObj)
+        context_dict['quizzes'] = quizzes
+
+    except Class.DoesNotExist:
+        context_dict['quizzes'] = None
+        context_dict['class'] = None
+    return render(request, 'classStudent.html', context = context_dict)
+
+def show_classTeacher(request, class_name_slug):
+    context_dict = {}
+
+    # Gets all class objects
+    class_list = Class.objects.all()
+    context_dict["classes"] = class_list
+
+    # prints out whether the method is a GET or a POST
+    print(request.method)
+    # prints out the user name, if no one is logged in it prints `AnonymousUser`
+    print(request.user)
+
+    #Try loop to get all information about class and quiz objects
+    try:
+        #Getting relevant class object
+        #Not using 'class' as keyword
+        classObj = Class.objects.get(slug=class_name_slug)
+        context_dict['class'] = classObj
+
+        #Getting relevant quiz object
+        quizzes = Quiz.objects.filter(course = classObj)
+        context_dict['quizzes'] = quizzes
+
+    except Class.DoesNotExist:
+        context_dict['quizzes'] = None
+        context_dict['class'] = None
+    return render(request, 'classTeacher.html', context = context_dict)
 
 def preferences(request):
     context_dict= {}
