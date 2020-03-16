@@ -1,21 +1,19 @@
 from django import forms
-from django.forms import formset_factory
-from quiz.models import Question, Quiz, Option
+from .models import User
 
-class questionForm(forms.ModelForm):
-    questionName = forms.CharField(max_length=50, required=True)
+#took out character (and related lines) for now as im still not sure how we're gonna do it (and also the radiobuttons are ugly af so)
+class UserFormStudent(forms.ModelForm):
+    #CHAR_CHOICES =(("1", "Char1"), ("2", "Char2"), ("3", "Char3"))
+    password = forms.CharField(widget=forms.PasswordInput())
+    #character = forms.ChoiceField(widget=forms.RadioSelect(), choices=CHAR_CHOICES)
+    is_student = forms.CharField(widget=forms.HiddenInput(), initial=True)
+    class Meta:
+        model = User
+        fields = ('username', 'name', 'email', 'password', 'is_student')
 
-class quizForm(forms.ModelForm):
-    name = forms.CharField(max_length=50, required=True)
-    description = forms.CharField(max_length=255, required=False)
-    due_date = forms.DateTimeField(required=True)
-    question_count = forms.IntegerField(default=0)
-   
+class UserFormTeacher(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput(), required=False, initial=True)
+    is_teacher = forms.CharField(widget=forms.HiddenInput(), initial=True)
     class Meta:
-       model = Quiz
-       fields = ('name', 'description', 'due_date')
-       
-class quizCreationForm(forms.ModelForm):
-    class Meta:
-        model = Quiz
-        fields = ()
+        model = User
+        fields = ('username', 'name', 'email', 'password', 'is_teacher')

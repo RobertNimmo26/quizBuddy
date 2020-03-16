@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static%}
+
+{% block title_block %}
+        Preferences
+{% endblock %}
+
+{% block header_buttons %}
+  <a href={% url 'dashboardStudent' %} class="btn btn-quizBuddy-4 mr-2" role="button">Dashboard</a>
+  <a href={% url 'user_logout' %} class="btn btn-quizBuddy-4 mr-2" role="button">Logout</a>
+{% endblock %}
+
+{% block body_block%}
+    <div class="container">
+        <h1>Edit Profile</h1>
+        <div class="col-md-9 personal-info">
+          <form class="form-horizontal" method = 'post' action = "." onsubmit="alert('Changes Saved Successfully');" role="form"> 
+           {%csrf_token%}
+            <div class="row">
+              <div class="col-md-3">
+                <div class="text-center">
+                  <h3>Hi {{user.name}} :)</h3>
+                    <img src = "{%static 'images/character/characterProfileLev1.jpg'%}" class="avatar img-circle" alt="avatar">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">Full Name:</label>
+            <div class="col-md-8">
+              <input class="form-control" type="text"  name = "name" value="{{user.name}}">
+            </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-3 control-label">Email:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" name = "email" value="{{user.email}}">
+            </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">Username:</label>
+            <div class="col-md-8">
+              <input class="form-control" type="text" name = "username" value="{{user.username}}">
+            </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-3 control-label">New Password:</label>
+            <div class="col-md-8">
+              <input class="form-control" name = "password" type="password" value="">
+            </div>
+        </div>
+        <div class="form-group">
+          <label class="col-lg-3 control-label">Change Character:</label>
+            <div class="col-lg-8">
+              <label class = "radio-inline" for="characterType1">
+                <input type="radio" id="1" name="characterType" value="1">
+                <img src = "{%static 'images/character/characterProfileLev1.jpg'%}"/>
+              </label>
+              <label class = "radio-inline" for="characterType2">
+                <input type="radio" id="2" name="characterType" value="2">
+                <img src = "{%static 'images/character/characterProfileLev2.jpg'%}"/>
+              </label>
+              <label class = "radio-inline" for="characterType3">
+                <input type="radio" id="3" name="characterType" value="3">
+                <img src = "{%static 'images/character/characterProfileLev3.jpg'%}"/>
+              </label>          
+            </div>
+        </div>
+          <div class="form-group">
+            <label class="col-md-3 control-label"></label>
+              <div class="col-md-8">
+                <input type="submit" class="btn btn-primary" value="Save Changes">
+                <span></span>
+                <input type="reset" class="btn btn-default" value="Cancel">
+              </div>
+          </div>
+        </form>
+        </div>
+    </div>
+{%endblock%}

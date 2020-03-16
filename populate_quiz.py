@@ -3,9 +3,38 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE','quiz_buddy.settings')
 import django
 django.setup()
 from django.utils import timezone
-from quiz.models import Class, Quiz, Question, Option
+from quiz.models import Character,User,Class, Quiz, Question, Option
+from quiz.managers import CustomUserManager
 
 def populate():
+    #CREATE USERS AND CHARACTERS
+    #------------------------------------------------------------------------------------------------------------------------------------
+
+    student_users = {'Alice':{'email':'alice@test.com', 'username':'alice9','password':'12364','is_student':True, 'character':1,'evolve_score':2},
+     'Tom':{'email':'tom@test.com', 'username':'tom','password':'password','is_student':True,'character':2,'evolve_score':3}}
+
+    teacher_users = {'David':{'email':'david@staff.com', 'username':'david','password':'2856','is_teacher':True,'is_staff':True},
+     'Anna':{'email':'anna@testteacher.com', 'username':'anna','password':'anna123','is_teacher':True,'is_staff':True}}
+
+    admin_user = {'Tania':{'email':'tania@admin.com','password':'hello'},
+     'Jim':{'email':'jim@admin.com','password':'bye'}}
+
+    characters = [{'type':1,'evolutionStage':1},{'type':1,'evolutionStage':2},{'type':1,'evolutionStage':3},
+    {'type':2,'evolutionStage':1},{'type':2,'evolutionStage':2},{'type':2,'evolutionStage':3},
+    {'type':3,'evolutionStage':1},{'type':3,'evolutionStage':2},{'type':3,'evolutionStage':3}]
+
+    for c in characters:
+        add_character(c['type'],c['evolutionStage'])
+
+    for s, s_data in student_users.items():
+        add_student(s,s_data['username'],s_data['email'],s_data['password'],s_data['is_student'],s_data['character'],s_data['evolve_score'])
+    
+    for t, t_data in teacher_users.items():
+        add_teacher(t,t_data['username'],t_data['email'],t_data['password'],t_data['is_teacher'],t_data['is_staff'])
+
+    for a, a_data in admin_user.items():
+        add_admin(a_data['email'],a_data['password'],a)
+
     
     #CREATE CLASSES AND ADD QUIZZES TO THE CLASSES
     #------------------------------------------------------------------------------------------------------------------------------------
@@ -46,7 +75,7 @@ def populate():
     {'text':'What symbol is used in Java for "AND"',
     'options':[{'text':'$$','is_correct':False},{'text':'&&','is_correct':True},{'text':'&','is_correct':False}]},
     {'text':'Which symbol is used to denote single line comments in Python',
-    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False},{'text':'\','is_correct':False}]}]
+    'options':[{'text':'#','is_correct':True},{'text':'@@','is_correct':False},{'text':'\\','is_correct':False}]}]
 
     psych_basics = [{'text': 'Pavlov is famous for conducting experiments on ?',
     'options':[{'text': 'Birds','is_correct': False},{'text':'Rats','is_correct':False},{'text':'Dogs','is_correct':True}]},
@@ -55,9 +84,10 @@ def populate():
     {'text':'The first step of classical conditioning is pairing a neutral stimulus with an _____ stimulus.',
     'options':[{'text':'Conditioned','is_correct':False},{'text':'Unconditioned','is_correct':True},{'text':'Novel','is_correct':False}]},
     {'text':'What is the main difference between a psychologist and a psychiatrist?',
-    'options':[{'text':'A psychiatrist is classified as a medical doctor','is_correct':True},{'text':'A pschologist only holds Associate Degree','is_correct':False}]},
+    'options':[{'text':'A psychiatrist is classified as a medical doctor','is_correct':True},
+    {'text':'A pschologist only holds Associate Degree','is_correct':False},{'text':'Both are the same','is_correct':False}]},
     {'text':'Psychology is the study of mind and ____',
-    'options':[{'text':'behaviour','is_correct':True},{'text':'body','is_correct':False}]}]
+    'options':[{'text':'behaviour','is_correct':True},{'text':'body','is_correct':False},{'text':'Dont Know','is_correct':False}]}]
 
     quiz__ques = {'MCQSet1':{'questions':questions1},'MCQSet2':{'questions':questions2},
     'Programming':{'questions':programming},'Psych-Basics':{'questions':psych_basics}}
@@ -68,20 +98,66 @@ def populate():
             for opt in q['options']:
                 add_option(q,opt['text'],opt['is_correct'])
 
+    #PRINT
+    #----------------------------------------------------------------------------------------------------------------------------------
+    print('\nAdmins')
+    print('--------------------')
+    for admin in User.objects.filter(is_superuser = True):
+        print(f'{admin.name}:{admin}')
+
+    print('\nTeachers')
+    print('--------------------')
+    for teacher in User.objects.filter(is_teacher = True):
+        print(f'{teacher.name}:{teacher}')
+
+    print('\nCharacters...')
+    print('--------------------')
+    for charac in Character.objects.all():
+        print(f' Character:{charac} Evolution Stage:{charac.evolutionStage}')
+
+    print('\nStudents')
+    print('--------------------')
+    for student in User.objects.filter(is_student = True):
+        print(f'Name:{student.name} Email:{student} CharacterType:{student.character} EvolutionStage:{student.evolveScore}')
+
+    print('\nCourses and Quizzes')
+    print('--------------------')
+
     # Print out the classes we have added.
     for c in Class.objects.all():
         for q in Quiz.objects.filter(course=c):
-            print(f'{c}: {q}')
+            print(f'\nCourse: {c}: Quiz: {q}')
+            print('-----------------')
             for ques in Question.objects.filter(quiz = q):
-                print(f'-:{ques}')
+                print(f'Question: {ques}')
                 for opt in Option.objects.filter(question = ques):
-                    print(f'--:{opt}')
+                    print(f'  Option: {opt}')
+
+    #-----------------------------------------------------------------------------------------------------------------------------------
+
+def add_student(name,username,email,password,is_student,charac,evol_score):
+    charact = Character.objects.get(characterType = charac,evolutionStage = evol_score)
+    u = User.objects.create_user(email = email, password = password, name = name,
+                                                username = username,is_student = is_student,character = charact,evolveScore = evol_score )
+    u.save()
+    return u
+
+def add_teacher(name,username,email,password,is_teacher,is_staff):
+    u = User.objects.create_user(email = email, password = password, name = name,
+                                                username = username, is_teacher = is_teacher, is_staff = is_staff )
+    u.save()
+    return u
+
+def add_admin(email,password,name):
+    admin = User.objects.create_superuser(email = email,password = password, name = name)
+    admin.save()
+    return admin
 
 
 def add_class(name):
     c = Class.objects.get_or_create(name=name)[0]
     c.save()
-    return c 
+    return c
 
 def add_quiz(c,name,desc,ques_count):
     date_time = timezone.now() + timezone.timedelta(days=3)
@@ -101,6 +177,11 @@ def add_option(ques,text,is_correct):
     opt = Option.objects.get_or_create(question = get_ques, text = text, is_correct = is_correct)[0]
     opt.save()
     return opt
+
+def add_character(charac_type, evolStage ):
+    charac = Character.objects.get_or_create(characterType= charac_type, evolutionStage = evolStage)[0]
+    charac.save()
+    return charac
 
 if __name__ == '__main__':
     print('Starting Quiz population script...')
