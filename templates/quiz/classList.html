@@ -1,0 +1,28 @@
+{% extends "dashboard-Teacher.html" %}
+
+{% block classTitle %}
+    {{ class.name }}
+{% endblock %}
+
+{% block classBodyBlock %}
+    <div class="container">
+    {% if students %}
+        {% for student in students %}
+            <div class="row mt-5 mr-1 ml-3">
+                <div class="col -3">
+                    <a href="#" class="btn btn-primary mr-2">{{ student.name }}</a>
+
+                    <button class="btn btn-quizBuddy-1 mr-2" type="button" onclick="window.location.href='#'">{{ student.name }}</button>
+                </div>
+                <div class="col -3">
+
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-danger mt-1 mr-1 ml-3" role="alert">
+            {{ class.name }} does not have any quizzes yet, click the create quiz button to add one.
+        </div>
+    {% endif %}
+    </div>
+{% endblock %}

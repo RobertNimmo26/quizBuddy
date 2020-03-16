@@ -28,14 +28,14 @@ def populate():
 
     for s, s_data in student_users.items():
         add_student(s,s_data['username'],s_data['email'],s_data['password'],s_data['is_student'],s_data['character'],s_data['evolve_score'])
-    
+
     for t, t_data in teacher_users.items():
         add_teacher(t,t_data['username'],t_data['email'],t_data['password'],t_data['is_teacher'],t_data['is_staff'])
 
     for a, a_data in admin_user.items():
         add_admin(a_data['email'],a_data['password'],a)
 
-    
+
     #CREATE CLASSES AND ADD QUIZZES TO THE CLASSES
     #------------------------------------------------------------------------------------------------------------------------------------
     math_quiz = [{'name':'MCQSet1', 'description':'A quiz that covers basic arithmetic operations','question_count':3},
