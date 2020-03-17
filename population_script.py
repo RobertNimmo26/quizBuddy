@@ -162,8 +162,9 @@ def add_class(name):
 def add_quiz(c,name,desc,ques_count):
     date_time = timezone.now() + timezone.timedelta(days=3)
     q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)[0]
-    q.course.add(c)
     q.save()
+    q.course.add(c)
+
     return q
 
 def add_ques(q,text):
