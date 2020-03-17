@@ -37,6 +37,20 @@ def dashboardTeacher(request):
 
     return render(request, 'dashboard-teacher.html', context=context_dict)
 
+def nextQuiz(class_list):
+    try:
+        quizzes = []
+        for c in class_list:
+            for q in Quiz.objects.filter(course = c):
+                quizzes.append(q)
+        nextQuiz = quizzes[0].due_date
+        for quiz in quizzes:
+            if quiz.due_date < nextQuiz:
+                nextQuiz = quiz.due_date
+        return nextQuiz
+    except:
+        return "You have no quizzes!"
+
 def dashboardStudent(request):
     context_dict = {}
     #Getting the Class and Quiz objects to display
@@ -45,19 +59,7 @@ def dashboardStudent(request):
 
 
     ####### this is not working. I was trying to get the quiz that is due next however the code doesn't seem to be working ########
-    try:
-        quiz = Quiz.objects.get(course=class_list[0])
-        nextQuiz= quiz.due_date
-        for i in range(1,len(class_list)):
-            print(i)
-            temp_quiz = Quiz.objects.get(course=class_list[i])
-            if temp_quiz.due_date<nextQuiz:
-                quiz=temp_quiz
-        context_dict['nextQuiz']=quiz.due_date
-        context_dict['nextQuizObject']=quiz
-
-    except:
-        context_dict['nextQuiz']="You have no quizzes!"
+    context_dict['nextQuiz']=nextQuiz(class_list)
     print(context_dict)
 
     ##########################################################
@@ -68,7 +70,7 @@ def dashboardStudent(request):
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
-
+    print(context_dict)
     return render(request, 'dashboard-student.html', context=context_dict)
 
 def manageStudent(request):
@@ -147,6 +149,9 @@ def show_classStudent(request, class_name_slug):
         #Getting relevant quiz object
         quizzes = Quiz.objects.filter(course = classObj)
         context_dict['quizzes'] = quizzes
+
+        class_list = Class.objects.all()
+        context_dict['nextQuiz']=nextQuiz(class_list)
 
     except Class.DoesNotExist:
         context_dict['quizzes'] = None
@@ -260,6 +265,8 @@ def registerStudent(request):
 
             # hash the password with the set_password method and update the user object
             user.set_password(user.password)
+
+            user.is_student=True
             user.save()
 
             registered = True
@@ -284,6 +291,8 @@ def registerTeacher(request):
             user = user_form.save()
 
             user.set_password(user.password)
+
+            user.is_teacher=True
             user.save()
 
             registered = True
@@ -329,7 +338,7 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
         request.user.save()
 
         #redirects user to student dashboard
-        return redirect(reverse('classStudent',kwargs={'class_name_slug':class_name_slug}))
+        return redirect(reverse('dashboardStudent'))
     else:
         context_dict = {}
 
@@ -370,7 +379,7 @@ def user_login(request):
             if user.is_active:
                 login(request, user)
                 if user.is_student:
-                    return redirect('dashboardStudent')
+                    return redirect(reverse('dashboardStudent'))
                 else:
                     return redirect('dashboardTeacher')
             else:
