@@ -6,14 +6,14 @@ class UserFormStudent(forms.ModelForm):
     #CHAR_CHOICES =(("1", "Char1"), ("2", "Char2"), ("3", "Char3"))
     password = forms.CharField(widget=forms.PasswordInput())
     #character = forms.ChoiceField(widget=forms.RadioSelect(), choices=CHAR_CHOICES)
-    is_student = forms.CharField(widget=forms.HiddenInput(), initial=True)
+    #is_student = forms.BooleanField(widget=forms.HiddenInput(), initial=True)
     class Meta:
         model = User
-        fields = ('username', 'name', 'email', 'password', 'is_student')
+        fields = ('username', 'name', 'email', 'password')
 
 class UserFormTeacher(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput(), required=False, initial=True)
-    is_teacher = forms.CharField(widget=forms.HiddenInput(), initial=True)
+    password = forms.CharField(widget=forms.PasswordInput(), initial=True)
+    #is_teacher = forms.BooleanField(widget=forms.HiddenInput(),required=False, initial=True)
     class Meta:
         model = User
-        fields = ('username', 'name', 'email', 'password', 'is_teacher')
+        fields = ('username', 'name', 'email', 'password')

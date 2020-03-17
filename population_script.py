@@ -1,4 +1,5 @@
-import os
+﻿import os
+import random
 os.environ.setdefault('DJANGO_SETTINGS_MODULE','quiz_buddy.settings')
 import django
 django.setup()
@@ -160,10 +161,13 @@ def add_class(name):
     return c
 
 def add_quiz(c,name,desc,ques_count):
-    date_time = timezone.now() + timezone.timedelta(days=3)
+    randomDay=random.randint(100,500)
+    date_time = timezone.now() + timezone.timedelta(days=randomDay)
+    print (date_time)
     q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)[0]
-    q.course.add(c)
     q.save()
+    q.course.add(c)
+
     return q
 
 def add_ques(q,text):
@@ -186,9 +190,3 @@ def add_character(charac_type, evolStage ):
 if __name__ == '__main__':
     print('Starting Quiz population script...')
     populate()
-
-
-#REFERENCES
-#------------------------------------------------------------------------------------------------------------------------------------
-#Questions for psychology quiz taken from:
-#https://quizpug.com. (2020). Can You Answer 12 Basic Psychology Questions?. [online] Available at: https://quizpug.com/can-you-answer-12-basic-psychology-questions/ [Accessed 7 Mar. 2020].
