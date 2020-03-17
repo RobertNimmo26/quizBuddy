@@ -36,6 +36,21 @@
 
       <!-- Provide a button to click to submit the form. -->
       <br>
+      {% if user_form.errors %}
+      <!-- Error messaging -->
+      <div id="errors">
+        <div class="inner">
+          <p>There were some errors in the information you entered. Please correct the following:</p>
+          {{ user_form.non_field_errors }}
+          <ul>
+            {% for field in user_form %}
+              {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <!-- /Error messaging -->
+      {% endif %}
       <input type="submit" name="submit" value="Register" />
     </form>
     {% endif %}

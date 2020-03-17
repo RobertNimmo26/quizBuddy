@@ -37,14 +37,7 @@ def dashboardTeacher(request):
 
     return render(request, 'dashboard-teacher.html', context=context_dict)
 
-def dashboardStudent(request):
-    context_dict = {}
-    #Getting the Class and Quiz objects to display
-    class_list = Class.objects.all()
-    context_dict["classes"] = class_list
-
-
-    ####### this is not working. I was trying to get the quiz that is due next however the code doesn't seem to be working ########
+def nextQuiz(class_list):
     try:
         quizzes = []
         for c in class_list:
@@ -54,9 +47,19 @@ def dashboardStudent(request):
         for quiz in quizzes:
             if quiz.due_date < nextQuiz:
                 nextQuiz = quiz.due_date
-        context_dict['nextQuiz'] = nextQuiz
+        return nextQuiz
     except:
-        context_dict['nextQuiz']="You have no quizzes!"
+        return "You have no quizzes!"
+
+def dashboardStudent(request):
+    context_dict = {}
+    #Getting the Class and Quiz objects to display
+    class_list = Class.objects.all()
+    context_dict["classes"] = class_list
+
+
+    ####### this is not working. I was trying to get the quiz that is due next however the code doesn't seem to be working ########
+    context_dict['nextQuiz']=nextQuiz(class_list)
     print(context_dict)
 
     ##########################################################
@@ -94,21 +97,8 @@ def show_classStudent(request, class_name_slug):
         quizzes = Quiz.objects.filter(course = classObj)
         context_dict['quizzes'] = quizzes
 
-        #try:
-        quiz = Quiz.objects.get(course=class_list[0])
-        nextQuiz= quiz.due_date
-        for i in range(1,len(class_list)):
-            print(i)
-            temp_quiz = Quiz.objects.get(course=class_list[i])
-            print(temp_quiz.due_date)
-            print(nextQuiz)
-            # if temp_quiz.due_date<nextQuiz:
-            #     quiz=temp_quiz
-        context_dict['nextQuiz']=quiz.due_date
-        context_dict['nextQuizObject']=quiz
-        # except:
-        #     context_dict['nextQuiz']="You have no quizzes!"
-        print(context_dict)
+        class_list = Class.objects.all()
+        context_dict['nextQuiz']=nextQuiz(class_list)
 
     except Class.DoesNotExist:
         context_dict['quizzes'] = None
@@ -222,6 +212,8 @@ def registerStudent(request):
 
             # hash the password with the set_password method and update the user object
             user.set_password(user.password)
+
+            user.is_student=True
             user.save()
 
             registered = True
@@ -246,6 +238,8 @@ def registerTeacher(request):
             user = user_form.save()
 
             user.set_password(user.password)
+
+            user.is_teacher=True
             user.save()
 
             registered = True
