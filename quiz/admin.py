@@ -12,16 +12,16 @@ class QuizTakerAdmin(admin.ModelAdmin):
     list_display = ('correctAnswers','is_completed')
 
 class CharacterAdmin(admin.ModelAdmin):
-    list_display = ('characterType','evolutionStage')
+    list_display = ('characterType','evolutionStage','can_change')
 
 class QuizAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'due_date')
+    list_display = ('quizId', 'name', 'description', 'due_date')
 
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'quiz')
+    list_display = ('questionId','text', 'quiz')
 
 class OptionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'question', 'is_correct')
+    list_display = ('optionId','text', 'question', 'is_correct')
 
 # Register your models here.
 
