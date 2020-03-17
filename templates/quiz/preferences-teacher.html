@@ -11,10 +11,18 @@
 
 {% block body_block%}
 <div class="container">
-    <div class="col-md-9 personal-info">
-      <form class="form-horizontal" method = 'post' action = "{%url 'preferencesTeacher' %}" onsubmit="alert('Changes Saved Successfully');" role="form"> 
-          {%csrf_token%}
         <h1>Edit Profile</h1>
+
+        {% if error %}
+          <br>
+          <strong><font color="red">{{ error }}</font></strong>
+          <br><br>
+        {% endif %}
+
+    <div class="col-md-9 personal-info">
+      <form class="form-horizontal" method = 'post' action = "{%url 'preferencesTeacher' %}" role="form"> 
+          {%csrf_token%}
+
           <h3>Hi {{user.name}} :) </h3>
           <div class="form-group">
             <label class="col-md-3 control-label">Full Name:</label>

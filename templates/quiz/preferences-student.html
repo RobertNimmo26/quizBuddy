@@ -13,8 +13,15 @@
 {% block body_block%}
     <div class="container">
         <h1>Edit Profile</h1>
+
+        {% if error %}
+          <br>
+          <strong><font color="red">{{ error }}</font></strong>
+          <br><br>
+        {% endif %}
+
         <div class="col-md-9 personal-info">
-          <form class="form-horizontal" method = 'post' action = "." onsubmit="alert('Changes Saved Successfully');" role="form"> 
+          <form class="form-horizontal" method = 'post' action = "." role="form"> 
            {%csrf_token%}
             <div class="row">
               <div class="col-md-3">
