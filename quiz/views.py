@@ -45,7 +45,19 @@ def dashboardStudent(request):
 
 
     ####### this is not working. I was trying to get the quiz that is due next however the code doesn't seem to be working ########
-   
+    try:
+        quizzes = []
+        for c in class_list:
+            for q in Quiz.objects.filter(course = c):
+                quizzes.append(q)
+        nextQuiz = quizzes[0].due_date
+        for quiz in quizzes:
+            if quiz.due_date < nextQuiz:
+                nextQuiz = quiz.due_date
+        context_dict['nextQuiz'] = nextQuiz
+    except:
+        context_dict['nextQuiz']="You have no quizzes!"
+    print(context_dict)
 
     ##########################################################
 
@@ -322,7 +334,7 @@ def user_login(request):
                 if user.is_student:
                     return redirect(reverse('dashboardStudent'))
                 else:
-                    redirect(reverse('dashboardTeacher'))
+                    return redirect('dashboardTeacher')
             else:
                 context_dict['error'] = "Your account is disabled."
                 return render(request, 'index.html', context=context_dict)
