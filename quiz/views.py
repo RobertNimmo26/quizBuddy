@@ -12,7 +12,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
-from quiz.forms import UserFormStudent, UserFormTeacher
+from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm
 
 
 def about(request):
@@ -368,9 +368,17 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 def createQuiz(request):   
     context_dict= {}
     if request.method == 'POST':
-        return redirect(reverse('quiz:teacherIndex'))
+        form = quizCreationForm(request.POST)
+        if form.is_valid():
+            quiz = Quiz(
+                
+            )
+            question = Question()
+             
+        return redirect(reverse('quiz:createQuiz'))
     else:
-        return render(request, 'create-quiz.html', context=context_dict)
+        form = quizCreationForm()
+    return render(request, 'create-quiz.html', {'quizCreationForm':quizCreationForm})
     
 def user_login(request):
     context_dict = {}
