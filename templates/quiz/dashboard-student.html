@@ -11,7 +11,9 @@
 {% block header_buttons %}
     <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'about' %}">About</button>
     <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferencesStudent' %}">Preferences</button>
-    <button class="btn btn-quizBuddy-5 mr-2" type="button">{{nextQuiz}}</button>
+    {% block next_quiz %}
+        
+    {% endblock %}
     <a href={% url 'user_logout' %} class="btn btn-quizBuddy-4 mr-2" role="button">Logout</a>
 {% endblock %}
 
