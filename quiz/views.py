@@ -73,6 +73,59 @@ def dashboardStudent(request):
     print(context_dict)
     return render(request, 'dashboard-student.html', context=context_dict)
 
+def manageStudent(request):
+    context_dict = {}
+    class_list = {}
+    #Getting the Class and Quiz objects to display
+    print(Class.objects.filter(name='Computing'))
+    #RANDOM CODE BITS that were used to add teachers/students to classes for testing purposes
+    #request.user.teachers.add(Class.objects.filter(name='Computing').get())
+    #User.objects.filter(name='ka').get().students.add(Class.objects.filter(name='Computing').get())
+    for teacher_class in request.user.teachers.all():
+        student_names = []
+        class_name = teacher_class
+        print(teacher_class)
+        for student in teacher_class.student.all():
+            student_names.append(student.name)
+        class_list[class_name] = student_names
+    context_dict["classes"] = class_list
+    # context_dict["quizes"] = quiz_list
+
+    # prints out whether the method is a GET or a POST
+    print(request.method)
+    # prints out the user name, if no one is logged in it prints `AnonymousUser`
+    print(request.user)
+
+    return render(request, 'manage-student.html', context=context_dict)
+
+def classList(request, class_name_slug):
+    context_dict = {}
+
+    # Gets all class objects
+    class_list = request.user.teachers.all()
+    context_dict["classes"] = class_list
+
+    # prints out whether the method is a GET or a POST
+    print(request.method)
+    # prints out the user name, if no one is logged in it prints `AnonymousUser`
+    print(request.user)
+
+    #Try loop to get all information about class and quiz objects
+    try:
+        #Getting relevant class object
+        #Not using 'class' as keyword
+        classObj = Class.objects.get(slug=class_name_slug)
+        context_dict['class'] = classObj
+
+        #Getting relevant quiz object
+        students = classObj.student.all()
+        context_dict['students'] = students
+
+    except Class.DoesNotExist:
+        context_dict['students'] = None
+        context_dict['class'] = None
+    return render(request, 'classList.html', context = context_dict)
+
 def show_classStudent(request, class_name_slug):
     print(class_name_slug)
     context_dict = {}
@@ -146,7 +199,7 @@ def preferencesStudent(request):
     #if user is not a student, redirect them to the teachersPreferences
     if request.user.is_student:
         #get the user who sent the request
-        user = User.objects.get(email = request.user) 
+        user = User.objects.get(email = request.user)
         #if its a post method then update the fields
         if request.method == 'POST':
             if request.POST['username']:
@@ -171,7 +224,7 @@ def preferencesStudent(request):
 @login_required
 def preferencesTeacher(request):
     if request.user.is_teacher or request.user.is_staff:
-        user = User.objects.get(email = request.user) 
+        user = User.objects.get(email = request.user)
         if request.method == 'POST':
             if request.POST['username']:
                 user.username = request.POST['username']

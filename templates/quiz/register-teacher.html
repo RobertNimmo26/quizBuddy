@@ -22,7 +22,7 @@
     <form id="user_form" method="post" action="{% url 'registerTeacher' %}" enctype="multipart/form-data">
 
       {% csrf_token %}
-      
+
       <!-- Displays form neatly instead of having the label n field next to eachother -->
       {% for field in user_form.visible_fields %}
         <div class="mydiv">
@@ -31,6 +31,7 @@
             {{ field }}
         </div>
       {% endfor %}
+
 
       <!-- Provide a button to click to submit the form. -->
       <br>
