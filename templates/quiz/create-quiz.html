@@ -10,8 +10,11 @@
 {% endblock %}
 
 {% block header_buttons %}
-    <button class="btn btn-quizBuddy-1 mr-2" type="button">Sign up, Student</button>
-    <button class="btn btn-quizBuddy-1-dark mr-2" type="button">Sign up, Teacher</button>
+    <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'about' %}">About</button>
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferencesTeacher' %}">Preferences</button>
+    <button class="btn btn-quizBuddy-1-dark mr-2" type="button">Create class</button>
+    <a href={% url 'user_logout' %} class="btn btn-quizBuddy-4 mr-2" role="button">Logout</a>
+
 {% endblock %}
 
 {% block body_block%}

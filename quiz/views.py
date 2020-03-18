@@ -364,7 +364,7 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
         return render(request, 'quiz.html', context=context_dict)
 
-
+@login_required
 def createQuiz(request):   
     context_dict= {}
     if request.method == 'post':
@@ -373,7 +373,7 @@ def createQuiz(request):
         # Create quiz objects and then save them to DB
         if form.is_valid():
             course = get_object_or_404(Class, name=form.cleaned_data['course'])
-            quiz = Quiz(name=form.cleaned_data['quiz_title'],
+            quiz = Quiz.objects.get_or_create(name=form.cleaned_data['quiz_title'],
                 course=Class,
                 description=form.cleaned_data['quiz_description'], 
                 due_date=form.cleaned_data['due_date'])
