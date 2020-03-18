@@ -46,8 +46,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Class(models.Model):
     classId = models.AutoField(primary_key=True,verbose_name=_("id"))
     name = models.CharField(_("name"), max_length=50)
-    teacher = models.ManyToManyField("User", verbose_name=_("teacher"),related_name="teachers")
-    student = models.ManyToManyField("User", verbose_name=_("student"),related_name="students")
+    teacher = models.ManyToManyField(User, verbose_name=_("teacher"),related_name="teachers")
+    student = models.ManyToManyField(User, verbose_name=_("student"),related_name="students")
     slug = models.SlugField(unique = True)
 
     def get_teachers(self):
