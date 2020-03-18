@@ -367,14 +367,15 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 @login_required
 def createQuiz(request):   
     context_dict= {}
-    if request.method == 'post':
+    if request.method == "POST":
         # Input data sent from form
         form = quizCreationForm(request.POST)
         # Create quiz objects and then save them to DB
         if form.is_valid():
-            course = get_object_or_404(Class, name=form.cleaned_data['course'])
-            quiz = Quiz.objects.get_or_create(name=form.cleaned_data['quiz_title'],
-                course=Class,
+            course = Class.objects.get_or_create(Class, name=form.cleaned_data['course'])
+            quiz = Quiz.objects.get_or_create(
+                name=form.cleaned_data['quiz_title'],
+                course=course,
                 description=form.cleaned_data['quiz_description'], 
                 due_date=form.cleaned_data['due_date'])
             quiz.save()
@@ -386,7 +387,7 @@ def createQuiz(request):
             second_option.save()
             third_option = Option(text=form.cleaned_data['third_option'], question=question, is_correct=false)
             third_option.save()
-        return redirect(reverse('createQuiz'))
+        return render(request, 'quiz.html', context=context_dict)
     else:
         form = quizCreationForm()
     return render(request, 'create-quiz.html', {'quizCreationForm':quizCreationForm})
