@@ -184,14 +184,6 @@ def show_classTeacher(request, class_name_slug):
         context_dict['class'] = None
     return render(request, 'classTeacher.html', context = context_dict)
 
-def preferences(request):
-    context_dict= {}
-    # prints out whether the method is a GET or a POST
-    print(request.method)
-    # prints out the user name, if no one is logged in it prints `AnonymousUser`
-    print(request.user)
-    return render(request, 'preferences.html', context=context_dict)
-
 @login_required
 def preferencesStudent(request):
     #if user is not a student, redirect them to the teachersPreferences
