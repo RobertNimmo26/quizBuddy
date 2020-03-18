@@ -46,10 +46,13 @@ def populate():
 
     psyc_quiz = [{'name': 'Psych-Basics', 'description':'Covers the content covered in lectures','question_count':5}]
 
-    course = {'Maths': {'quiz':math_quiz}, 'Computing': {'quiz':computing_quiz}, 'Psychology':{'quiz':psyc_quiz}}
+    course = {'Maths': {'quiz':math_quiz, 'teacher':teacher_users['David'],'student': student_users['Alice']},
+     'Computing': {'quiz':computing_quiz,'teacher':teacher_users['Anna'],'student':student_users['Tom']},
+      'Psychology':{'quiz':psyc_quiz,'teacher':teacher_users['David'], 'student':student_users['Alice']}}
+
     #for every course add a quiz
     for course, course_data in course.items():
-        c = add_class(course)
+        c = add_class(course,course_data['student']['email'],course_data['teacher']['email'])
         for q in course_data['quiz']:
             add_quiz(c,q['name'],q['description'],q['question_count'])
 
@@ -126,6 +129,8 @@ def populate():
 
     # Print out the classes we have added.
     for c in Class.objects.all():
+        print(f'{c} --> {c.teacher}')
+        print(f'{c} --> {c.student}')
         for q in Quiz.objects.filter(course=c):
             print(f'\nCourse: {c}: Quiz: {q}')
             print('-----------------')
@@ -155,9 +160,13 @@ def add_admin(email,password,name):
     return admin
 
 
-def add_class(name):
+def add_class(name, s, t):
     c = Class.objects.get_or_create(name=name)[0]
     c.save()
+    c.student.add(User.objects.filter(email = s))
+    print(f'{c.student}')
+    c.teacher.add(User.objects.filter(email = t))
+    print(f'{c.teacher}')
     return c
 
 def add_quiz(c,name,desc,ques_count):
