@@ -367,28 +367,26 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
 def createQuiz(request):   
     context_dict= {}
-    if request.method == 'POST':
+    if request.method == 'post':
         # Input data sent from form
         form = quizCreationForm(request.POST)
-        # Create quiz objects
+        # Create quiz objects and then save them to DB
         if form.is_valid():
-            quiz = Quiz(
-                name = form.quiz_title,
-                course = form.course,
-                description = form.description,
-                due_date = form.due_date
-            )
+            course = get_object_or_404(Class, name=form.cleaned_data['course'])
+            quiz = Quiz(name=form.cleaned_data['quiz_title'],
+                course=Class,
+                description=form.cleaned_data['quiz_description'], 
+                due_date=form.cleaned_data['due_date'])
             quiz.save()
-            question = Question(
-                quiz = quiz,
-                text = form.question
-            )
-            first_option = Option(
-                text = form.first_option,
-                question = question,
-                is_correct = false
-            ) 
-        return redirect(reverse('quiz:createQuiz'))
+            question = Question(quiz=quiz, text=form.cleaned_data['question'])
+            question.save()
+            first_option = Option(text=form.cleaned_data['first_question'], question=question, is_correct=false)
+            first_option.save()
+            second_option = Option(text=form.cleaned_data['second_option'], question=question, is_correct=false)
+            second_option.save()
+            third_option = Option(text=form.cleaned_data['third_option'], question=question, is_correct=false)
+            third_option.save()
+        return redirect(reverse('createQuiz'))
     else:
         form = quizCreationForm()
     return render(request, 'create-quiz.html', {'quizCreationForm':quizCreationForm})

@@ -19,11 +19,12 @@ class UserFormTeacher(forms.ModelForm):
         fields = ('username', 'name', 'email', 'password')
 
 class quizCreationForm(forms.Form):
-    quiz_title = forms.CharField(label="Quiz Title:", max_length=50, required=True)
-    course = forms.CharField(label="Course:", max_length=50, required=True)
-    question = forms.CharField(label="Question:", max_length=50, required=True)
-    first_option = forms.CharField(label="Option 1:", max_length=50, required=True)
-    second_option = forms.CharField(label="Option 2:", max_length=50, required=True)
-    third_option = forms.CharField(label="Option 3:", max_length=50, required=True)
+    quiz_title = forms.CharField(label="Quiz Title", max_length=50, required=True)
+    quiz_description = forms.CharField(label="Quiz Description", max_length=255, required=True)
+    course = forms.CharField(label="Class", max_length=50, required=True)
+    question = forms.CharField(label="Question", max_length=50, required=True)
+    first_option = forms.CharField(label="Option 1", max_length=50, required=True)
+    second_option = forms.CharField(label="Option 2", max_length=50, required=True)
+    third_option = forms.CharField(label="Option 3", max_length=50, required=True)
     due_date = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'], required=True)
     
