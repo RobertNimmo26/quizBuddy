@@ -368,13 +368,26 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 def createQuiz(request):   
     context_dict= {}
     if request.method == 'POST':
+        # Input data sent from form
         form = quizCreationForm(request.POST)
+        # Create quiz objects
         if form.is_valid():
             quiz = Quiz(
-                
+                name = form.quiz_title,
+                course = form.course,
+                description = form.description,
+                due_date = form.due_date
             )
-            question = Question()
-             
+            quiz.save()
+            question = Question(
+                quiz = quiz,
+                text = form.question
+            )
+            first_option = Option(
+                text = form.first_option,
+                question = question,
+                is_correct = false
+            ) 
         return redirect(reverse('quiz:createQuiz'))
     else:
         form = quizCreationForm()
