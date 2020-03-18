@@ -1,4 +1,4 @@
-{% extends "dashboard-Teacher.html" %}
+{% extends "manage-student.html" %}
 
 {% block classTitle %}
     {{ class.name }}
@@ -10,9 +10,14 @@
         {% for student in students %}
             <div class="row mt-5 mr-1 ml-3">
                 <div class="col -3">
-                    <a href="#" class="btn btn-primary mr-2">{{ student.name }}</a>
-
-                    <button class="btn btn-quizBuddy-1 mr-2" type="button" onclick="window.location.href='#'">{{ student.name }}</button>
+                  <div class="row">
+                  <div class=col>
+                    <p>{{ student.name }}</p>
+                  </div>
+                  <div class=col>
+                    <button class="btn btn-quizBuddy-1 mr-2" type="button" onclick="window.location.href='#'">press</button>
+                  </div>
+                  </div>
                 </div>
                 <div class="col -3">
 
@@ -21,7 +26,7 @@
         {% endfor %}
     {% else %}
         <div class="alert alert-danger mt-1 mr-1 ml-3" role="alert">
-            {{ class.name }} does not have any quizzes yet, click the create quiz button to add one.
+            {{ class.name }} does not have any students yet.
         </div>
     {% endif %}
     </div>

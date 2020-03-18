@@ -1,4 +1,5 @@
 ﻿import os
+import random
 os.environ.setdefault('DJANGO_SETTINGS_MODULE','quiz_buddy.settings')
 import django
 django.setup()
@@ -160,7 +161,9 @@ def add_class(name):
     return c
 
 def add_quiz(c,name,desc,ques_count):
-    date_time = timezone.now() + timezone.timedelta(days=3)
+    randomDay=random.randint(100,500)
+    date_time = timezone.now() + timezone.timedelta(days=randomDay)
+    print (date_time)
     q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)[0]
     q.save()
     q.course.add(c)

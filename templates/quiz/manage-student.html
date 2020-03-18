@@ -7,16 +7,18 @@
 
 {% block header_buttons %}
 <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'about' %}">About</button>
-<button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferences' %}">Preferences</button>
+<button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferencesTeacher' %}">Preferences</button>
     <button class="btn btn-quizBuddy-1-dark mr-2" type="button">Create class</button>
     <button class="btn btn-quizBuddy-5 mr-2" type="button">Create quiz</button>
+<a href={% url 'user_logout' %} class="btn btn-quizBuddy-4 mr-2" role="button">Logout</a>
+
 {% endblock %}
 
 {% block body_block%}
 <div class="container-fluids">
     <div class="row">
         <div class = "col-8">
-            {% if hasClasses %}
+            {% if classes %}
             <ul class="nav nav-tabs mt-1 mr-1 ml-3">
                 {% for class in classes %}
                     <li class="nav-item">
@@ -34,7 +36,7 @@
             </div>
             {% else %}
                 <div class="alert alert-danger mt-1 mr-1 ml-3" role="alert">
-                    You are not enrolled into any classes, contact your teacher.
+                    You don't have any classes yet.
                 </div>
             {% endif %}
         </div>
