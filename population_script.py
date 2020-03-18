@@ -4,7 +4,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE','quiz_buddy.settings')
 import django
 django.setup()
 from django.utils import timezone
-from quiz.models import Character,User,Class, Quiz, Question, Option
+from quiz.models import Character,User,Class, Quiz, Question, Option, QuizTaker
 from quiz.managers import CustomUserManager
 
 def populate():
@@ -50,11 +50,18 @@ def populate():
      'Computing': {'quiz':computing_quiz,'teacher':teacher_users['Anna'],'student':student_users['Tom']},
       'Psychology':{'quiz':psyc_quiz,'teacher':teacher_users['David'], 'student':student_users['Alice']}}
 
+    quizTaker = {'MCQSet1':{'student':student_users['Alice'],'correctAns':3},
+    'Programming':{'student':student_users['Tom'],'correctAns':2},
+    'Psych-Basics':{'student':student_users['Alice'],'correctAns':4}}
+
     #for every course add a quiz
     for course, course_data in course.items():
         c = add_class(course,course_data['student']['email'],course_data['teacher']['email'])
         for q in course_data['quiz']:
             add_quiz(c,q['name'],q['description'],q['question_count'])
+    
+    for q,q_taker in quizTaker.items():
+        q = add_quizTaker(q_taker['student']['email'],q,q_taker['correctAns'])
 
     #ADD QUESTIONS TO THE QUIZZES AND THEN ADD OPTIONS TO THE QUESTIONS
     #------------------------------------------------------------------------------------------------------------------------------------
@@ -125,19 +132,24 @@ def populate():
         print(f'Name:{student.name} Email:{student} CharacterType:{student.character} EvolutionStage:{student.evolveScore}')
 
     print('\nCourses and Quizzes')
-    print('--------------------')
+    print('---------------------')
 
     # Print out the classes we have added.
     for c in Class.objects.all():
-        print(f'{c} --> {c.teacher}')
-        print(f'{c} --> {c.student}')
+        for (k,v) in zip(c.teacher.all(),c.student.all()):
+            print(f'Course: {c} Teacher: {k} Student: {v}')
         for q in Quiz.objects.filter(course=c):
-            print(f'\nCourse: {c}: Quiz: {q}')
+            print(f'\nCourse: {c}: Quiz: {q} Due Date: {q.due_date}')
             print('-----------------')
             for ques in Question.objects.filter(quiz = q):
                 print(f'Question: {ques}')
                 for opt in Option.objects.filter(question = ques):
                     print(f'  Option: {opt}')
+
+    print('\nStudent Quiz Scores')
+    print('---------------------')
+    for q in QuizTaker.objects.all():
+        print(f'Student: {q.user.name}, Quiz: {q.quiz}, Correct Answers: {q.correctAnswers}')
 
     #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -163,20 +175,16 @@ def add_admin(email,password,name):
 def add_class(name, s, t):
     c = Class.objects.get_or_create(name=name)[0]
     c.save()
-    c.student.add(User.objects.filter(email = s))
-    print(f'{c.student}')
-    c.teacher.add(User.objects.filter(email = t))
-    print(f'{c.teacher}')
+    c.student.add(User.objects.get(email = s))
+    c.teacher.add(User.objects.get(email = t))
     return c
 
 def add_quiz(c,name,desc,ques_count):
     randomDay=random.randint(100,500)
     date_time = timezone.now() + timezone.timedelta(days=randomDay)
-    print (date_time)
     q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)[0]
     q.save()
     q.course.add(c)
-
     return q
 
 def add_ques(q,text):
@@ -195,6 +203,13 @@ def add_character(charac_type, evolStage ):
     charac = Character.objects.get_or_create(characterType= charac_type, evolutionStage = evolStage)[0]
     charac.save()
     return charac
+
+def add_quizTaker(user,q,correctAns):
+    quiz = Quiz.objects.get(name = q)
+    student = User.objects.get(email = user)
+    quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = student, correctAnswers = correctAns, is_completed = True)[0]
+    quizTaker.save()
+    return quizTaker
 
 if __name__ == '__main__':
     print('Starting Quiz population script...')
