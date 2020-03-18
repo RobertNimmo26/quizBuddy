@@ -50,18 +50,20 @@ def populate():
      'Computing': {'quiz':computing_quiz,'teacher':teacher_users['Anna'],'student':student_users['Tom']},
       'Psychology':{'quiz':psyc_quiz,'teacher':teacher_users['David'], 'student':student_users['Alice']}}
 
-    quizTaker = {'MCQSet1':{'student':student_users['Alice'],'correctAns':3},
-    'Programming':{'student':student_users['Tom'],'correctAns':2},
-    'Psych-Basics':{'student':student_users['Alice'],'correctAns':4}}
+    quizTaker = {'MCQSet1':{'student':student_users['Alice'],'correctAns':3,'is_completed':True},
+    'MCQSet2':{'student':student_users['Alice'],'correctAns':0,'is_completed':False},
+    'Programming':{'student':student_users['Tom'],'correctAns':2,'is_completed':True},
+    'Psych-Basics':{'student':student_users['Alice'],'correctAns':4,'is_completed':False}}
 
-    #for every course add a quiz
+    #Add courses and quizzes to courses
     for course, course_data in course.items():
         c = add_class(course,course_data['student']['email'],course_data['teacher']['email'])
         for q in course_data['quiz']:
             add_quiz(c,q['name'],q['description'],q['question_count'])
     
+    #Make students do quizzes
     for q,q_taker in quizTaker.items():
-        q = add_quizTaker(q_taker['student']['email'],q,q_taker['correctAns'])
+        q = add_quizTaker(q_taker['student']['email'],q,q_taker['correctAns'],q_taker['is_completed'])
 
     #ADD QUESTIONS TO THE QUIZZES AND THEN ADD OPTIONS TO THE QUESTIONS
     #------------------------------------------------------------------------------------------------------------------------------------
@@ -149,7 +151,7 @@ def populate():
     print('\nStudent Quiz Scores')
     print('---------------------')
     for q in QuizTaker.objects.all():
-        print(f'Student: {q.user.name}, Quiz: {q.quiz}, Correct Answers: {q.correctAnswers}')
+        print(f'Student: {q.user.name}, Quiz: {q.quiz}, Complete: {q.is_completed} Correct Answers: {q.correctAnswers}')
 
     #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -204,10 +206,10 @@ def add_character(charac_type, evolStage ):
     charac.save()
     return charac
 
-def add_quizTaker(user,q,correctAns):
+def add_quizTaker(user,q,correctAns,complete):
     quiz = Quiz.objects.get(name = q)
     student = User.objects.get(email = user)
-    quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = student, correctAnswers = correctAns, is_completed = True)[0]
+    quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = student, correctAnswers = correctAns, is_completed = complete)[0]
     quizTaker.save()
     return quizTaker
 
