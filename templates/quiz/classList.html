@@ -15,7 +15,11 @@
                     <p>{{ student.name }}</p>
                   </div>
                   <div class=col>
-                    <button class="btn btn-quizBuddy-1 mr-2" type="button" onclick="window.location.href='#'">press</button>
+                    <!-- sends chosen student's email to the view so the student can be removed from the class -->
+                    <form id="delete" method="post" action="{% url 'classList' class.slug %}">
+                      {% csrf_token %}
+                    <button class="btn btn-quizBuddy-1 mr-2" name="student" type="submit" value={{student}}>remove</button>
+                  </form>
                   </div>
                   </div>
                 </div>

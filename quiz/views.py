@@ -39,6 +39,7 @@ def dashboardTeacher(request):
 
     return render(request, 'dashboard-teacher.html', context=context_dict)
 
+@login_required
 def nextQuiz(class_list):
     try:
         quizzes = []
@@ -69,6 +70,7 @@ def dashboardStudent(request):
     print(context_dict)
     return render(request, 'dashboard-student.html', context=context_dict)
 
+@login_required
 def manageStudent(request):
     context_dict = {}
     class_list = {}
@@ -94,8 +96,21 @@ def manageStudent(request):
 
     return render(request, 'manage-student.html', context=context_dict)
 
+@login_required
 def classList(request, class_name_slug):
     context_dict = {}
+
+    #if the remove button was clicked on the page
+    #it gets the student's email from the form (the remove button) and removes it
+    #from current class
+    if request.method == 'POST':
+        print("REMOVED FROM CLASS: ")
+        print(Class.objects.get(slug=class_name_slug))
+        print("STUDENT TO BE REMOVED: ")
+        print(request.POST.get('student'))
+        email = request.POST.get('student')
+        student = User.objects.filter(email=email).get()
+        student.students.remove(Class.objects.get(slug=class_name_slug))
 
     # Gets all class objects
     class_list = request.user.teachers.all()
@@ -388,7 +403,7 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
         return render(request, 'quiz.html', context=context_dict)
 
 @login_required
-def createQuiz(request):   
+def createQuiz(request):
     context_dict= {}
     if request.method == 'post':
         # Input data sent from form
@@ -398,7 +413,7 @@ def createQuiz(request):
             course = get_object_or_404(Class, name=form.cleaned_data['course'])
             quiz = Quiz.objects.get_or_create(name=form.cleaned_data['quiz_title'],
                 course=Class,
-                description=form.cleaned_data['quiz_description'], 
+                description=form.cleaned_data['quiz_description'],
                 due_date=form.cleaned_data['due_date'])
             quiz.save()
             question = Question(quiz=quiz, text=form.cleaned_data['question'])
@@ -413,7 +428,7 @@ def createQuiz(request):
     else:
         form = quizCreationForm()
     return render(request, 'create-quiz.html', {'quizCreationForm':quizCreationForm})
-    
+
 def user_login(request):
     context_dict = {}
     # if post, means they are logging in
