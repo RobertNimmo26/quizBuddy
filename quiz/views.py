@@ -13,7 +13,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
-from quiz.forms import UserFormStudent, UserFormTeacher
+from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm
 
 
 def about(request):
@@ -387,7 +387,33 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
         return render(request, 'quiz.html', context=context_dict)
 
-
+@login_required
+def createQuiz(request):   
+    context_dict= {}
+    if request.method == 'post':
+        # Input data sent from form
+        form = quizCreationForm(request.POST)
+        # Create quiz objects and then save them to DB
+        if form.is_valid():
+            course = get_object_or_404(Class, name=form.cleaned_data['course'])
+            quiz = Quiz.objects.get_or_create(name=form.cleaned_data['quiz_title'],
+                course=Class,
+                description=form.cleaned_data['quiz_description'], 
+                due_date=form.cleaned_data['due_date'])
+            quiz.save()
+            question = Question(quiz=quiz, text=form.cleaned_data['question'])
+            question.save()
+            first_option = Option(text=form.cleaned_data['first_question'], question=question, is_correct=false)
+            first_option.save()
+            second_option = Option(text=form.cleaned_data['second_option'], question=question, is_correct=false)
+            second_option.save()
+            third_option = Option(text=form.cleaned_data['third_option'], question=question, is_correct=false)
+            third_option.save()
+        return redirect(reverse('createQuiz'))
+    else:
+        form = quizCreationForm()
+    return render(request, 'create-quiz.html', {'quizCreationForm':quizCreationForm})
+    
 def user_login(request):
     context_dict = {}
     # if post, means they are logging in

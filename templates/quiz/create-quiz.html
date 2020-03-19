@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block head_block %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block title_block %}
+       Quiz Creation
+{% endblock %}
+
+{% block header_buttons %}
+    <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'about' %}">About</button>
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferencesTeacher' %}">Preferences</button>
+    <button class="btn btn-quizBuddy-1-dark mr-2" type="button">Create class</button>
+    <a href={% url 'user_logout' %} class="btn btn-quizBuddy-4 mr-2" role="button">Logout</a>
+
+{% endblock %}
+
+{% block body_block%}
+    <form action="{% url 'createQuiz' %}" method="post">
+        {% csrf_token %}
+        {{ quizCreationForm.as_p }} <br>
+        <input type="submit" value="submit" />
+    </form>
+    <script>
+        $(function () {
+            $("#id_due_date").datetimepicker({
+                format: 'd/m/Y H:i',
+            });
+        });
+</script>
+{% endblock %}

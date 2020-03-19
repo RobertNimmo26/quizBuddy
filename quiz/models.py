@@ -84,6 +84,7 @@ class Quiz(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.quizId)
         super(Quiz, self).save(*args, **kwargs)
+        print("Saved!")
 
     class Meta:
         # Fix pluralization of model name
