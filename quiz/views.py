@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from datetime import datetime
+from django.contrib.auth.decorators import user_passes_test
 
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -15,6 +16,22 @@ from django.urls import reverse
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
 from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm
 
+#Checker functions for logged on students or teachers, used with @user_passes_test()
+
+def teacher_check(user):
+    #implement using decorator "@user_passes_test(teacher_check)"
+    if user.is_teacher:
+        return True
+    else:
+        return False
+
+
+def student_check(user):
+    #implement using decorator "@user_passes_test(student_check)"
+    if user.is_student:
+        return True
+    else:
+        return False
 
 def about(request):
     context_dict= {}
@@ -25,10 +42,20 @@ def about(request):
     return render(request, 'about.html', context=context_dict)
 
 @login_required
+@user_passes_test(teacher_check)
 def dashboardTeacher(request):
     context_dict = {}
     #Getting the Class and Quiz objects to display
-    class_list = Class.objects.all()
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_teachers():
+            class_list += [classObj]
+
+
     context_dict["classes"] = class_list
     # context_dict["quizes"] = quiz_list
 
@@ -55,10 +82,21 @@ def nextQuiz(class_list):
         return "You have no quizzes!"
 
 @login_required
+@user_passes_test(student_check)
 def dashboardStudent(request):
     context_dict = {}
     #Getting the Class and Quiz objects to display
-    class_list = Class.objects.all()
+
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_students():
+            class_list += [classObj]
+
+    # class_list = Class.objects.all()
     context_dict["classes"] = class_list
 
     context_dict['nextQuiz']=nextQuiz(class_list)
@@ -158,12 +196,20 @@ def classList(request, class_name_slug):
     return render(request, 'classList.html', context = context_dict)
 
 @login_required
+@user_passes_test(student_check)
 def show_classStudent(request, class_name_slug):
     print(class_name_slug)
     context_dict = {}
 
     # Gets all class objects
-    class_list = Class.objects.all()
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_students():
+            class_list += [classObj]
     context_dict["classes"] = class_list
 
     # prints out whether the method is a GET or a POST
@@ -182,7 +228,6 @@ def show_classStudent(request, class_name_slug):
         quizzes = Quiz.objects.filter(course = classObj)
         context_dict['quizzes'] = quizzes
 
-        class_list = Class.objects.all()
         context_dict['nextQuiz']=nextQuiz(class_list)
 
     except Class.DoesNotExist:
@@ -191,11 +236,19 @@ def show_classStudent(request, class_name_slug):
     return render(request, 'classStudent.html', context = context_dict)
 
 @login_required
+@user_passes_test(teacher_check)
 def show_classTeacher(request, class_name_slug):
     context_dict = {}
 
     # Gets all class objects
-    class_list = Class.objects.all()
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_teachers():
+            class_list += [classObj]
     context_dict["classes"] = class_list
 
     # prints out whether the method is a GET or a POST
@@ -220,6 +273,7 @@ def show_classTeacher(request, class_name_slug):
     return render(request, 'classTeacher.html', context = context_dict)
 
 @login_required
+@user_passes_test(student_check)
 def preferencesStudent(request):
     #if user is not a student, redirect them to the teachersPreferences
     if request.user.is_student:
@@ -264,6 +318,7 @@ def preferencesStudent(request):
         return redirect('preferencesTeacher')
 
 @login_required
+@user_passes_test(teacher_check)
 def preferencesTeacher(request):
     if request.user.is_teacher or request.user.is_staff:
         context_dict={}
