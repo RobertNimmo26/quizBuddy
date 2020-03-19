@@ -36,7 +36,7 @@ def dashboardTeacher(request):
     #Getting the Class and Quiz objects to display
     for classObj in Class.objects.all():
         if user.email in classObj.get_teachers():
-            class_list += classObj
+            class_list += [classObj]
 
 
     context_dict["classes"] = class_list
@@ -75,7 +75,7 @@ def dashboardStudent(request):
     #Getting the Class and Quiz objects to display
     for classObj in Class.objects.all():
         if user.email in classObj.get_students():
-            class_list += classObj
+            class_list += [classObj]
 
     # class_list = Class.objects.all()
     context_dict["classes"] = class_list
@@ -148,7 +148,14 @@ def show_classStudent(request, class_name_slug):
     context_dict = {}
 
     # Gets all class objects
-    class_list = Class.objects.all()
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_students():
+            class_list += [classObj]
     context_dict["classes"] = class_list
 
     # prints out whether the method is a GET or a POST
@@ -180,7 +187,14 @@ def show_classTeacher(request, class_name_slug):
     context_dict = {}
 
     # Gets all class objects
-    class_list = Class.objects.all()
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_teachers():
+            class_list += [classObj]
     context_dict["classes"] = class_list
 
     # prints out whether the method is a GET or a POST
@@ -408,7 +422,7 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
         return render(request, 'quiz.html', context=context_dict)
 
 @login_required
-def createQuiz(request):   
+def createQuiz(request):
     context_dict= {}
     if request.method == 'post':
         # Input data sent from form
@@ -418,7 +432,7 @@ def createQuiz(request):
             course = get_object_or_404(Class, name=form.cleaned_data['course'])
             quiz = Quiz.objects.get_or_create(name=form.cleaned_data['quiz_title'],
                 course=Class,
-                description=form.cleaned_data['quiz_description'], 
+                description=form.cleaned_data['quiz_description'],
                 due_date=form.cleaned_data['due_date'])
             quiz.save()
             question = Question(quiz=quiz, text=form.cleaned_data['question'])
@@ -433,7 +447,7 @@ def createQuiz(request):
     else:
         form = quizCreationForm()
     return render(request, 'create-quiz.html', {'quizCreationForm':quizCreationForm})
-    
+
 def user_login(request):
     context_dict = {}
     # if post, means they are logging in
