@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from datetime import datetime
+from django.contrib.auth.decorators import user_passes_test
 
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -28,7 +29,16 @@ def about(request):
 def dashboardTeacher(request):
     context_dict = {}
     #Getting the Class and Quiz objects to display
-    class_list = Class.objects.all()
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_teachers():
+            class_list += classObj
+
+
     context_dict["classes"] = class_list
     # context_dict["quizes"] = quiz_list
 
@@ -57,7 +67,17 @@ def nextQuiz(class_list):
 def dashboardStudent(request):
     context_dict = {}
     #Getting the Class and Quiz objects to display
-    class_list = Class.objects.all()
+
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_students():
+            class_list += classObj
+
+    # class_list = Class.objects.all()
     context_dict["classes"] = class_list
 
     context_dict['nextQuiz']=nextQuiz(class_list)
@@ -424,3 +444,21 @@ def user_login(request):
 
     else:
         return render(request, 'index.html', context=context_dict)
+
+
+#Checker functions for logged on students or teachers, used with @user_passes_test()
+
+def teacher_check(user):
+    #implement using decorator "@user_passes_test(teacher_check)"
+    if user.is_teacher.get():
+        return True
+    else:
+        return False
+
+
+def student_check(user):
+    #implement using decorator "@user_passes_test(student_check)"
+    if user.is_student.get():
+        return True
+    else:
+        return False
