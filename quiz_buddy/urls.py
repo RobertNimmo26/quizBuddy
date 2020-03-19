@@ -39,4 +39,5 @@ urlpatterns = [ path('', views.user_login, name='index'),
                 path('user_logout/',views.user_logout,name = 'user_logout'),
                 path('preferencesStudent/',views.preferencesStudent, name = 'preferencesStudent'),
                 path('preferencesTeacher/', views.preferencesTeacher, name = 'preferencesTeacher'),
+                path('createQuiz/', views.createQuiz, name = 'createQuiz'),
 ]
