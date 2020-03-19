@@ -26,5 +26,8 @@ class quizCreationForm(forms.Form):
     first_option = forms.CharField(label="Option 1", max_length=50, required=True)
     second_option = forms.CharField(label="Option 2", max_length=50, required=True)
     third_option = forms.CharField(label="Option 3", max_length=50, required=True)
+    ANSWERS=[('first_option','option 1'),
+         ('second_option','option 2'),
+         ('third_option', 'option 3')]
+    correct_answer = forms.ChoiceField(choices=ANSWERS, widget=forms.RadioSelect)
     due_date = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'], required=True)
-    
