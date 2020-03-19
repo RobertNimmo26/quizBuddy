@@ -16,6 +16,22 @@ from django.urls import reverse
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
 from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm
 
+#Checker functions for logged on students or teachers, used with @user_passes_test()
+
+def teacher_check(user):
+    #implement using decorator "@user_passes_test(teacher_check)"
+    if user.is_teacher:
+        return True
+    else:
+        return False
+
+
+def student_check(user):
+    #implement using decorator "@user_passes_test(student_check)"
+    if user.is_student:
+        return True
+    else:
+        return False
 
 def about(request):
     context_dict= {}
@@ -26,6 +42,7 @@ def about(request):
     return render(request, 'about.html', context=context_dict)
 
 @login_required
+@user_passes_test(teacher_check)
 def dashboardTeacher(request):
     context_dict = {}
     #Getting the Class and Quiz objects to display
@@ -64,6 +81,7 @@ def nextQuiz(class_list):
         return "You have no quizzes!"
 
 @login_required
+@user_passes_test(student_check)
 def dashboardStudent(request):
     context_dict = {}
     #Getting the Class and Quiz objects to display
@@ -143,6 +161,7 @@ def classList(request, class_name_slug):
     return render(request, 'classList.html', context = context_dict)
 
 @login_required
+@user_passes_test(student_check)
 def show_classStudent(request, class_name_slug):
     print(class_name_slug)
     context_dict = {}
@@ -174,7 +193,6 @@ def show_classStudent(request, class_name_slug):
         quizzes = Quiz.objects.filter(course = classObj)
         context_dict['quizzes'] = quizzes
 
-        class_list = Class.objects.all()
         context_dict['nextQuiz']=nextQuiz(class_list)
 
     except Class.DoesNotExist:
@@ -183,6 +201,7 @@ def show_classStudent(request, class_name_slug):
     return render(request, 'classStudent.html', context = context_dict)
 
 @login_required
+@user_passes_test(teacher_check)
 def show_classTeacher(request, class_name_slug):
     context_dict = {}
 
@@ -219,6 +238,7 @@ def show_classTeacher(request, class_name_slug):
     return render(request, 'classTeacher.html', context = context_dict)
 
 @login_required
+@user_passes_test(student_check)
 def preferencesStudent(request):
     #if user is not a student, redirect them to the teachersPreferences
     if request.user.is_student:
@@ -263,6 +283,7 @@ def preferencesStudent(request):
         return redirect('preferencesTeacher')
 
 @login_required
+@user_passes_test(teacher_check)
 def preferencesTeacher(request):
     if request.user.is_teacher or request.user.is_staff:
         context_dict={}
@@ -476,21 +497,3 @@ def user_login(request):
 
     else:
         return render(request, 'index.html', context=context_dict)
-
-
-#Checker functions for logged on students or teachers, used with @user_passes_test()
-
-def teacher_check(user):
-    #implement using decorator "@user_passes_test(teacher_check)"
-    if user.is_teacher.get():
-        return True
-    else:
-        return False
-
-
-def student_check(user):
-    #implement using decorator "@user_passes_test(student_check)"
-    if user.is_student.get():
-        return True
-    else:
-        return False
