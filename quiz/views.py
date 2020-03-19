@@ -100,17 +100,37 @@ def manageStudent(request):
 def classList(request, class_name_slug):
     context_dict = {}
 
-    #if the remove button was clicked on the page
-    #it gets the student's email from the form (the remove button) and removes it
-    #from current class
+    #request was sent either to add or to remove someone from class
     if request.method == 'POST':
-        print("REMOVED FROM CLASS: ")
-        print(Class.objects.get(slug=class_name_slug))
-        print("STUDENT TO BE REMOVED: ")
-        print(request.POST.get('student'))
-        email = request.POST.get('student')
-        student = User.objects.filter(email=email).get()
-        student.students.remove(Class.objects.get(slug=class_name_slug))
+        #if the ass button was clicked on the page
+        #it gets the student's email from the form's input field
+        #and adds the student to current class (if they exist)
+        #if not, it will create an item in the context_dict indicating an error
+        if request.POST.get('button') =="add":
+            try:
+                print("ADDED TO CLASS: ")
+                print(Class.objects.get(slug=class_name_slug))
+                print("STUDENT TO BE ADDED: ")
+                print(request.POST.get('add_student'))
+                email = request.POST.get('add_student')
+                student = User.objects.filter(email=email).get()
+                student.students.add(Class.objects.get(slug=class_name_slug))
+
+            except User.DoesNotExist:
+                    context_dict["remove_error"] = [True];
+                    print(context_dict["remove_error"])
+
+        #if the remove button was clicked on the page
+        #it gets the student's email from the form (the remove button) and removes it
+        #from current class
+        else:
+            print("REMOVED FROM CLASS: ")
+            print(Class.objects.get(slug=class_name_slug))
+            print("STUDENT TO BE REMOVED: ")
+            print(request.POST.get('button'))
+            email = request.POST.get('button')
+            student = User.objects.filter(email=email).get()
+            student.students.remove(Class.objects.get(slug=class_name_slug))
 
     # Gets all class objects
     class_list = request.user.teachers.all()
