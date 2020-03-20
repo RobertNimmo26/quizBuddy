@@ -1,0 +1,40 @@
+{% extends 'dashboard-teacher.html' %}
+{% load static%}
+
+{% block title_block %}
+        Quiz Results
+{% endblock %}
+
+{% block body_block%}
+<div class="container">
+    <div class="row mt-5 mr-1 ml-3">
+        <div class = "col-3">
+            <h1>Quiz Results</h1>
+            {% if quizTaken %}
+                <table class = 'table'>
+                    <tr>
+                        <th>Quiz Name</th>
+                        <th>Student Name</th>
+                        <th>Student Grade</th>
+                    </tr>
+
+                    {% for q in quizTaken %}
+                    <tr>
+                        <td>{{ q.quiz }}</td>
+                        <td>{{ q.user.name }}</td>
+                        <td>{{ q.correctAnswers }}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Quiz Mark: {{q.quiz.question_count}}</td>
+                        <td>Average Score: </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <div class="alert alert-danger mt-1 mr-1 ml-3" role="alert">
+                    You don't have any quizzes, please create a Quiz now.
+                </div>
+            {% endif %}
+    </div>
+</div>
+{% endblock %}

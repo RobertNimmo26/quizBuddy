@@ -435,3 +435,39 @@ def user_login(request):
 
     else:
         return render(request, 'index.html', context=context_dict)
+
+@login_required   
+def quizResultsStudent(request):
+    context_dict = {}
+    class_list = []
+    for c in request.user.students.all():
+        class_list.append(c)
+    #upcoming deadline
+    context_dict['nextQuiz'] = nextQuiz(class_list)
+    #get the quizzes taken by the users if they are completed
+    quiz_taken = QuizTaker.objects.filter(user = request.user,is_completed = True)
+    context_dict['quiz_taken'] = quiz_taken
+    return render(request, 'quizResults-student.html',context = context_dict )
+
+@login_required
+def quizResultsTeacher(request):
+    context_dict = {}
+    quizList = []
+    quizTaken = []
+    #for every class where this user is a teacher
+    for c in request.user.teachers.all():
+        quiz = Quiz.objects.filter(course = c)
+        for q in quiz:
+            #add the quiz belonging to that class to the quizList
+            quizList.append(q)
+
+    print(quizList)
+    
+    for q in quizList:
+        quiz = QuizTaker.objects.filter(quiz = q)
+        for q_taken in quiz:
+            quizTaken.append(q_taken)
+
+    context_dict['quizTaken'] = quizTaken
+    return render(request,'quizResults-teacher.html',context = context_dict)
+

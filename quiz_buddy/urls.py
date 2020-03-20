@@ -38,4 +38,7 @@ urlpatterns = [ path('', views.user_login, name='index'),
                 path('preferencesStudent/',views.preferencesStudent, name = 'preferencesStudent'),
                 path('preferencesTeacher/', views.preferencesTeacher, name = 'preferencesTeacher'),
                 path('createQuiz/', views.createQuiz, name = 'createQuiz'),
+                path('quizResultsStudent/',views.quizResultsStudent, name = 'quizResultsStudent'),
+                path('quizResultsTeacher/',views.quizResultsTeacher, name = 'quizResultsTeacher'),
+
 ]

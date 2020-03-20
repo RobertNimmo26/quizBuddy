@@ -1,0 +1,46 @@
+{% extends 'dashboard-student.html' %}
+{% load static%}
+
+{% block title_block %}
+    Quiz Results
+{% endblock %}
+
+{% block body_block %}
+<div class="container">
+    <div class="row mt-5 mr-1 ml-3">
+        <div class="col -3">
+            <h1>Quiz Results</h1>
+            {% if quiz_taken %}
+                <table class = 'table'>
+                    <tr>
+                        <th>Quiz Name</th>
+                        <th>Your Marks</th>
+                        <th>Total Marks</th>
+                    </tr>
+
+                    {% for q in quiz_taken %}
+                    <tr>
+                        <td><button class="btn btn-quizBuddy-1 mr-2" type="button" onclick="window.location.href='#'">{{ q.quiz }}</button></td>
+                        <td><button class="btn btn-quizBuddy-1 mr-2" type="button" onclick="window.location.href='#'">{{ q.correctAnswers }}</button></td>
+                        <td><button class="btn btn-quizBuddy-1 mr-2" type="button" onclick="window.location.href='#'">{{ q.quiz.question_count }}</button></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <div class="alert alert-danger mt-1 mr-1 ml-3" role="alert">
+                    No Quizzes completed.
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-4 ">
+            <div class="card" style="width: 18rem;">
+                <img class="card-img-top" src= "{%static 'images/character/characterProfileLev1.jpg'%}" alt="Card image cap"/>
+                    <div class="card-body">
+                    <h5 class="card-title">Hi {{user.username}} </h5>
+                    <a href={% url 'dashboardStudent' %} class="btn btn-quizBuddy-4 mr-2" role="button">Go Back to the Dashboard</a>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
