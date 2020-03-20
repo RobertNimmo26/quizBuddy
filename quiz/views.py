@@ -109,6 +109,7 @@ def dashboardStudent(request):
     return render(request, 'dashboard-student.html', context=context_dict)
 
 @login_required
+@user_passes_test(teacher_check)
 def manageStudent(request):
     context_dict = {}
     class_list = {}
@@ -135,6 +136,7 @@ def manageStudent(request):
     return render(request, 'manage-student.html', context=context_dict)
 
 @login_required
+@user_passes_test(teacher_check)
 def classList(request, class_name_slug):
     context_dict = {}
 

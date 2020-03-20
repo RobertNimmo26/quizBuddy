@@ -8,10 +8,22 @@
 {% endblock %}
 
 {% block header_buttons %}
-    <a href={% url 'about' %} class="btn btn-quizBuddy-4 mr-2" role="button">About</a>
-    <a href={% url 'registerStudent' %} class="btn btn-quizBuddy-1 mr-2" role="button">Sign up, Student</a>
-    <a href={% url 'registerTeacher' %} class="btn btn-quizBuddy-1-dark mr-2" role="button">Sign up, Teacher</a>
+{% if request.user.is_teacher %}
+<button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'dashboardTeacher' %}">Dashboard</button>
+<button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferencesTeacher' %}">Preferences</button>
+<button class="btn btn-quizBuddy-1-dark mr-2" type="button">Create class</button>
+<button class="btn btn-quizBuddy-5 mr-2" type="button" onclick="window.location.href={% url 'createQuiz' %}">Create quiz</button>
+<button class="btn btn-quizBuddy-1 mr-2" type="button" onclick="window.location.href={% url 'manageStudent' %}">Manage students</button>
+<a href={% url 'user_logout' %} class="btn btn-quizBuddy-4 mr-2" role="button">Logout</a>
+{% elif request.user.is_student %}
+ <!-- NAVBAR FOR STUDENTS -->
+{% else %}
+<a href={% url 'about' %} class="btn btn-quizBuddy-4 mr-2" role="button">About</a>
+<a href={% url 'registerStudent' %} class="btn btn-quizBuddy-1 mr-2" role="button">Sign up, Student</a>
+<a href={% url 'registerTeacher' %} class="btn btn-quizBuddy-1-dark mr-2" role="button">Sign up, Teacher</a>
+{% endif %}
 {% endblock %}
+
 {% block body_block%}
  <!-- makes the whole thing full screen -->
 <div class="jumbotron jumbotron-fluid bg-white" align="center" style="height:100vh;">
