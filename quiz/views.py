@@ -68,7 +68,6 @@ def dashboardTeacher(request):
 
     return render(request, 'dashboard-teacher.html', context=context_dict)
 
-@login_required
 def nextQuiz(class_list):
     try:
         quizzes = []
