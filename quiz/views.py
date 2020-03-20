@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
@@ -149,6 +151,10 @@ def show_classStudent(request, class_name_slug):
 
         class_list = Class.objects.all()
         context_dict['nextQuiz']=nextQuiz(class_list)
+
+        apikey= os.getenv("APIKEY")
+
+        context_dict['apikey']=apikey
 
     except Class.DoesNotExist:
         context_dict['quizzes'] = None

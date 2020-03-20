@@ -26,7 +26,8 @@
                 <button class="btn btn-quizBuddy-1 mr-2" type="button" onclick="window.location.href='#'">{{ quiz.due_date }}</button>
             </div>
             <div class="col -3">
-                <button class="btn btn-quizBuddy-5" type="button" onclick="execute('{{quiz.name}}','{{quiz.due_date|date:'Y-m-d H:i:00'}}')"><i class="fa fa-calendar"></i>     Add to Google Calendar</button>
+
+                <button class="btn btn-quizBuddy-5" type="button" onclick="execute('{{quiz.name}}','{{quiz.due_date|date:'Y-m-d H:i:00'}}','{{apikey}}')"><i class="fa fa-calendar"></i>     Add to Google Calendar</button>
 
             </div>
         </div>
