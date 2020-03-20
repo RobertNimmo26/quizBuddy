@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block next_quiz %}
-    <button class="btn btn-quizBuddy-5 mr-2" type="button">{{nextQuiz}}</button>
+    <button class="btn btn-quizBuddy-5 mr-2" type="button">Next deadline: {{nextQuiz}}</button>
 {% endblock %}
 
 {% block classBodyBlock %}
@@ -21,9 +21,9 @@
     {% for quiz in quizzes %}
         <div class="row mt-5 mr-1 ml-5 pt-2">
             <div class="col -3">
-                <a href="{% url 'quiz' class.slug quiz.slug %}" class="btn btn-primary mr-2">{{ quiz.name }}</a>
+                <a href="{% url 'quiz' class.slug quiz.slug %}" class="btn btn-primary mr-2 mt-1 mb-1">{{ quiz.name }}</a>
 
-                <button class="btn btn-quizBuddy-1 mr-2" type="button" onclick="window.location.href='#'">{{ quiz.due_date }}</button>
+                <button class="btn btn-quizBuddy-1 mr-2" type="button">{{ quiz.due_date }}</button>
             </div>
             <div class="col -3">
 

@@ -4,7 +4,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE','quiz_buddy.settings')
 import django
 django.setup()
 from django.utils import timezone
-from quiz.models import Character,User,Class, Quiz, Question, Option
+from quiz.models import Character,User,Class, Quiz, Question, Option, QuizTaker
 from quiz.managers import CustomUserManager
 
 def populate():
@@ -12,7 +12,7 @@ def populate():
     #------------------------------------------------------------------------------------------------------------------------------------
 
     student_users = {'Alice':{'email':'alice@test.com', 'username':'alice9','password':'12364','is_student':True, 'character':1,'evolve_score':2},
-     'Tom':{'email':'tom@test.com', 'username':'tom','password':'password','is_student':True,'character':2,'evolve_score':3}}
+     'Tom':{'email':'tom@test.com', 'username':'Tom','password':'password','is_student':True,'character':2,'evolve_score':3}}
 
     teacher_users = {'David':{'email':'david@staff.com', 'username':'david','password':'2856','is_teacher':True,'is_staff':True},
      'Anna':{'email':'anna@testteacher.com', 'username':'anna','password':'anna123','is_teacher':True,'is_staff':True}}
@@ -29,14 +29,14 @@ def populate():
 
     for s, s_data in student_users.items():
         add_student(s,s_data['username'],s_data['email'],s_data['password'],s_data['is_student'],s_data['character'],s_data['evolve_score'])
-    
+
     for t, t_data in teacher_users.items():
         add_teacher(t,t_data['username'],t_data['email'],t_data['password'],t_data['is_teacher'],t_data['is_staff'])
 
     for a, a_data in admin_user.items():
         add_admin(a_data['email'],a_data['password'],a)
 
-    
+
     #CREATE CLASSES AND ADD QUIZZES TO THE CLASSES
     #------------------------------------------------------------------------------------------------------------------------------------
     math_quiz = [{'name':'MCQSet1', 'description':'A quiz that covers basic arithmetic operations','question_count':3},
@@ -46,12 +46,24 @@ def populate():
 
     psyc_quiz = [{'name': 'Psych-Basics', 'description':'Covers the content covered in lectures','question_count':5}]
 
-    course = {'Maths': {'quiz':math_quiz}, 'Computing': {'quiz':computing_quiz}, 'Psychology':{'quiz':psyc_quiz}}
-    #for every course add a quiz
+    course = {'Maths': {'quiz':math_quiz, 'teacher':teacher_users['David'],'student': student_users['Alice']},
+     'Computing': {'quiz':computing_quiz,'teacher':teacher_users['Anna'],'student':student_users['Tom']},
+      'Psychology':{'quiz':psyc_quiz,'teacher':teacher_users['David'], 'student':student_users['Alice']}}
+
+    quizTaker = {'MCQSet1':{'student':student_users['Alice'],'correctAns':3,'is_completed':True},
+    'MCQSet2':{'student':student_users['Alice'],'correctAns':0,'is_completed':False},
+    'Programming':{'student':student_users['Tom'],'correctAns':2,'is_completed':True},
+    'Psych-Basics':{'student':student_users['Alice'],'correctAns':4,'is_completed':False}}
+
+    #Add courses and quizzes to courses
     for course, course_data in course.items():
-        c = add_class(course)
+        c = add_class(course,course_data['student']['email'],course_data['teacher']['email'])
         for q in course_data['quiz']:
             add_quiz(c,q['name'],q['description'],q['question_count'])
+
+    #Make students do quizzes
+    for q,q_taker in quizTaker.items():
+        q = add_quizTaker(q_taker['student']['email'],q,q_taker['correctAns'],q_taker['is_completed'])
 
     #ADD QUESTIONS TO THE QUIZZES AND THEN ADD OPTIONS TO THE QUESTIONS
     #------------------------------------------------------------------------------------------------------------------------------------
@@ -122,17 +134,24 @@ def populate():
         print(f'Name:{student.name} Email:{student} CharacterType:{student.character} EvolutionStage:{student.evolveScore}')
 
     print('\nCourses and Quizzes')
-    print('--------------------')
+    print('---------------------')
 
     # Print out the classes we have added.
     for c in Class.objects.all():
+        for (k,v) in zip(c.teacher.all(),c.student.all()):
+            print(f'Course: {c} Teacher: {k} Student: {v}')
         for q in Quiz.objects.filter(course=c):
-            print(f'\nCourse: {c}: Quiz: {q}')
+            print(f'\nCourse: {c}: Quiz: {q} Due Date: {q.due_date}')
             print('-----------------')
             for ques in Question.objects.filter(quiz = q):
                 print(f'Question: {ques}')
                 for opt in Option.objects.filter(question = ques):
                     print(f'  Option: {opt}')
+
+    print('\nStudent Quiz Scores')
+    print('---------------------')
+    for q in QuizTaker.objects.all():
+        print(f'Student: {q.user.name}, Quiz: {q.quiz}, Complete: {q.is_completed} Correct Answers: {q.correctAnswers}')
 
     #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -155,19 +174,19 @@ def add_admin(email,password,name):
     return admin
 
 
-def add_class(name):
+def add_class(name, s, t):
     c = Class.objects.get_or_create(name=name)[0]
     c.save()
+    c.student.add(User.objects.get(email = s))
+    c.teacher.add(User.objects.get(email = t))
     return c
 
 def add_quiz(c,name,desc,ques_count):
     randomDay=random.randint(100,500)
     date_time = timezone.now() + timezone.timedelta(days=randomDay)
-    print (date_time)
     q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)[0]
     q.save()
     q.course.add(c)
-
     return q
 
 def add_ques(q,text):
@@ -186,6 +205,13 @@ def add_character(charac_type, evolStage ):
     charac = Character.objects.get_or_create(characterType= charac_type, evolutionStage = evolStage)[0]
     charac.save()
     return charac
+
+def add_quizTaker(user,q,correctAns,complete):
+    quiz = Quiz.objects.get(name = q)
+    student = User.objects.get(email = user)
+    quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = student, correctAnswers = correctAns, is_completed = complete)[0]
+    quizTaker.save()
+    return quizTaker
 
 if __name__ == '__main__':
     print('Starting Quiz population script...')

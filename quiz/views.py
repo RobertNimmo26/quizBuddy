@@ -9,14 +9,31 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from datetime import datetime
+from django.contrib.auth.decorators import user_passes_test
 
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
-from quiz.forms import UserFormStudent, UserFormTeacher
+from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm
 
+#Checker functions for logged on students or teachers, used with @user_passes_test()
+
+def teacher_check(user):
+    #implement using decorator "@user_passes_test(teacher_check)"
+    if user.is_teacher:
+        return True
+    else:
+        return False
+
+
+def student_check(user):
+    #implement using decorator "@user_passes_test(student_check)"
+    if user.is_student:
+        return True
+    else:
+        return False
 
 def about(request):
     context_dict= {}
@@ -27,10 +44,20 @@ def about(request):
     return render(request, 'about.html', context=context_dict)
 
 @login_required
+@user_passes_test(teacher_check)
 def dashboardTeacher(request):
     context_dict = {}
     #Getting the Class and Quiz objects to display
-    class_list = Class.objects.all()
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_teachers():
+            class_list += [classObj]
+
+
     context_dict["classes"] = class_list
     # context_dict["quizes"] = quiz_list
 
@@ -41,6 +68,7 @@ def dashboardTeacher(request):
 
     return render(request, 'dashboard-teacher.html', context=context_dict)
 
+@login_required
 def nextQuiz(class_list):
     try:
         quizzes = []
@@ -56,10 +84,21 @@ def nextQuiz(class_list):
         return "You have no quizzes!"
 
 @login_required
+@user_passes_test(student_check)
 def dashboardStudent(request):
     context_dict = {}
     #Getting the Class and Quiz objects to display
-    class_list = Class.objects.all()
+
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_students():
+            class_list += [classObj]
+
+    # class_list = Class.objects.all()
     context_dict["classes"] = class_list
 
     context_dict['nextQuiz']=nextQuiz(class_list)
@@ -71,6 +110,7 @@ def dashboardStudent(request):
     print(context_dict)
     return render(request, 'dashboard-student.html', context=context_dict)
 
+@login_required
 def manageStudent(request):
     context_dict = {}
     class_list = {}
@@ -96,8 +136,41 @@ def manageStudent(request):
 
     return render(request, 'manage-student.html', context=context_dict)
 
+@login_required
 def classList(request, class_name_slug):
     context_dict = {}
+
+    #request was sent either to add or to remove someone from class
+    if request.method == 'POST':
+        #if the ass button was clicked on the page
+        #it gets the student's email from the form's input field
+        #and adds the student to current class (if they exist)
+        #if not, it will create an item in the context_dict indicating an error
+        if request.POST.get('button') =="add":
+            try:
+                print("ADDED TO CLASS: ")
+                print(Class.objects.get(slug=class_name_slug))
+                print("STUDENT TO BE ADDED: ")
+                print(request.POST.get('add_student'))
+                email = request.POST.get('add_student')
+                student = User.objects.filter(email=email).get()
+                student.students.add(Class.objects.get(slug=class_name_slug))
+
+            except User.DoesNotExist:
+                    context_dict["remove_error"] = [True];
+                    print(context_dict["remove_error"])
+
+        #if the remove button was clicked on the page
+        #it gets the student's email from the form (the remove button) and removes it
+        #from current class
+        else:
+            print("REMOVED FROM CLASS: ")
+            print(Class.objects.get(slug=class_name_slug))
+            print("STUDENT TO BE REMOVED: ")
+            print(request.POST.get('button'))
+            email = request.POST.get('button')
+            student = User.objects.filter(email=email).get()
+            student.students.remove(Class.objects.get(slug=class_name_slug))
 
     # Gets all class objects
     class_list = request.user.teachers.all()
@@ -125,12 +198,20 @@ def classList(request, class_name_slug):
     return render(request, 'classList.html', context = context_dict)
 
 @login_required
+@user_passes_test(student_check)
 def show_classStudent(request, class_name_slug):
     print(class_name_slug)
     context_dict = {}
 
     # Gets all class objects
-    class_list = Class.objects.all()
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_students():
+            class_list += [classObj]
     context_dict["classes"] = class_list
 
     # prints out whether the method is a GET or a POST
@@ -149,7 +230,6 @@ def show_classStudent(request, class_name_slug):
         quizzes = Quiz.objects.filter(course = classObj)
         context_dict['quizzes'] = quizzes
 
-        class_list = Class.objects.all()
         context_dict['nextQuiz']=nextQuiz(class_list)
 
         apikey= os.getenv("APIKEY")
@@ -162,11 +242,19 @@ def show_classStudent(request, class_name_slug):
     return render(request, 'classStudent.html', context = context_dict)
 
 @login_required
+@user_passes_test(teacher_check)
 def show_classTeacher(request, class_name_slug):
     context_dict = {}
 
     # Gets all class objects
-    class_list = Class.objects.all()
+    class_list = []
+
+    user = User.objects.get(email = request.user)
+
+    #Getting the Class and Quiz objects to display
+    for classObj in Class.objects.all():
+        if user.email in classObj.get_teachers():
+            class_list += [classObj]
     context_dict["classes"] = class_list
 
     # prints out whether the method is a GET or a POST
@@ -190,15 +278,8 @@ def show_classTeacher(request, class_name_slug):
         context_dict['class'] = None
     return render(request, 'classTeacher.html', context = context_dict)
 
-def preferences(request):
-    context_dict= {}
-    # prints out whether the method is a GET or a POST
-    print(request.method)
-    # prints out the user name, if no one is logged in it prints `AnonymousUser`
-    print(request.user)
-    return render(request, 'preferences.html', context=context_dict)
-
 @login_required
+@user_passes_test(student_check)
 def preferencesStudent(request):
     #if user is not a student, redirect them to the teachersPreferences
     if request.user.is_student:
@@ -243,6 +324,7 @@ def preferencesStudent(request):
         return redirect('preferencesTeacher')
 
 @login_required
+@user_passes_test(teacher_check)
 def preferencesTeacher(request):
     if request.user.is_teacher or request.user.is_staff:
         context_dict={}
@@ -401,6 +483,32 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
         return render(request, 'quiz.html', context=context_dict)
 
+@login_required
+def createQuiz(request):
+    context_dict= {}
+    if request.method == 'post':
+        # Input data sent from form
+        form = quizCreationForm(request.POST)
+        # Create quiz objects and then save them to DB
+        if form.is_valid():
+            course = get_object_or_404(Class, name=form.cleaned_data['course'])
+            quiz = Quiz.objects.get_or_create(name=form.cleaned_data['quiz_title'],
+                course=Class,
+                description=form.cleaned_data['quiz_description'],
+                due_date=form.cleaned_data['due_date'])
+            quiz.save()
+            question = Question(quiz=quiz, text=form.cleaned_data['question'])
+            question.save()
+            first_option = Option(text=form.cleaned_data['first_question'], question=question, is_correct=false)
+            first_option.save()
+            second_option = Option(text=form.cleaned_data['second_option'], question=question, is_correct=false)
+            second_option.save()
+            third_option = Option(text=form.cleaned_data['third_option'], question=question, is_correct=false)
+            third_option.save()
+        return redirect(reverse('createQuiz'))
+    else:
+        form = quizCreationForm()
+    return render(request, 'create-quiz.html', {'quizCreationForm':quizCreationForm})
 
 def user_login(request):
     context_dict = {}
