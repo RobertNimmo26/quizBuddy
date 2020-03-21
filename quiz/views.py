@@ -185,6 +185,11 @@ def preferencesStudent(request):
         context_dict={}
         #get the user who sent the request
         user = User.objects.get(email = request.user)
+        class_list = []
+        for c in request.user.students.all():
+            class_list.append(c)
+        #upcoming deadline
+        context_dict['nextQuiz'] = nextQuiz(class_list)
         #if its a post method then update the fields
         if request.method == 'POST':
             ableToChange=True
@@ -454,20 +459,32 @@ def quizResultsTeacher(request):
     context_dict = {}
     quizList = []
     quizTaken = []
+    average_Score = []
+    
     #for every class where this user is a teacher
     for c in request.user.teachers.all():
         quiz = Quiz.objects.filter(course = c)
         for q in quiz:
-            #add the quiz belonging to that class to the quizList
-            quizList.append(q)
-
-    print(quizList)
-    
+            #add the quiz to the quizList
+            quizList.append(q)  
+    #for every quiz in the quizList  
     for q in quizList:
-        quiz = QuizTaker.objects.filter(quiz = q)
-        for q_taken in quiz:
+        #get the quizTakers who have taken this quiz
+        quizTaker = QuizTaker.objects.filter(quiz = q)
+        #sum_ans and count used to calculate average
+        sum_ans = 0
+        count = 0
+        #iterate over the querySet
+        for q_taken in quizTaker:
             quizTaken.append(q_taken)
+            sum_ans += q_taken.correctAnswers
+            count +=1
+        #portion of code to calculate average, but if no one has taken the quiz, prevent division by zero error
+        if count != 0:
+            average_Score.append(sum_ans/count)
+        else:
+            average_Score.append(count)
 
-    context_dict['quizTaken'] = quizTaken
+    context_dict['quizTaken'] = zip(quizTaken,average_Score)
     return render(request,'quizResults-teacher.html',context = context_dict)
 
