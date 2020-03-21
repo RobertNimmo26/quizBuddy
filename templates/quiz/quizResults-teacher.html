@@ -5,36 +5,41 @@
         Quiz Results
 {% endblock %}
 
+{% block dash_button %}
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'dashboardTeacher' %}">Dashboard</button>
+{% endblock %}
 {% block body_block%}
 <div class="container">
-    <div class="row mt-5 mr-1 ml-3">
-        <div class = "col-3">
-            <h1>Quiz Results</h1>
-            {% if quizTaken %}
-                <table class = 'table'>
-                    <tr>
-                        <th>Quiz Name</th>
-                        <th>Student Name</th>
-                        <th>Student Grade</th>
-                    </tr>
-
-                    {% for q in quizTaken %}
-                    <tr>
-                        <td>{{ q.quiz }}</td>
-                        <td>{{ q.user.name }}</td>
-                        <td>{{ q.correctAnswers }}</td>
-                    </tr>
-                    <tr>
-                        <td>Total Quiz Mark: {{q.quiz.question_count}}</td>
-                        <td>Average Score: </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            {% else %}
-                <div class="alert alert-danger mt-1 mr-1 ml-3" role="alert">
-                    You don't have any quizzes, please create a Quiz now.
-                </div>
-            {% endif %}
-    </div>
+    <h1>Quiz Results</h1>
+    {% if quizTaken %}
+        <table class = 'table'>
+            <tr>
+                <th>Quiz Name</th>
+                <th>Student Name</th>
+                <th>Student Grade</th>
+            </tr>
+            {% for q,avg_score in quizTaken %}
+            <tr>
+                <td>{{ q.quiz }}</td>
+                <td>{{ q.user.name }}</td>
+                {% if q.is_completed %}
+                <td>{{ q.correctAnswers }}</td>
+                {% else %}
+                <td>Not Completed</td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td>Total Mark </td>
+                <td>{{q.quiz.question_count}}</td>
+                <td>Average Mark </td>
+                <td> {{avg_score}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <div class="alert alert-danger mt-1 mr-1 ml-3" role="alert">
+            Sorry! No Results to Show :(
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
