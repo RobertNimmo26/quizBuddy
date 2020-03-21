@@ -18,22 +18,31 @@
                 <th>Student Name</th>
                 <th>Student Grade</th>
             </tr>
-            {% for q,avg_score in quizTaken %}
-            <tr>
-                <td>{{ q.quiz }}</td>
-                <td>{{ q.user.name }}</td>
-                {% if q.is_completed %}
-                <td>{{ q.correctAnswers }}</td>
-                {% else %}
-                <td>Not Completed</td>
-                {% endif %}
-            </tr>
-            <tr>
-                <td>Total Mark </td>
-                <td>{{q.quiz.question_count}}</td>
-                <td>Average Mark </td>
-                <td> {{avg_score}}</td>
-            </tr>
+            {% for quiz,quizTaker in quizTaken.items %}
+                {% for q in quizTaker %}
+                    <tr>
+                        <td>{{ q.quiz }}</td>
+                        <td>{{ q.user.name }}</td>
+                        {% if q.is_completed %}
+                        <td>{{ q.correctAnswers }}</td>
+                        {% else %}
+                        <td>Not Completed</td>
+                        {% endif %}
+                    </tr>     
+                    {% if forloop.last %}
+                        {% for q_name, score in avg_score.items %}
+                            {% if q_name == q.quiz.name %}
+                            <tr>
+                                <td><strong>Total Mark:
+                                {{q.quiz.question_count}} </strong></td>
+                                <td><strong> Average Mark: 
+                                {{score}}</strong></td>
+                                <td></td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
             {% endfor %}
         </table>
     {% else %}

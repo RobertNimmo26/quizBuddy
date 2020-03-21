@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from datetime import datetime
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
 from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm
+from collections import defaultdict
 
 #Checker functions for logged on students or teachers, used with @user_passes_test()
 
@@ -546,8 +547,8 @@ def quizResultsStudent(request):
 def quizResultsTeacher(request):
     context_dict = {}
     quizList = []
-    quizTaken = []
-    average_Score = []
+    quizTaken = defaultdict(list)
+    average_Score = {}
     
     #for every class where this user is a teacher
     for c in request.user.teachers.all():
@@ -564,15 +565,17 @@ def quizResultsTeacher(request):
         count = 0
         #iterate over the querySet
         for q_taken in quizTaker:
-            quizTaken.append(q_taken)
-            sum_ans += q_taken.correctAnswers
-            count +=1
+            quizTaken[q_taken.quiz].append(q_taken)
+            if q_taken.is_completed:
+                sum_ans += q_taken.correctAnswers
+                count +=1
         #portion of code to calculate average, but if no one has taken the quiz, prevent division by zero error
         if count != 0:
-            average_Score.append(sum_ans/count)
+            average_Score[q.name] = sum_ans/count
         else:
-            average_Score.append(count)
-
-    context_dict['quizTaken'] = zip(quizTaken,average_Score)
+            average_Score[q.name] = count
+            
+    context_dict['quizTaken'] = dict(quizTaken)
+    context_dict['avg_score'] = average_Score
     return render(request,'quizResults-teacher.html',context = context_dict)
 
