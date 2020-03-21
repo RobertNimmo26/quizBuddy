@@ -48,5 +48,5 @@ function addEvent(quizName, dateTime) {
 
 
 gapi.load("client:auth2", function (clientid) {
-    gapi.auth2.init({ client_id: "1021959925748-jd8qsfpgaiim11q7ifj2u0mo0kfn8i94.apps.googleusercontent.com" }); //add calendar client_id here
+    gapi.auth2.init({ client_id: "1021959925748-jd8qsfpgaiim11q7ifj2u0mo0kfn8i94.apps.googleusercontent.com" }); //add your calendar client_id here
 });
