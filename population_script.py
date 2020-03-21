@@ -12,7 +12,7 @@ def populate():
     #------------------------------------------------------------------------------------------------------------------------------------
 
     student_users = {'Alice':{'email':'alice@test.com', 'username':'alice9','password':'12364','is_student':True, 'character':1,'evolve_score':2},
-     'Tom':{'email':'tom@test.com', 'username':'tom','password':'password','is_student':True,'character':2,'evolve_score':3}}
+     'Tom':{'email':'tom@test.com', 'username':'Tom','password':'password','is_student':True,'character':2,'evolve_score':3}}
 
     teacher_users = {'David':{'email':'david@staff.com', 'username':'david','password':'2856','is_teacher':True,'is_staff':True},
      'Anna':{'email':'anna@testteacher.com', 'username':'anna','password':'anna123','is_teacher':True,'is_staff':True}}
@@ -29,14 +29,14 @@ def populate():
 
     for s, s_data in student_users.items():
         add_student(s,s_data['username'],s_data['email'],s_data['password'],s_data['is_student'],s_data['character'],s_data['evolve_score'])
-    
+
     for t, t_data in teacher_users.items():
         add_teacher(t,t_data['username'],t_data['email'],t_data['password'],t_data['is_teacher'],t_data['is_staff'])
 
     for a, a_data in admin_user.items():
         add_admin(a_data['email'],a_data['password'],a)
 
-    
+
     #CREATE CLASSES AND ADD QUIZZES TO THE CLASSES
     #------------------------------------------------------------------------------------------------------------------------------------
     math_quiz = [{'name':'MCQSet1', 'description':'A quiz that covers basic arithmetic operations','question_count':3},
@@ -60,7 +60,7 @@ def populate():
         c = add_class(course,course_data['student']['email'],course_data['teacher']['email'])
         for q in course_data['quiz']:
             add_quiz(c,q['name'],q['description'],q['question_count'])
-    
+
     #Make students do quizzes
     for q,q_taker in quizTaker.items():
         q = add_quizTaker(q_taker['student']['email'],q,q_taker['correctAns'],q_taker['is_completed'])
