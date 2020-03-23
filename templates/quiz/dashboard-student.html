@@ -10,22 +10,25 @@
 
 {% block header_buttons %}
     <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'about' %}">About</button>
-    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferencesStudent' %}">Preferences</button>
     {% block next_quiz %}
-        <button class="btn btn-quizBuddy-5 mr-2" type="button">{{nextQuiz}}</button>
+        <button class="btn btn-quizBuddy-5 mr-2" type="button">Next deadline: {{nextQuiz}}</button>
     {% endblock %}
-    <a href={% url 'user_logout' %} class="btn btn-quizBuddy-4 mr-2" role="button">Logout</a>
+    {% block dash_button %}
+    {% endblock %}
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'quizResultsStudent' %}">Results</button>
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferencesStudent' %}">Preferences</button>
+    <button class="btn btn-quizBuddy-5 mr-2" type="button" onclick="window.location.href={% url 'user_logout' %}">Logout</button>
 {% endblock %}
 
 {% block body_block%}
-<div class="container-fluids">
+<div class="container-fluid">
     <div class="row">
         <div class = "col-8">
             {% if classes %}
-            <ul class="nav nav-tabs mt-1 mr-1 ml-3">
+            <ul class="nav nav-tabs mt-1 mr-1 ml-3 ">
                 {% for class in classes %}
                     <li class="nav-item">
-                        <a href={% url 'classStudent' class.slug %} class="btn btn-quizBuddy-4 mr-2" role="button">{{ class.name }}</a>
+                        <a href={% url 'classStudent' class.slug %} class="btn btn-quizBuddy-4 mr-2 mb-1" role="button">{{ class.name }}</a>
                     </li>
                 {% endfor %}
             </ul>
@@ -44,9 +47,8 @@
             <div class="card" style="width: 18rem;">
                 <img class="card-img-top" src= "{%static 'images/character/characterProfileLev1.jpg'%}" alt="Card image cap"/>
                     <div class="card-body">
-                    <h5 class="card-title">Username: {{user.username}}</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                    <h5 class="card-title">{{user.username}}</h5>
+                    <p class="card-text">Level: {{user.character.evolutionStage}}</p>
                 </div>
             </div>
         </div>

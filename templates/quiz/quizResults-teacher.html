@@ -1,0 +1,54 @@
+{% extends 'dashboard-teacher.html' %}
+{% load static%}
+
+{% block title_block %}
+        Quiz Results
+{% endblock %}
+
+{% block dash_button %}
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'dashboardTeacher' %}">Dashboard</button>
+{% endblock %}
+{% block body_block%}
+<div class="container">
+    <h1>Quiz Results</h1>
+    {% if quizTaken %}
+        <table class = 'table'>
+            <tr>
+                <th>Quiz Name</th>
+                <th>Student Name</th>
+                <th>Student Grade</th>
+            </tr>
+            {% for quiz,quizTaker in quizTaken.items %}
+                {% for q in quizTaker %}
+                    <tr>
+                        <td>{{ q.quiz }}</td>
+                        <td>{{ q.user.name }}</td>
+                        {% if q.is_completed %}
+                        <td>{{ q.correctAnswers }}</td>
+                        {% else %}
+                        <td>Not Completed</td>
+                        {% endif %}
+                    </tr>     
+                    {% if forloop.last %}
+                        {% for q_name, score in avg_score.items %}
+                            {% if q_name == q.quiz.name %}
+                            <tr>
+                                <td><strong>Total Mark:
+                                {{q.quiz.question_count}} </strong></td>
+                                <td><strong> Average Mark: 
+                                {{score}}</strong></td>
+                                <td></td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </table>
+    {% else %}
+        <div class="alert alert-danger mt-1 mr-1 ml-3" role="alert">
+            Sorry! No Results to Show :(
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
