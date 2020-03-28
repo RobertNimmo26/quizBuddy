@@ -1,5 +1,5 @@
 from django import forms
-from .models import User
+from .models import User, Class
 
 #took out character (and related lines) for now as im still not sure how we're gonna do it (and also the radiobuttons are ugly af so)
 class UserFormStudent(forms.ModelForm):
@@ -21,7 +21,7 @@ class UserFormTeacher(forms.ModelForm):
 class quizCreationForm(forms.Form):
     quiz_title = forms.CharField(label="Quiz Title", max_length=50, required=True)
     quiz_description = forms.CharField(label="Quiz Description", max_length=255, required=True)
-    course = forms.CharField(label="Class", max_length=50, required=True)
+    course = forms.ModelChoiceField(queryset=Class.objects.all(), label="Class", required=True)
     question = forms.CharField(label="Question", max_length=50, required=True)
     first_option = forms.CharField(label="Option 1", max_length=50, required=True)
     second_option = forms.CharField(label="Option 2", max_length=50, required=True)
@@ -31,3 +31,5 @@ class quizCreationForm(forms.Form):
          ('third_option', 'option 3')]
     correct_answer = forms.ChoiceField(choices=ANSWERS, widget=forms.RadioSelect)
     due_date = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'], required=True)
+
+

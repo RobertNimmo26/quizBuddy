@@ -474,26 +474,17 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
 @login_required
 def createQuiz(request):
-    context_dict= {}
     if request.method == "POST":
         # Input data sent from form
         form = quizCreationForm(request.POST)
         # Create quiz objects and then save them to DB
         if form.is_valid():
-<<<<<<< HEAD
             course = Class.objects.filter(name=form.cleaned_data['course'])[0]
             quiz = Quiz.objects.get_or_create(
                 name=form.cleaned_data['quiz_title'],
                 description=form.cleaned_data['quiz_description'],
                 due_date=form.cleaned_data['due_date'])[0]
             quiz.course.add(course)
-=======
-            course = get_object_or_404(Class, name=form.cleaned_data['course'])
-            quiz = Quiz.objects.get_or_create(name=form.cleaned_data['quiz_title'],
-                course=Class,
-                description=form.cleaned_data['quiz_description'],
-                due_date=form.cleaned_data['due_date'])
->>>>>>> master
             quiz.save()
             print(form.cleaned_data['correct_answer'])
             question = Question(quiz=quiz, text=form.cleaned_data['question'])
@@ -516,7 +507,12 @@ def createQuiz(request):
         form = quizCreationForm()
     else:
         form = quizCreationForm()
-    return render(request, 'create-quiz.html', {'quizCreationForm':quizCreationForm})
+    courses = Class.objects.all()
+    context_dict= {
+        'course' : courses,
+        'quizCreationForm':quizCreationForm,
+    }
+    return render(request, 'create-quiz.html', context_dict)
 
 def user_login(request):
     context_dict = {}
