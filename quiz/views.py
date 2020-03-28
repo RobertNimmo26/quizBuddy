@@ -20,7 +20,6 @@ def teacher_check(user):
     else:
         return False
 
-
 def student_check(user):
     #implement using decorator "@user_passes_test(student_check)"
     if user.is_student:
@@ -52,7 +51,7 @@ def dashboardTeacher(request):
 
 
     context_dict["classes"] = class_list
-    # context_dict["quizes"] = quiz_list
+    context_dict["quizzes"] =nextQuizzes(class_list)
 
     # prints out whether the method is a GET or a POST
     print(request.method)
@@ -74,6 +73,23 @@ def nextQuiz(class_list):
         return nextQuiz
     except:
         return "You have no quizzes!"
+
+def nextQuizzes(class_list):
+    quizzes = {}
+    nextQuiz=None
+    for c in class_list:
+        for q in Quiz.objects.filter(course = c):
+            if nextQuiz==None:
+                nextQuiz = q
+            elif q.due_date < nextQuiz.due_date:
+                nextQuiz = q
+        if nextQuiz == None:
+            quizzes[c]="There's no quizzes due"
+        else:
+            quizzes[c]=nextQuiz
+
+    return quizzes
+    
 
 @login_required
 @user_passes_test(student_check)
@@ -247,27 +263,34 @@ def show_classTeacher(request, class_name_slug):
     for classObj in Class.objects.all():
         if user.email in classObj.get_teachers():
             class_list += [classObj]
+
     context_dict["classes"] = class_list
+    context_dict["quizzesDue"] =nextQuizzes(class_list)
+    print(context_dict["quizzesDue"])
+
 
     # prints out whether the method is a GET or a POST
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
 
-    #Try loop to get all information about class and quiz objects
-    try:
-        #Getting relevant class object
-        #Not using 'class' as keyword
-        classObj = get_object_or_404(Class,slug=class_name_slug)
+
+    #Getting relevant class object
+    #Not using 'class' as keyword
+    classObj = get_object_or_404(Class,slug=class_name_slug)
+
+    #Checking that user is in the class
+    if user.email not in classObj.get_teachers():
+        return redirect(reverse('dashboardTeacher'))
+    else:
+
         context_dict['class'] = classObj
+
 
         #Getting relevant quiz object
         quizzes = Quiz.objects.filter(course = classObj)
         context_dict['quizzes'] = quizzes
 
-    except Class.DoesNotExist:
-        context_dict['quizzes'] = None
-        context_dict['class'] = None
     return render(request, 'classTeacher.html', context = context_dict)
 
 @login_required
@@ -416,8 +439,11 @@ def registerTeacher(request):
 def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
     if request.method =='POST':
+        #gets class object
+        course= get_object_or_404(Class,classId=class_name_slug)
         #gets quiz object
         quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)
+
         correctAnswers=0
 
         #for each form response checks if answer is true
@@ -426,7 +452,7 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
                 correctAnswers+=1
 
         #Creates a new quiztaker object
-        quiz_taker= QuizTaker(user=request.user,quiz=quiz, correctAnswers=correctAnswers,is_completed=True,)
+        quiz_taker= QuizTaker(user=request.user,quiz=quiz, course=course, correctAnswers=correctAnswers,is_completed=True,)
         quiz_taker.save()
 
         #calculates new user evolvescore
@@ -549,14 +575,14 @@ def quizResultsTeacher(request):
     quizList = []
     quizTaken = defaultdict(list)
     average_Score = {}
-    
+
     #for every class where this user is a teacher
     for c in request.user.teachers.all():
         quiz = Quiz.objects.filter(course = c)
         for q in quiz:
             #add the quiz to the quizList
-            quizList.append(q)  
-    #for every quiz in the quizList  
+            quizList.append(q)
+    #for every quiz in the quizList
     for q in quizList:
         #get the quizTakers who have taken this quiz
         quizTaker = QuizTaker.objects.filter(quiz = q)
@@ -569,13 +595,15 @@ def quizResultsTeacher(request):
             if q_taken.is_completed:
                 sum_ans += q_taken.correctAnswers
                 count +=1
+
         #portion of code to calculate average, but if no one has taken the quiz, prevent division by zero error
         if count != 0:
             average_Score[q.name] = sum_ans/count
         else:
             average_Score[q.name] = count
-            
+
     context_dict['quizTaken'] = dict(quizTaken)
     context_dict['avg_score'] = average_Score
+    #print(quizTaken)
     return render(request,'quizResults-teacher.html',context = context_dict)
 

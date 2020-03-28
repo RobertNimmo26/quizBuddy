@@ -25,4 +25,10 @@
         </div>
     {% endif %}
     </div>
+    
+{% endblock %}
+{% block next_quizzes %}
+    {% for key, value in quizzesDue.items %}
+        <p class="card-text">{{key}}: {{value.due_date}}</p>
+    {% endfor %}
 {% endblock %}
