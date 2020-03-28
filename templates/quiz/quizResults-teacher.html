@@ -23,7 +23,7 @@
                 {% for q in quizTaker %}
                     <tr>
                         <td>{{ q.quiz }}</td>
-                        <td>{{ q.course }}
+                        <td>{{ q.course }}</td>
                         <td>{{ q.user.name }}</td>
                         {% if q.is_completed %}
                         <td>{{ q.correctAnswers }}</td>

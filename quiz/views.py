@@ -6,9 +6,12 @@ from django.urls import reverse
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
-from datetime import datetime
+
+from datetime import datetime, timedelta
+
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
 from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm
+
 from collections import defaultdict
 
 #Checker functions for logged on students or teachers, used with @user_passes_test()
@@ -51,7 +54,7 @@ def dashboardTeacher(request):
 
 
     context_dict["classes"] = class_list
-    context_dict["quizzes"] =nextQuizzes(class_list)
+    context_dict["quizzes"] =nextQuizzes(class_list,request.user)
 
     # prints out whether the method is a GET or a POST
     print(request.method)
@@ -60,12 +63,12 @@ def dashboardTeacher(request):
 
     return render(request, 'dashboard-teacher.html', context=context_dict)
 
-def nextQuiz(class_list):
+def nextQuiz(class_list,user):
     try:
         quizzes = []
         for c in class_list:
-            for q in Quiz.objects.filter(course = c):
-                quizzes.append(q)
+            userQuizzes= Quiz.objects.filter(course = c)
+            quizzes=getCurrentQuizzesStudent(userQuizzes,c,user)
         nextQuiz = quizzes[0].due_date
         for quiz in quizzes:
             if quiz.due_date < nextQuiz:
@@ -74,11 +77,13 @@ def nextQuiz(class_list):
     except:
         return "You have no quizzes!"
 
-def nextQuizzes(class_list):
+def nextQuizzes(class_list,user):
     quizzes = {}
     nextQuiz=None
     for c in class_list:
-        for q in Quiz.objects.filter(course = c):
+        print(c.name)
+        userQuizzes= Quiz.objects.filter(course = c)
+        for q in getCurrentQuizzesTeacher(userQuizzes,c,user):
             if nextQuiz==None:
                 nextQuiz = q
             elif q.due_date < nextQuiz.due_date:
@@ -87,9 +92,10 @@ def nextQuizzes(class_list):
             quizzes[c]="There's no quizzes due"
         else:
             quizzes[c]=nextQuiz
+        nextQuiz=None
+
 
     return quizzes
-    
 
 @login_required
 @user_passes_test(student_check)
@@ -109,7 +115,7 @@ def dashboardStudent(request):
     # class_list = Class.objects.all()
     context_dict["classes"] = class_list
 
-    context_dict['nextQuiz']=nextQuiz(class_list)
+    context_dict['nextQuiz']=nextQuiz(class_list,request.user)
 
     # prints out whether the method is a GET or a POST
     print(request.method)
@@ -227,27 +233,77 @@ def show_classStudent(request, class_name_slug):
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
 
-    #Try loop to get all information about class and quiz objects
-    try:
-        #Getting relevant class object
-        #Not using 'class' as keyword
-        classObj = get_object_or_404(Class,slug=class_name_slug)
+    #Getting relevant class object
+    #Not using 'class' as keyword
+    classObj = get_object_or_404(Class,slug=class_name_slug)
+
+    #Checking that user is in the class
+    if user.email not in classObj.get_students():
+        return redirect(reverse('dashboardStudent'))
+    else:
         context_dict['class'] = classObj
 
         #Getting relevant quiz object
-        quizzes = Quiz.objects.filter(course = classObj)
-        context_dict['quizzes'] = quizzes
+        userQuizzes = Quiz.objects.filter(course = classObj)
 
-        context_dict['nextQuiz']=nextQuiz(class_list)
+        context_dict['quizzes'] = getCurrentQuizzesStudent(userQuizzes, classObj,request.user)
+
+        context_dict['nextQuiz']=nextQuiz(class_list,request.user)
 
         apikey= os.getenv("APIKEY")
 
         context_dict['apikey']=apikey
-
-    except Class.DoesNotExist:
-        context_dict['quizzes'] = None
-        context_dict['class'] = None
     return render(request, 'classStudent.html', context = context_dict)
+
+def getCurrentQuizzesStudent(userQuizzes,classObj,user):
+
+    dt=datetime.now()
+
+    #Simulating time
+    td = timedelta(days=0)
+
+    dontAddQuiz=False
+    quizzes=[]
+    for quiz in userQuizzes:
+        
+
+        if quiz.due_date.replace(tzinfo=None) > (dt+td):
+            print(quiz.name)
+            quiz_takers=QuizTaker.objects.filter(course = classObj, quiz=quiz)
+            for taker in quiz_takers:
+                print(taker.is_completed)
+                if taker.user==user and taker.is_completed==True:
+                    dontAddQuiz=True
+        else:
+            dontAddQuiz=True
+
+        if dontAddQuiz ==False:
+            quizzes.append(quiz)
+        dontAddQuiz=False
+
+    return quizzes
+
+def getCurrentQuizzesTeacher(userQuizzes,classObj,user):
+
+    dt=datetime.now()
+
+    #Simulating time
+    td = timedelta(days=0)
+
+    dontAddQuiz=False
+    quizzes=[]
+    for quiz in userQuizzes:
+        
+
+        if quiz.due_date.replace(tzinfo=None) < (dt+td):
+            dontAddQuiz=True
+
+        if dontAddQuiz ==False:
+            quizzes.append(quiz)
+        dontAddQuiz=False
+
+    return quizzes
+
 
 @login_required
 @user_passes_test(teacher_check)
@@ -265,7 +321,7 @@ def show_classTeacher(request, class_name_slug):
             class_list += [classObj]
 
     context_dict["classes"] = class_list
-    context_dict["quizzesDue"] =nextQuizzes(class_list)
+    context_dict["quizzesDue"] =nextQuizzes(class_list,request.user)
     print(context_dict["quizzesDue"])
 
 
@@ -288,8 +344,8 @@ def show_classTeacher(request, class_name_slug):
 
 
         #Getting relevant quiz object
-        quizzes = Quiz.objects.filter(course = classObj)
-        context_dict['quizzes'] = quizzes
+        userQuizzes = Quiz.objects.filter(course = classObj)
+        context_dict['quizzes'] =getCurrentQuizzesTeacher(userQuizzes,classObj,request.user)
 
     return render(request, 'classTeacher.html', context = context_dict)
 
@@ -303,7 +359,7 @@ def preferencesStudent(request):
     for c in request.user.students.all():
         class_list.append(c)
     #upcoming deadline
-    context_dict['nextQuiz'] = nextQuiz(class_list)
+    context_dict['nextQuiz'] = nextQuiz(class_list, request.user)
     #if its a post method then update the fields
     if request.method == 'POST':
         ableToChange=True
@@ -562,7 +618,7 @@ def quizResultsStudent(request):
     for c in request.user.students.all():
         class_list.append(c)
     #upcoming deadline
-    context_dict['nextQuiz'] = nextQuiz(class_list)
+    context_dict['nextQuiz'] = nextQuiz(class_list,request.user)
     #get the quizzes taken by the users if they are completed
     quiz_taken = QuizTaker.objects.filter(user = request.user,is_completed = True)
     context_dict['quiz_taken'] = quiz_taken
@@ -606,4 +662,3 @@ def quizResultsTeacher(request):
     context_dict['avg_score'] = average_Score
     #print(quizTaken)
     return render(request,'quizResults-teacher.html',context = context_dict)
-
