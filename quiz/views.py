@@ -1,20 +1,15 @@
-from django.shortcuts import render
+import os
+
 from django.http import HttpResponse
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import render,redirect, get_object_or_404
 from django.urls import reverse
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login,logout
+from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.auth.models import User
 from datetime import datetime
-from django.contrib.auth.decorators import user_passes_test
-
-from django.http import HttpResponse
-from django.shortcuts import redirect
-from django.urls import reverse
-
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
 from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm
+from collections import defaultdict
 
 #Checker functions for logged on students or teachers, used with @user_passes_test()
 
@@ -66,7 +61,6 @@ def dashboardTeacher(request):
 
     return render(request, 'dashboard-teacher.html', context=context_dict)
 
-@login_required
 def nextQuiz(class_list):
     try:
         quizzes = []
@@ -232,6 +226,10 @@ def show_classStudent(request, class_name_slug):
 
         context_dict['nextQuiz']=nextQuiz(class_list)
 
+        apikey= os.getenv("APIKEY")
+
+        context_dict['apikey']=apikey
+
     except Class.DoesNotExist:
         context_dict['quizzes'] = None
         context_dict['class'] = None
@@ -277,85 +275,82 @@ def show_classTeacher(request, class_name_slug):
 @login_required
 @user_passes_test(student_check)
 def preferencesStudent(request):
-    #if user is not a student, redirect them to the teachersPreferences
-    if request.user.is_student:
+    context_dict={}
+    #get the user who sent the request
+    user = User.objects.get(email = request.user)
+    class_list = []
+    for c in request.user.students.all():
+        class_list.append(c)
+    #upcoming deadline
+    context_dict['nextQuiz'] = nextQuiz(class_list)
+    #if its a post method then update the fields
+    if request.method == 'POST':
+        ableToChange=True
 
-        context_dict={}
-        #get the user who sent the request
-        user = User.objects.get(email = request.user)
-        #if its a post method then update the fields
-        if request.method == 'POST':
-            ableToChange=True
+        if request.POST['username']:
+            user.username = request.POST['username']
+        if request.POST['name']:
+            user.name = request.POST['name']
+        if 'email' in request.POST:
+            new_email=request.POST['email']
 
-            if request.POST['username']:
-                user.username = request.POST['username']
-            if request.POST['name']:
-                user.name = request.POST['name']
-            if 'email' in request.POST:
-                new_email=request.POST['email']
+            for otherUser in User.objects.all():
 
-                for otherUser in User.objects.all():
-
-                    if str(otherUser.email)== str(new_email) and str(new_email)!=str(user.email):
-                        context_dict['error']="Email aready exists. Please try a different email."
-                        ableToChange=False
-                if ableToChange==True:
-                    user.email = new_email
-            if 'characterType' in request.POST:
-                user.character = Character.objects.get(characterType =request.POST['characterType'], evolutionStage = user.evolveScore)
-            if request.POST['password']:
-                user.set_password(request.POST['password'])
-                user.save()
-                #ask user to login again
-                return redirect('/')
-
+                if str(otherUser.email)== str(new_email) and str(new_email)!=str(user.email):
+                    context_dict['error']="Email aready exists. Please try a different email."
+                    ableToChange=False
+            if ableToChange==True:
+                user.email = new_email
+        if 'characterType' in request.POST:
+            user.character = Character.objects.get(characterType =request.POST['characterType'], evolutionStage = user.evolveScore)
+        if request.POST['password']:
+            user.set_password(request.POST['password'])
             user.save()
-            print(user)
-            if ableToChange:
-                return redirect('dashboardStudent')
+            #ask user to login again
+            return redirect('/')
 
-            return render(request, 'preferences-student.html',context_dict)
-        return render(request, 'preferences-student.html', context_dict)
-    else:
-        return redirect('preferencesTeacher')
+        user.save()
+        print(user)
+        if ableToChange:
+            return redirect('dashboardStudent')
+
+        return render(request, 'preferences-student.html',context_dict)
+    return render(request, 'preferences-student.html', context_dict)
 
 @login_required
 @user_passes_test(teacher_check)
 def preferencesTeacher(request):
-    if request.user.is_teacher or request.user.is_staff:
-        context_dict={}
+    context_dict={}
 
-        user = User.objects.get(email = request.user)
-        if request.method == 'POST':
-            ableToChange=True
+    user = User.objects.get(email = request.user)
+    if request.method == 'POST':
+        ableToChange=True
 
-            if request.POST['username']:
-                user.username = request.POST['username']
-            if request.POST['name']:
-                user.name = request.POST['name']
-            if request.POST['email']:
-                new_email=request.POST['email']
+        if request.POST['username']:
+            user.username = request.POST['username']
+        if request.POST['name']:
+            user.name = request.POST['name']
+        if request.POST['email']:
+            new_email=request.POST['email']
 
-                for otherUser in User.objects.all():
+            for otherUser in User.objects.all():
 
-                    if str(otherUser.email)== str(new_email) and str(new_email)!=str(user.email):
-                        context_dict['error']="Email aready exists. Please try a different email."
-                        ableToChange=False
-                if ableToChange==True:
-                    user.email = new_email
-            if request.POST['password']:
-                user.set_password(request.POST['password'])
-                user.save()
-                return redirect('/')
+                if str(otherUser.email)== str(new_email) and str(new_email)!=str(user.email):
+                    context_dict['error']="Email aready exists. Please try a different email."
+                    ableToChange=False
+            if ableToChange==True:
+                user.email = new_email
+        if request.POST['password']:
+            user.set_password(request.POST['password'])
             user.save()
+            return redirect('/')
+        user.save()
 
-            if ableToChange:
-                return redirect('dashboardTeacher')
+        if ableToChange:
+            return redirect('dashboardTeacher')
 
-            return render(request, 'preferences-teacher.html',context_dict)
-        return render(request, 'preferences-teacher.html')
-    else:
-        return redirect('dashboardStudent')
+        return render(request, 'preferences-teacher.html',context_dict)
+    return render(request, 'preferences-teacher.html')
 
 @login_required
 def user_logout(request):
@@ -534,3 +529,55 @@ def user_login(request):
 
     else:
         return render(request, 'index.html', context=context_dict)
+
+@login_required   
+@user_passes_test(student_check)
+def quizResultsStudent(request):
+    context_dict = {}
+    class_list = []
+    for c in request.user.students.all():
+        class_list.append(c)
+    #upcoming deadline
+    context_dict['nextQuiz'] = nextQuiz(class_list)
+    #get the quizzes taken by the users if they are completed
+    quiz_taken = QuizTaker.objects.filter(user = request.user,is_completed = True)
+    context_dict['quiz_taken'] = quiz_taken
+    return render(request, 'quizResults-student.html',context = context_dict )
+
+@login_required
+@user_passes_test(teacher_check)
+def quizResultsTeacher(request):
+    context_dict = {}
+    quizList = []
+    quizTaken = defaultdict(list)
+    average_Score = {}
+    
+    #for every class where this user is a teacher
+    for c in request.user.teachers.all():
+        quiz = Quiz.objects.filter(course = c)
+        for q in quiz:
+            #add the quiz to the quizList
+            quizList.append(q)  
+    #for every quiz in the quizList  
+    for q in quizList:
+        #get the quizTakers who have taken this quiz
+        quizTaker = QuizTaker.objects.filter(quiz = q)
+        #sum_ans and count used to calculate average
+        sum_ans = 0
+        count = 0
+        #iterate over the querySet
+        for q_taken in quizTaker:
+            quizTaken[q_taken.quiz].append(q_taken)
+            if q_taken.is_completed:
+                sum_ans += q_taken.correctAnswers
+                count +=1
+        #portion of code to calculate average, but if no one has taken the quiz, prevent division by zero error
+        if count != 0:
+            average_Score[q.name] = sum_ans/count
+        else:
+            average_Score[q.name] = count
+            
+    context_dict['quizTaken'] = dict(quizTaken)
+    context_dict['avg_score'] = average_Score
+    return render(request,'quizResults-teacher.html',context = context_dict)
+

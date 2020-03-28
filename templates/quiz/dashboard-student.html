@@ -10,15 +10,18 @@
 
 {% block header_buttons %}
     <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'about' %}">About</button>
-    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferencesStudent' %}">Preferences</button>
     {% block next_quiz %}
         <button class="btn btn-quizBuddy-5 mr-2" type="button">Next deadline: {{nextQuiz}}</button>
     {% endblock %}
-    <a href={% url 'user_logout' %} class="btn btn-quizBuddy-4 mr-2" role="button">Logout</a>
+    {% block dash_button %}
+    {% endblock %}
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'quizResultsStudent' %}">Results</button>
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferencesStudent' %}">Preferences</button>
+    <button class="btn btn-quizBuddy-5 mr-2" type="button" onclick="window.location.href={% url 'user_logout' %}">Logout</button>
 {% endblock %}
 
 {% block body_block%}
-<div class="container-fluids">
+<div class="container-fluid">
     <div class="row">
         <div class = "col-8">
             {% if classes %}

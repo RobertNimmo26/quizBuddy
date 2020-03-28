@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'dashboard-teacher.html' %}
 
 {% block head_block %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
@@ -9,9 +9,8 @@
        Quiz Creation
 {% endblock %}
 
-{% block header_buttons %}
-<a href={% url 'dashboardTeacher' %} class="btn btn-quizBuddy-4 mr-2" role="button">Dashboard</a>
-<a href={% url 'user_logout' %} class="btn btn-quizBuddy-4 mr-2" role="button">Logout</a>
+{% block dash_button %}
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'dashboardTeacher' %}">Dashboard</button>
 {% endblock %}
 
 {% block body_block%}

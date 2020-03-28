@@ -1,19 +1,17 @@
-{% extends 'base.html' %}
+{% extends 'dashboard-student.html' %}
 {% load static%}
 
 {% block title_block %}
         Preferences
 {% endblock %}
 
-{% block header_buttons %}
+{% block dash_button %}
   <a href={% url 'dashboardStudent' %} class="btn btn-quizBuddy-4 mr-2" role="button">Dashboard</a>
-  <a href={% url 'user_logout' %} class="btn btn-quizBuddy-4 mr-2" role="button">Logout</a>
 {% endblock %}
 
 {% block body_block%}
     <div class="container">
         <h1>Edit Profile</h1>
-
         {% if error %}
           <br>
           <strong><font color="red">{{ error }}</font></strong>

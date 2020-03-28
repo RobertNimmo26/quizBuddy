@@ -13,8 +13,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from django.urls import include
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from quiz import views
@@ -35,9 +34,11 @@ urlpatterns = [ path('', views.user_login, name='index'),
                 path('registerStudent/', views.registerStudent, name='registerStudent'),
                 path('registerTeacher/', views.registerTeacher, name='registerTeacher'),
                 path('dashboardStudent/classStudent/<slug:class_name_slug>/<slug:quiz_name_slug>/',views.quiz,name='quiz'),
-                #path('preferences/', views.preferences, name='preferences'),
                 path('user_logout/',views.user_logout,name = 'user_logout'),
                 path('preferencesStudent/',views.preferencesStudent, name = 'preferencesStudent'),
                 path('preferencesTeacher/', views.preferencesTeacher, name = 'preferencesTeacher'),
                 path('createQuiz/', views.createQuiz, name = 'createQuiz'),
+                path('quizResultsStudent/',views.quizResultsStudent, name = 'quizResultsStudent'),
+                path('quizResultsTeacher/',views.quizResultsTeacher, name = 'quizResultsTeacher'),
+
 ]

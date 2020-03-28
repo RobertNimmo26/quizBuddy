@@ -1,7 +1,14 @@
 {% extends 'dashboard-student.html' %}
+{% load static %}
 
 {% block classTitle %}
     {{ class.name }}
+{% endblock %}
+
+{% block head_block%}
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script type="text/javascript" src="{% static 'javascript/addEvent.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 {% endblock %}
 
 {% block next_quiz %}
@@ -12,13 +19,15 @@
 <div class="container">
 {% if quizzes %}
     {% for quiz in quizzes %}
-        <div class="row mt-4 mr-1 ml-3 mb-1">
+        <div class="row mt-5 mr-1 ml-5 pt-2">
             <div class="col -3">
                 <a href="{% url 'quiz' class.slug quiz.slug %}" class="btn btn-primary mr-2 mt-1 mb-1">{{ quiz.name }}</a>
 
                 <button class="btn btn-quizBuddy-1 mr-2" type="button">{{ quiz.due_date }}</button>
             </div>
             <div class="col -3">
+
+                <button class="btn btn-quizBuddy-5 mr-2" type="button" onclick="execute('{{quiz.name}}','{{quiz.due_date|date:'Y-m-d H:i:00'}}','{{apikey}}')"><i class="fa fa-calendar"></i>     Add to Google Calendar</button>
 
             </div>
         </div>
