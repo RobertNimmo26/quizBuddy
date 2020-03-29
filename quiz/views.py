@@ -276,7 +276,6 @@ def dashboardStudent(request):
 
 @login_required
 def createQuiz(request):
-    questionCounter = 0
     if request.method == "POST":
         # Input data sent from form
         quizForm = quizCreationForm(request.POST)
@@ -292,13 +291,9 @@ def createQuiz(request):
             quiz.course.add(course)
             quiz.save()
             # Get questions
-            print(questionForms.is_valid())
             if questionForms.is_valid():
-                print(questionForms)
                 # Get data from each form and save to DB
                 for noOfQuestions, q in enumerate(questionForms):
-                    print(noOfQuestions)
-                    print(q)
                     question = Question(quiz=quiz, text=q.cleaned_data['question'])
                     question.save()
                     # Retrieve correct answer
@@ -316,8 +311,7 @@ def createQuiz(request):
                     if(correct_answer == "third_option"):
                         third_option.is_correct=True
                     third_option.save()
-                    questionCounter += 1
-                quiz.question_count = questionCounter
+                quiz.question_count = noOfQuestions + 1
                 quiz.save()
         # Clear forms for redirect
         quizForm = quizCreationForm()
