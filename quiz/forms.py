@@ -26,14 +26,14 @@ class quizCreationForm(forms.Form):
     due_date = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'], required=True)
 
 class questionCreationForm(forms.Form):
-    question = forms.CharField(widget=forms.TextInput(attrs={'required':'required'}), label="Question", max_length=50, required=True)
-    first_option = forms.CharField(widget=forms.TextInput(attrs={'required':'required'}), label="Option 1", max_length=50, required=True)
-    second_option = forms.CharField(widget=forms.TextInput(attrs={'required':'required'}), label="Option 2", max_length=50, required=True)
-    third_option = forms.CharField(widget=forms.TextInput(attrs={'required':'required'}), label="Option 3", max_length=50, required=True)
+    question = forms.CharField(widget=forms.TextInput(attrs={}), label="Question", max_length=50, required=True)
+    first_option = forms.CharField(widget=forms.TextInput(attrs={}), label="Option 1", max_length=50, required=True)
+    second_option = forms.CharField(widget=forms.TextInput(attrs={}), label="Option 2", max_length=50, required=True)
+    third_option = forms.CharField(widget=forms.TextInput(attrs={}), label="Option 3", max_length=50, required=True)
     ANSWERS=[('first_option','option 1'),
          ('second_option','option 2'),
          ('third_option', 'option 3')]
-    correct_answer = forms.ChoiceField(choices=ANSWERS, widget=forms.RadioSelect(attrs={'required':'required'}))
+    correct_answer = forms.ChoiceField(choices=ANSWERS, widget=forms.RadioSelect(attrs={}))
 # Formset Allows for adding multiple forms
 questionFormset = formset_factory(questionCreationForm)
 
