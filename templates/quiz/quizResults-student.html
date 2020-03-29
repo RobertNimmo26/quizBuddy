@@ -42,7 +42,8 @@
             <div class="card" style="width: 18rem;">
                 <img class="card-img-top" src= "{%static 'images/character/characterProfileLev1.jpg'%}" alt="Card image cap"/>
                     <div class="card-body">
-                    <h5 class="card-title">Hi {{user.username}} </h5>
+                    <h5 class="card-title">{{user.username}} </h5>
+                    <p class="card-text">Level: {{user.character.evolutionStage}}</p>
                     <a href={% url 'dashboardStudent' %} class="btn btn-quizBuddy-4 mr-2" role="button">Go Back to the Dashboard</a>
                     </div>
             </div>
