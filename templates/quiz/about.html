@@ -43,7 +43,6 @@
 <button class="btn btn-quizBuddy-5 mr-2" type="button" onclick="window.location.href={% url 'user_logout' %}">Logout</button>
 
 {% else %}
-<a href={% url 'about' %} class="btn btn-quizBuddy-4 mr-2" role="button">About</a>
 <a href={% url 'registerStudent' %} class="btn btn-quizBuddy-1 mr-2" role="button">Sign up, Student</a>
 <a href={% url 'registerTeacher' %} class="btn btn-quizBuddy-1-dark mr-2" role="button">Sign up, Teacher</a>
 {% endif %}
