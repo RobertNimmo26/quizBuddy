@@ -10,7 +10,7 @@
 <div class="container">
     <div class="row mt-5 mr-1 ml-3">
         <div class="col -3">
-            <h1>Email Students</h1>
+            <h1>Send an email to the class</h1>
             <form class="form-horizontal" method = 'post' action = "{%url 'sendEmail' %}" role="form"> 
                 {%csrf_token%}
                 <div class = "form-group">
@@ -36,7 +36,7 @@
                 <div class="form-group">
                   <label class="col-md-3 control-label"></label>
                   <div class="col-md-8">
-                    <input type="submit" class="btn btn-primary" value="Submit">
+                    <input type="submit" class="btn btn-primary" value="Send">
                     <span></span>
                     <a href={% url 'dashboardTeacher' %} class="btn btn-primary" role="button">Cancel</a>
                   </div>
