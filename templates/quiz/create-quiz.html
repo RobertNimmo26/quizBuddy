@@ -33,12 +33,12 @@
                     </table>
                 {% endfor %}
             </div>
-            <input type="button" value="Add Question" id="add_question" /> <hr>
-            <div id="empty_form" style="display:none">
+            <div id="empty_form">
                 <div class="no_error">
                     {{ questionForms.empty_form.as_p }}
                 </div>
             </div>
+            <input type="button" value="Add Question" id="add_question" /> <hr>
             <input type="submit" value="submit" class="btn btn-block btn-primary" />
         </form>
     </div>
