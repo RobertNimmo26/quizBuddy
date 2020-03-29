@@ -68,7 +68,10 @@ def nextQuiz(class_list,user):
         quizzes = []
         for c in class_list:
             userQuizzes= Quiz.objects.filter(course = c)
-            quizzes=getCurrentQuizzesStudent(userQuizzes,c,user)
+            print(userQuizzes)
+            for i in getCurrentQuizzesStudent(userQuizzes,c,user):
+                quizzes.append(i)
+            print(quizzes)
         nextQuiz = quizzes[0].due_date
         for quiz in quizzes:
             if quiz.due_date < nextQuiz:
@@ -125,6 +128,7 @@ def dashboardStudent(request):
     return render(request, 'dashboard-student.html', context=context_dict)
 
 @login_required
+<<<<<<< Updated upstream
 def manageStudent(request):
     context_dict = {}
     class_list = {}
@@ -147,6 +151,53 @@ def manageStudent(request):
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
     print(request.user)
+=======
+def createQuiz(request):
+    context_dict= {}
+    if request.method == 'post':
+        # Input data sent from form
+        form = quizCreationForm(request.POST)
+        # Create quiz objects and then save them to DB
+        if form.is_valid():
+            course = get_object_or_404(Class, name=form.cleaned_data['course'])
+            quiz = Quiz.objects.get_or_create(name=form.cleaned_data['quiz_title'],
+                course=Class,
+                description=form.cleaned_data['quiz_description'],
+                due_date=form.cleaned_data['due_date'])
+            quiz.save()
+            question = Question(quiz=quiz, text=form.cleaned_data['question'])
+            question.save()
+            first_option = Option(text=form.cleaned_data['first_question'], question=question, is_correct=false)
+            first_option.save()
+            second_option = Option(text=form.cleaned_data['second_option'], question=question, is_correct=false)
+            second_option.save()
+            third_option = Option(text=form.cleaned_data['third_option'], question=question, is_correct=false)
+            third_option.save()
+        return redirect(reverse('createQuiz'))
+    else:
+        form = quizCreationForm()
+    return render(request, 'create-quiz.html', {'quizCreationForm':quizCreationForm})
+
+@login_required
+def quiz(request,class_name_slug=None,quiz_name_slug=None):
+
+    if request.method =='POST':
+        #gets class object
+        course= get_object_or_404(Class,classId=class_name_slug)
+        #gets quiz object
+        quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)
+
+        correctAnswers=0
+
+        #for each form response checks if answer is true
+        for key, value in request.POST.items():
+            if value =='True':
+                correctAnswers+=1
+
+        #Creates a new quiztaker object
+        quiz_taker= QuizTaker(user=request.user,quiz=quiz, course=course, correctAnswers=correctAnswers,is_completed=True,)
+        quiz_taker.save()
+>>>>>>> Stashed changes
 
     return render(request, 'manage-student.html', context=context_dict)
 
