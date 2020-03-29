@@ -19,13 +19,13 @@
         {% endif %}
 
         <div class="col-md-9 personal-info">
-          <form class="form-horizontal" method = 'post' action = "." role="form">
+          <form class="form-horizontal" method = 'post' action = "." role="form"> 
            {%csrf_token%}
             <div class="row">
               <div class="col-md-3">
                 <div class="text-center">
                   <h3>Hi {{user.name}} :)</h3>
-                    <img src = "{% static "images/character/char" %}{{user.character.characterType}}{{user.character.evolutionStage}}.png" class="avatar img-circle" alt="avatar">
+                    <img src = "{%static 'images/character/characterProfileLev1.jpg'%}" class="avatar img-circle" alt="avatar">
                 </div>
             </div>
         </div>
@@ -58,16 +58,16 @@
             <div class="col-lg-8">
               <label class = "radio-inline" for="characterType1">
                 <input type="radio" id="1" name="characterType" value="1">
-                <img src = "{%static 'images/character/char11.png'%}" width=120px />
+                <img src = "{%static 'images/character/characterProfileLev1.jpg'%}"/>
               </label>
               <label class = "radio-inline" for="characterType2">
                 <input type="radio" id="2" name="characterType" value="2">
-                <img src = "{%static 'images/character/char21.png'%}" width=120px/>
+                <img src = "{%static 'images/character/characterProfileLev2.jpg'%}"/>
               </label>
               <label class = "radio-inline" for="characterType3">
                 <input type="radio" id="3" name="characterType" value="3">
-                <img src = "{%static 'images/character/char31.png'%}" width=120px/>
-              </label>
+                <img src = "{%static 'images/character/characterProfileLev3.jpg'%}"/>
+              </label>          
             </div>
         </div>
           <div class="form-group">
