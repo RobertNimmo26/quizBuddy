@@ -51,9 +51,7 @@ def populate():
       'Psychology':{'quiz':psyc_quiz,'teacher':teacher_users['David'], 'student':student_users['Alice']}}
 
     quizTaker = {'MCQSet1':{'student':student_users['Alice'],'class':'Maths','correctAns':3,'is_completed':True},
-    'MCQSet2':{'student':student_users['Alice'],'class':'Maths','correctAns':0,'is_completed':False},
-    'Programming':{'student':student_users['Tom'],'class':'Computing','correctAns':2,'is_completed':True},
-    'Psych-Basics':{'student':student_users['Alice'],'class':'Psychology','correctAns':4,'is_completed':False}}
+    'Programming':{'student':student_users['Tom'],'class':'Computing','correctAns':2,'is_completed':True}}
 
     #Add courses and quizzes to courses
     for course, course_data in course.items():
