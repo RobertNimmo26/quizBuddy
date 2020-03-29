@@ -60,6 +60,7 @@ class Class(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        self.classId 
         self.slug = slugify(self.classId)
         super(Class, self).save(*args, **kwargs)
 

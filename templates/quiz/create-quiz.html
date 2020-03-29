@@ -14,32 +14,65 @@
 {% endblock %}
 
 {% block body_block%}
-    <div class="container">
-        <div class="row mt-4 mr-1">
-            <div class="col">
-            <form action="{% url 'createQuiz' %}" method="post">
+<div class="container">
+<div class="row mt-4 mr-1">
+    <div class="col">
+        <form action="{% url 'createQuiz' %}" method="post">
+            <div class="form-group">
                 {% csrf_token %}
-                 <ul class="list-group mb-1">
+                <ul class="list-group mb-1">
                     {% for field in quizCreationForm %}
-                    <li class="list-group-item"> <p style="text-align:left;">
-                                                    {{ field.label }}
-                                                <span style="float:right;">
-                                                    {{ field }}
-                                                </span>
-                                                </p>
-                    </li>
+                        <li class="list-group-item">
+                            <p style="text-align:left;">
+                                {{ field.label }}
+                            <span style="float:right;">
+                                {{ field }}
+                            </span>
+                            </p>
+                        </li>
                     {% endfor %}
                 </ul>
-                <input class="btn btn-quizBuddy-3 btn-lg" type="submit" value="submit" />
-            </form>
-            <script>
-                $(function () {
-                    $("#id_due_date").datetimepicker({
-                        format: 'd/m/Y H:i',
-                    });
-                });
-            </script>
             </div>
-        </div>
+            {{ questionForms.management_form }}
+            <div id="form_set">
+                {% for question in questionForms.forms %}
+                    {% for field in question %}
+                    {{ question.non_field_errors }}
+                    {{ question.errors }}
+                    <li class="list-group-item">
+                        <p style="text-align:left;">
+                            {{ field.label }}
+                        <span style="float:right;">
+                            {{ field }}
+                        </span>
+                        </p>
+                    </li>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            <div id="empty_form">
+                <div class="no_error list-group mb-1">
+                   <li class="list-group-item">
+                     {{ questionForms.empty_form.as_p }}
+                   </li>
+                </div>
+            </div>
+            <input type="button" value="Add Question" id="add_question" /> <hr>
+            <input class="btn btn-quizBuddy-3 btn-lg" type="submit" value="submit" />
+        </form>
     </div>
+</div>
+</div>
+<script>
+    $(function () {
+        $("#id_due_date").datetimepicker({
+            format: 'd/m/Y H:i',
+        });
+    });
+    $('#add_question').click(function() {
+	    var form_idx = $('#id_form-TOTAL_FORMS').val();
+	    $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+	    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+    });
+</script>
 {% endblock %}

@@ -4,11 +4,11 @@ from django.core.mail import EmailMessage,BadHeaderError
 from django.shortcuts import render,redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth import authenticate, login,logout
-from django.contrib.auth.decorators import login_required,user_passes_test
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
-from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm
+from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset
 from collections import defaultdict
 
 def registerStudent(request):
@@ -261,7 +261,8 @@ def nextQuiz(class_list,user):
         quizzes = []
         for c in class_list:
             userQuizzes= Quiz.objects.filter(course = c)
-            quizzes=getCurrentQuizzesStudent(userQuizzes,c,user)
+            for i in getCurrentQuizzesStudent(userQuizzes,c,user):
+                quizzes.append(i)
         nextQuiz = quizzes[0].due_date
         for quiz in quizzes:
             if quiz.due_date < nextQuiz:
@@ -329,6 +330,9 @@ def createQuiz(request):
 def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
     if request.method =='POST':
+        #gets class object
+        course= get_object_or_404(Class,classId=class_name_slug)
+        print(course)
         #gets quiz object
         quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)
         correctAnswers=0
@@ -339,7 +343,7 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
                 correctAnswers+=1
 
         #Creates a new quiztaker object
-        quiz_taker= QuizTaker(user=request.user,quiz=quiz, correctAnswers=correctAnswers,is_completed=True,)
+        quiz_taker= QuizTaker(user=request.user,quiz=quiz, course=course, correctAnswers=correctAnswers,is_completed=True,)
         quiz_taker.save()
 
         #calculates new user evolvescore
