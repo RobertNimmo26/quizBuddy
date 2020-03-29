@@ -8,11 +8,11 @@
     <div class="container">
     {% if quizzes %}
         {% for quiz in quizzes %}
-            <div class="row mt-5 mr-1 ml-3">
+            <div class="row mt-5 mr-1 mb-1 ml-3">
                 <div class="col -3">
-                    <a href="#" class="btn btn-primary mr-2">{{ quiz.name }}</a>
+                    <a href="#" class="btn btn-primary mr-2 mb-1">{{ quiz.name }}</a>
 
-                    <button class="btn btn-quizBuddy-1 mr-2" type="button" onclick="window.location.href='#'">{{ quiz.due_date }}</button>
+                    <button class="btn btn-quizBuddy-1 mr-2 mb-1" type="button" onclick="window.location.href='#'">{{ quiz.due_date }}</button>
                 </div>
                 <div class="col -3">
 
@@ -25,7 +25,7 @@
         </div>
     {% endif %}
     </div>
-    
+
 {% endblock %}
 {% block next_quizzes %}
     {% for key, value in quizzesDue.items %}
