@@ -41,11 +41,11 @@
         <div class="col-4 ">
             <div class="card" style="width: 18rem;">
                 <img class="card-img-top" src= "{%static 'images/character/characterProfileLev1.jpg'%}" alt="Card image cap"/>
-                    <div class="card-body">
+                <div class="card-body">
                     <h5 class="card-title">{{user.username}} </h5>
                     <p class="card-text">Level: {{user.character.evolutionStage}}</p>
-                    <a href={% url 'dashboardStudent' %} class="btn btn-quizBuddy-4 mr-2" role="button">Go Back to the Dashboard</a>
-                    </div>
+                    <p class="card-text">Points: {{user.evolveScore}}
+                </div>
             </div>
         </div>
     </div>
