@@ -57,3 +57,32 @@
     });
 </script>
 {% endblock %}
+    <div class="container">
+        <div class="row mt-4 mr-1">
+            <div class="col">
+            <form action="{% url 'createQuiz' %}" method="post">
+                {% csrf_token %}
+                 <ul class="list-group mb-1">
+                    {% for field in quizCreationForm %}
+                    <li class="list-group-item"> <p style="text-align:left;">
+                                                    {{ field.label }}
+                                                <span style="float:right;">
+                                                    {{ field }}
+                                                </span>
+                                                </p>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <input class="btn btn-quizBuddy-3 btn-lg" type="submit" value="submit" />
+            </form>
+            <script>
+                $(function () {
+                    $("#id_due_date").datetimepicker({
+                        format: 'd/m/Y H:i',
+                    });
+                });
+            </script>
+            </div>
+        </div>
+    </div>
+{% endblock %}

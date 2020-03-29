@@ -26,7 +26,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_teacher = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
     character = models.ForeignKey("Character", blank=True, null=True, on_delete=models.SET_NULL)
-    evolveScore = models.IntegerField(_("score"),blank = True, null = True,default=0)
+    #evolveScore = models.IntegerField(_("score"),blank = True, null = True,default=0)
 
 
     #Required django User fields
@@ -114,6 +114,7 @@ class Option(models.Model):
 class QuizTaker(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    course = models.ForeignKey(Class, on_delete=models.CASCADE)
     correctAnswers = models.IntegerField(default=0)
     is_completed = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)

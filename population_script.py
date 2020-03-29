@@ -50,10 +50,10 @@ def populate():
      'Computing': {'quiz':computing_quiz,'teacher':teacher_users['Anna'],'student':student_users['Tom']},
       'Psychology':{'quiz':psyc_quiz,'teacher':teacher_users['David'], 'student':student_users['Alice']}}
 
-    quizTaker = {'MCQSet1':{'student':student_users['Alice'],'correctAns':3,'is_completed':True},
-    'MCQSet2':{'student':student_users['Alice'],'correctAns':0,'is_completed':False},
-    'Programming':{'student':student_users['Tom'],'correctAns':2,'is_completed':True},
-    'Psych-Basics':{'student':student_users['Alice'],'correctAns':4,'is_completed':False}}
+    quizTaker = {'MCQSet1':{'student':student_users['Alice'],'class':'Maths','correctAns':3,'is_completed':True},
+    'MCQSet2':{'student':student_users['Alice'],'class':'Maths','correctAns':0,'is_completed':False},
+    'Programming':{'student':student_users['Tom'],'class':'Computing','correctAns':2,'is_completed':True},
+    'Psych-Basics':{'student':student_users['Alice'],'class':'Psychology','correctAns':4,'is_completed':False}}
 
     #Add courses and quizzes to courses
     for course, course_data in course.items():
@@ -63,7 +63,7 @@ def populate():
 
     #Make students do quizzes
     for q,q_taker in quizTaker.items():
-        q = add_quizTaker(q_taker['student']['email'],q,q_taker['correctAns'],q_taker['is_completed'])
+        q = add_quizTaker(q_taker['student']['email'],q,q_taker['class'],q_taker['correctAns'],q_taker['is_completed'])
 
     #ADD QUESTIONS TO THE QUIZZES AND THEN ADD OPTIONS TO THE QUESTIONS
     #------------------------------------------------------------------------------------------------------------------------------------
@@ -206,10 +206,11 @@ def add_character(charac_type, evolStage ):
     charac.save()
     return charac
 
-def add_quizTaker(user,q,correctAns,complete):
+def add_quizTaker(user,q,course,correctAns,complete):
     quiz = Quiz.objects.get(name = q)
+    courseObj = Class.objects.get(name=course)
     student = User.objects.get(email = user)
-    quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = student, correctAnswers = correctAns, is_completed = complete)[0]
+    quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = student,course=courseObj, correctAnswers = correctAns, is_completed = complete)[0]
     quizTaker.save()
     return quizTaker
 
