@@ -8,10 +8,46 @@
 {% endblock %}
 
 {% block header_buttons %}
-    <a href={% url 'about' %} class="btn btn-quizBuddy-4 mr-2" role="button">About</a>
-    <a href={% url 'registerStudent' %} class="btn btn-quizBuddy-1 mr-2" role="button">Sign up, Student</a>
-    <a href={% url 'registerTeacher' %} class="btn btn-quizBuddy-1-dark mr-2" role="button">Sign up, Teacher</a>
+<button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'about' %}">About</button>
+{% if request.user.is_student %}
+{% block next_quiz %}
+    <button class="btn btn-quizBuddy-5 mr-2" type="button">Next deadline: {{nextQuiz}}</button>
 {% endblock %}
+{% endif %}
+{% block dash_button %}
+{% if request.user.is_teacher %}
+<button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'dashboardTeacher' %}">Dashboard</button>
+{% elif request.user.is_student %}
+<button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'dashboardStudent' %}">Dashboard</button>
+{% endif %}
+{% endblock %}
+
+{% if request.user.is_teacher %}
+<div class="btn-group" role="group">
+<button id="btnGroupDrop1" type="button" class="btn btn-quizBuddy-1-dark mr-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Create
+</button>
+<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+    <a class="dropdown-item" href="#">Create class</a>
+    <a class="dropdown-item" href={% url 'createQuiz' %}>Create quiz</a>
+</div>
+</div>
+<button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'quizResultsTeacher' %}">View Results</button>
+<button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'manageStudent' %}">Manage Students</button>
+<button class="btn btn-quizBuddy-1-dark mr-2" type="button" onclick="window.location.href={% url 'preferencesTeacher' %}">Preferences</button>
+<button class="btn btn-quizBuddy-5 mr-2" type ="button" onclick="window.location.href={% url 'user_logout' %}">Logout</button>
+
+{% elif request.user.is_student %}
+<button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'quizResultsStudent' %}">Results</button>
+<button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'preferencesStudent' %}">Preferences</button>
+<button class="btn btn-quizBuddy-5 mr-2" type="button" onclick="window.location.href={% url 'user_logout' %}">Logout</button>
+
+{% else %}
+<a href={% url 'registerStudent' %} class="btn btn-quizBuddy-1 mr-2" role="button">Sign up, Student</a>
+<a href={% url 'registerTeacher' %} class="btn btn-quizBuddy-1-dark mr-2" role="button">Sign up, Teacher</a>
+{% endif %}
+{% endblock %}
+
 {% block body_block%}
  <!-- makes the whole thing full screen -->
 <div class="jumbotron jumbotron-fluid bg-white" align="center" style="height:100vh;">
