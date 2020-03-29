@@ -276,6 +276,7 @@ def dashboardStudent(request):
 
 @login_required
 def createQuiz(request):
+    questionCounter = 0
     if request.method == "POST":
         # Input data sent from form
         quizForm = quizCreationForm(request.POST)
@@ -311,11 +312,14 @@ def createQuiz(request):
                     if(correct_answer == "third_option"):
                         third_option.is_correct=True
                     third_option.save()
+                    questionCounter += 1
+                quiz.question_count = questionCounter
+                quiz.save()
         # Clear forms for redirect
-        form = quizCreationForm()
+        quizForm = quizCreationForm()
         questionForms = questionFormset()
     else:
-        form = quizCreationForm()
+        quizForm = quizCreationForm()
         questionForms = questionFormset()
     context_dict = {
         'questionForms':questionForms,
