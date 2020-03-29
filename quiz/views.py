@@ -291,9 +291,13 @@ def createQuiz(request):
             quiz.course.add(course)
             quiz.save()
             # Get questions
+            print(questionForms.is_valid())
             if questionForms.is_valid():
+                print(questionForms)
                 # Get data from each form and save to DB
-                for q in questionForms:
+                for noOfQuestions, q in enumerate(questionForms):
+                    print(noOfQuestions)
+                    print(q)
                     question = Question(quiz=quiz, text=q.cleaned_data['question'])
                     question.save()
                     # Retrieve correct answer
@@ -311,16 +315,19 @@ def createQuiz(request):
                     if(correct_answer == "third_option"):
                         third_option.is_correct=True
                     third_option.save()
-        # Clear forms for redirect
-        form = quizCreationForm()
-        questionForms = questionFormset()
+                quiz.question_count=(noOfQuestions+1)
+        return redirect(reverse('dashboardTeacher'))
+
     else:
+
         form = quizCreationForm()
+        form.fields['course'].queryset=Class.objects.filter(teacher=request.user)
         questionForms = questionFormset()
-    context_dict = {
-        'questionForms':questionForms,
-        'quizCreationForm':quizCreationForm,
-    }
+
+        context_dict = {
+            'questionForms':questionForms,
+            'quizCreationForm':form,
+        }
     return render(request, 'create-quiz.html', context_dict)
 
 @login_required
