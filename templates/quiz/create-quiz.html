@@ -22,8 +22,14 @@
         <div class="form-group">
             {% csrf_token %}
             {{ quizCreationForm.as_p }} <br>
-            <input type="submit" value="submit" />
         </div>
+        <div>
+        {{ questionForms.management_form }}
+        {% for question in questionForms %}
+        {{question.as_p}}
+        {% endfor %}
+        </div>
+        <input type="submit" value="submit" class="btn btn-block btn-primary" />
         </form>
     </div>
 </div>

@@ -4,11 +4,11 @@ from django.http import HttpResponse
 from django.shortcuts import render,redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth import authenticate, login,logout
-from django.contrib.auth.decorators import login_required,user_passes_test
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from datetime import datetime
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
-from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm
+from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset
 from collections import defaultdict
 
 #Checker functions for logged on students or teachers, used with @user_passes_test()
@@ -476,40 +476,46 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 def createQuiz(request):
     if request.method == "POST":
         # Input data sent from form
-        form = quizCreationForm(request.POST)
+        quizForm = quizCreationForm(request.POST)
+        questionForms = questionFormset(request.POST)
         # Create quiz objects and then save them to DB
-        if form.is_valid():
-            course = Class.objects.filter(name=form.cleaned_data['course'])[0]
+        if quizForm.is_valid():
+            # Course is synonymous with class
+            course = Class.objects.filter(name=quizForm.cleaned_data['course'])[0]
             quiz = Quiz.objects.get_or_create(
-                name=form.cleaned_data['quiz_title'],
-                description=form.cleaned_data['quiz_description'],
-                due_date=form.cleaned_data['due_date'])[0]
+                name=quizForm.cleaned_data['quiz_title'],
+                description=quizForm.cleaned_data['quiz_description'],
+                due_date=quizForm.cleaned_data['due_date'])[0]
             quiz.course.add(course)
             quiz.save()
-            print(form.cleaned_data['correct_answer'])
-            question = Question(quiz=quiz, text=form.cleaned_data['question'])
-            question.save()
-            # Retrieve correct answer
-            correct_answer = form.cleaned_data['correct_answer']
-            # Set questions and save to database
-            first_option = Option(text=form.cleaned_data['first_option'], question=question, is_correct=False)
-            if(correct_answer == "first_option"):
-                first_option.is_correct=True
-            first_option.save()
-            second_option = Option(text=form.cleaned_data['second_option'], question=question, is_correct=False)
-            if(correct_answer == "second_option"):
-                second_option.is_correct=True
-            second_option.save()
-            third_option = Option(text=form.cleaned_data['third_option'], question=question, is_correct=False)
-            if(correct_answer == "third_option"):
-                third_option.is_correct=True
-            third_option.save()
+        # Get questions
+        if questionForms.is_valid():
+            # Get data from each form and save to DB
+            for q in questionForms:
+                question = Question(quiz=quiz, text=q.cleaned_data['question'])
+                question.save()
+                # Retrieve correct answer
+                correct_answer = q.cleaned_data['correct_answer']
+                # Set questions and save to database
+                first_option = Option(text=q.cleaned_data['first_option'], question=question, is_correct=False)
+                if(correct_answer == "first_option"):
+                    first_option.is_correct=True
+                first_option.save()
+                second_option = Option(text=q.cleaned_data['second_option'], question=question, is_correct=False)
+                if(correct_answer == "second_option"):
+                    second_option.is_correct=True
+                second_option.save()
+                third_option = Option(text=q.cleaned_data['third_option'], question=question, is_correct=False)
+                if(correct_answer == "third_option"):
+                    third_option.is_correct=True
+                third_option.save()
         form = quizCreationForm()
+        questionForms = questionFormset()
     else:
         form = quizCreationForm()
-    courses = Class.objects.all()
-    context_dict= {
-        'course' : courses,
+        questionForms = questionFormset()
+    context_dict = {
+        'questionForms':questionForms,
         'quizCreationForm':quizCreationForm,
     }
     return render(request, 'create-quiz.html', context_dict)
