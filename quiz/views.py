@@ -29,7 +29,13 @@ def registerStudent(request):
 
             user.is_student=True
             user.save()
+            print(user)
+            print(request.user)
+            character= Character(characterType=1, can_change=True, evolutionStage=1)
+            character.save()
 
+            user.character=character
+            user.save()
             registered = True
         else:
             # invalid form, print error
@@ -95,6 +101,21 @@ def user_login(request):
 
 def about(request):
     context_dict= {}
+    if not request.user.is_anonymous:
+        user = User.objects.get(email = request.user)
+        #IF IT'S A STUDENT then we need this info in order to be able to display the deadline
+        if user.is_student:
+            class_list = []
+
+            #Getting the Class and Quiz objects to display
+            for classObj in Class.objects.all():
+                if user.email in classObj.get_students():
+                    class_list += [classObj]
+
+            # class_list = Class.objects.all()
+            context_dict["classes"] = class_list
+
+            context_dict['nextQuiz']=nextQuiz(class_list,request.user)
     # prints out whether the method is a GET or a POST
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
@@ -127,7 +148,7 @@ def getCurrentQuizzesTeacher(userQuizzes,classObj,user):
     dontAddQuiz=False
     quizzes=[]
     for quiz in userQuizzes:
-        
+
 
         if quiz.due_date.replace(tzinfo=None) < (dt+td):
             dontAddQuiz=True
@@ -217,7 +238,7 @@ def getCurrentQuizzesStudent(userQuizzes,classObj,user):
     dontAddQuiz=False
     quizzes=[]
     for quiz in userQuizzes:
-        
+
 
         if quiz.due_date.replace(tzinfo=None) > (dt+td):
             print(quiz.name)
@@ -328,11 +349,11 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
         #evolves character if points are equal or greater than points required and the user hasn't evolved already
         if (newScore>=70 and request.user.character.evolutionStage!=3):
-            character= Character(characterType=request.user.character.characterType, can_change=request.user.character.characterType, evolutionStage=3)
+            character= Character(characterType=request.user.character.characterType, can_change=request.user.character.can_change, evolutionStage=3)
             character.save()
             request.user.character=character
         elif (newScore>=30 and request.user.character.evolutionStage!=2):
-            character= Character(characterType=request.user.character.characterType, can_change=request.user.character.characterType, evolutionStage=2)
+            character= Character(characterType=request.user.character.characterType, can_change=request.user.character.can_change, evolutionStage=2)
             character.save()
             request.user.character=character
         request.user.save()
@@ -479,7 +500,7 @@ def manageStudent(request):
 
     return render(request, 'manage-student.html', context=context_dict)
 
-@login_required   
+@login_required
 @user_passes_test(student_check)
 def quizResultsStudent(request):
     context_dict = {}
@@ -500,14 +521,14 @@ def quizResultsTeacher(request):
     quizList = []
     quizTaken = defaultdict(list)
     average_Score = {}
-    
+
     #for every class where this user is a teacher
     for c in request.user.teachers.all():
         quiz = Quiz.objects.filter(course = c)
         for q in quiz:
             #add the quiz to the quizList
-            quizList.append(q)  
-    #for every quiz in the quizList  
+            quizList.append(q)
+    #for every quiz in the quizList
     for q in quizList:
         #get the quizTakers who have taken this quiz
         quizTaker = QuizTaker.objects.filter(quiz = q)
@@ -525,7 +546,7 @@ def quizResultsTeacher(request):
             average_Score[q.name] = sum_ans/count
         else:
             average_Score[q.name] = count
-            
+
     context_dict['quizTaken'] = dict(quizTaken)
     context_dict['avg_score'] = average_Score
     return render(request,'quizResults-teacher.html',context = context_dict)
@@ -621,7 +642,9 @@ def preferencesStudent(request):
             if ableToChange==True:
                 user.email = new_email
         if 'characterType' in request.POST:
-            user.character = Character.objects.get(characterType =request.POST['characterType'], evolutionStage = user.evolveScore)
+            character = Character(characterType=request.POST['characterType'], can_change=request.user.character.can_change, evolutionStage=user.character.evolutionStage)
+            character.save()
+            user.character = character
         if request.POST['password']:
             user.set_password(request.POST['password'])
             user.save()
@@ -677,4 +700,3 @@ def user_logout(request):
     logout(request)
     # Take the user back to the homepage.
     return redirect('/')
-

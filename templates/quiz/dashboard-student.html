@@ -11,7 +11,7 @@
 {% block header_buttons %}
     <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'about' %}">About</button>
     {% block next_quiz %}
-        <button class="btn btn-quizBuddy-5 mr-2" type="button">Next deadline: {{nextQuiz}}</button>
+        <button class="btn btn-quizBuddy-5 mr-2" type="button" >Next deadline: {{nextQuiz}}</button>
     {% endblock %}
     {% block dash_button %}
     {% endblock %}
@@ -49,12 +49,12 @@
             <br>
             <div class="card" style="width: 18rem;">
                 <br>
-                <img class="card-img-top" src= "{%static 'images/character/characterProfileLev1.jpg'%}" alt="Character"/>
+                <img class="card-img-top" src= "{% static "images/character/char" %}{{user.character.characterType}}{{user.character.evolutionStage}}.png" alt="Character"/>
                 <div class="card-body">
                     <h5 class="card-title">{{user.username}}</h5>
                     <p class="card-text">Level: {{user.character.evolutionStage}}</p>
                     <p class="card-text">Points: {{user.evolveScore}}
-                </div> 
+                </div>
             </div>
         </div>
     </div>

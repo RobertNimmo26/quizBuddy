@@ -30,10 +30,10 @@
         <div class = "col-8">
             {% if classes %}
             <nav class="navbar navbar-expand-lg navbar-light bg-light border-secondary border-left border-bottom border-right rounded-bottom">
-            <ul class="nav nav-tabs mt-1 mr-1 ml-3">
+            <ul class="nav nav-tabs mt-1 mb-1 mr-1 ml-3">
                 {% for class in classes %}
                     <li class="nav-item">
-                        <a href={% url 'classTeacher' class.slug %} class="btn btn-quizBuddy-4 mr-2" role="button">{{ class.name }}</a>
+                        <a href={% url 'classTeacher' class.slug %} class="btn btn-quizBuddy-4 mr-2 " role="button">{{ class.name }}</a>
                     </li>
                 {% endfor %}
             </ul>
@@ -57,7 +57,7 @@
                     {% if quizzes %}
                         {% block next_quizzes %}
                             {% for key, value in quizzes.items %}
-                                <p class="card-text">{{key}}: {{value.due_date}}</p>
+                                <p class="card-text mb-1 ">{{key}}: {{value.due_date}}</p>
                             {% endfor %}
                         {% endblock %}
                     {% else %}
