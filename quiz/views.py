@@ -275,49 +275,6 @@ def dashboardStudent(request):
     return render(request, 'dashboard-student.html', context=context_dict)
 
 @login_required
-def manageStudent(request):
-    context_dict = {}
-    class_list = {}
-    #Getting the Class and Quiz objects to display
-    print(Class.objects.filter(name='Computing'))
-    #RANDOM CODE BITS that were used to add teachers/students to classes for testing purposes
-    #request.user.teachers.add(Class.objects.filter(name='Computing').get())
-    #User.objects.filter(name='ka').get().students.add(Class.objects.filter(name='Computing').get())
-    for teacher_class in request.user.teachers.all():
-        student_names = []
-        class_name = teacher_class
-        print(teacher_class)
-        for student in teacher_class.student.all():
-            student_names.append(student.name)
-        class_list[class_name] = student_names
-    context_dict["classes"] = class_list
-    # context_dict["quizes"] = quiz_list
-
-    # prints out whether the method is a GET or a POST
-    print(request.method)
-    # prints out the user name, if no one is logged in it prints `AnonymousUser`
-    print(request.user)
-
-@login_required
-def quiz(request,class_name_slug=None,quiz_name_slug=None):
-
-    if request.method =='POST':
-        #gets class object
-        course= get_object_or_404(Class,classId=class_name_slug)
-        #gets quiz object
-        quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)
-
-        correctAnswers=0
-
-        #for each form response checks if answer is true
-        for key, value in request.POST.items():
-            if value =='True':
-                correctAnswers+=1
-
-        #Creates a new quiztaker object
-        quiz_taker= QuizTaker(user=request.user,quiz=quiz, course=course, correctAnswers=correctAnswers,is_completed=True,)
-        quiz_taker.save()
-
 def createQuiz(request):
     context_dict= {}
     if request.method == 'post':
@@ -346,6 +303,7 @@ def createQuiz(request):
 
 @login_required
 def quiz(request,class_name_slug=None,quiz_name_slug=None):
+
     if request.method =='POST':
         #gets class object
         course= get_object_or_404(Class,classId=class_name_slug)
