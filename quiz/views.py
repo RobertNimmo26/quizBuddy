@@ -1,5 +1,6 @@
 import os
 from django.http import HttpResponse
+from django.core.mail import EmailMessage,BadHeaderError
 from django.shortcuts import render,redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth import authenticate, login,logout
@@ -172,7 +173,7 @@ def dashboardTeacher(request):
 
 
     context_dict["classes"] = class_list
-    context_dict["quizzes"] =nextQuizzes(class_list,request.user)
+    context_dict["quizzes"] = nextQuizzes(class_list,request.user)
 
     # prints out whether the method is a GET or a POST
     print(request.method)
@@ -180,6 +181,30 @@ def dashboardTeacher(request):
     print(request.user)
 
     return render(request, 'dashboard-teacher.html', context=context_dict)
+
+@login_required
+@user_passes_test(teacher_check)
+def sendEmail(request):
+    context_dict = {}
+    class_list = []
+    for c in request.user.teachers.all():
+        class_list.append(c)
+    context_dict['classes'] = class_list
+    if request.method == 'POST':
+        course = request.POST['class']
+        subject = request.POST['subject']
+        message = request.POST['message']
+        student_emails = []
+        c = Class.objects.get(name = course)
+        for s in c.student.all():
+            student_emails.append(s.email)
+        try:
+            EmailMessage(subject, message, request.user.email, student_emails)
+        except BadHeaderError:
+            return HttpResponse('Invalid header found.')
+        return redirect('dashboardTeacher')
+    return render(request, "send_email.html", context = context_dict)
+
 
 #helper functions to get next quiz due date for student.
 def getCurrentQuizzesStudent(userQuizzes,classObj,user):

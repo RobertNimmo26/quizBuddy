@@ -125,3 +125,4 @@ STATICFILES_DIRS = [STATIC_DIR, ]
 # User model
 
 AUTH_USER_MODEL = 'quiz.User'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

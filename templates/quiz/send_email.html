@@ -1,0 +1,48 @@
+{% extends 'dashboard-teacher.html' %}
+{% block title_block %}
+        Email
+{% endblock %}
+{% block dash_button %}
+    <button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'dashboardTeacher' %}">Dashboard</button>
+{% endblock %}
+
+{% block body_block %}
+<div class="container">
+    <div class="row mt-5 mr-1 ml-3">
+        <div class="col -3">
+            <h1>Email Students</h1>
+            <form class="form-horizontal" method = 'post' action = "{%url 'sendEmail' %}" role="form"> 
+                {%csrf_token%}
+                <div class = "form-group">
+                    <label class="col-md-3 control-label">Choose Class</label>
+                    <select name="class">
+                        {% for c in classes %}
+                            <option value="{{c}}">{{c}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">Subject</label>
+                  <div class="col-md-8">
+                    <input class="form-control" type="text"  name = "subject" value="" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-lg-3 control-label">Message</label>
+                  <div class="col-lg-8">
+                    <input class="form-control" type="text" name = "message" value="" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label"></label>
+                  <div class="col-md-8">
+                    <input type="submit" class="btn btn-primary" value="Submit">
+                    <span></span>
+                    <a href={% url 'dashboardTeacher' %} class="btn btn-primary" role="button">Cancel</a>
+                  </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

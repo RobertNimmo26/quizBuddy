@@ -40,5 +40,5 @@ urlpatterns = [ path('', views.user_login, name='index'),
                 path('createQuiz/', views.createQuiz, name = 'createQuiz'),
                 path('quizResultsStudent/',views.quizResultsStudent, name = 'quizResultsStudent'),
                 path('quizResultsTeacher/',views.quizResultsTeacher, name = 'quizResultsTeacher'),
-
+                path('sendEmail/', views.sendEmail, name = 'sendEmail'),
 ]
