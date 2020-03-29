@@ -94,6 +94,20 @@ def user_login(request):
 
 def about(request):
     context_dict= {}
+    user = User.objects.get(email = request.user)
+    #IF IT'S A STUDENT then we need this info in order to be able to display the deadline
+    if user.is_student:
+        class_list = []
+
+        #Getting the Class and Quiz objects to display
+        for classObj in Class.objects.all():
+            if user.email in classObj.get_students():
+                class_list += [classObj]
+
+        # class_list = Class.objects.all()
+        context_dict["classes"] = class_list
+
+        context_dict['nextQuiz']=nextQuiz(class_list,request.user)
     # prints out whether the method is a GET or a POST
     print(request.method)
     # prints out the user name, if no one is logged in it prints `AnonymousUser`
@@ -253,25 +267,6 @@ def dashboardStudent(request):
     return render(request, 'dashboard-student.html', context=context_dict)
 
 @login_required
-@user_passes_test(teacher_check)
-def manageStudent(request):
-    context_dict = {}
-    class_list = {}
-    #Getting the Class and Quiz objects to display
-    print(Class.objects.filter(name='Computing'))
-    #RANDOM CODE BITS that were used to add teachers/students to classes for testing purposes
-    #request.user.teachers.add(Class.objects.filter(name='Computing').get())
-    #User.objects.filter(name='ka').get().students.add(Class.objects.filter(name='Computing').get())
-    for teacher_class in request.user.teachers.all():
-        student_names = []
-        class_name = teacher_class
-        print(teacher_class)
-        for student in teacher_class.student.all():
-            student_names.append(student.name)
-        class_list[class_name] = student_names
-    context_dict["classes"] = class_list
-    # context_dict["quizes"] = quiz_list
-    
 def createQuiz(request):
     context_dict= {}
     if request.method == 'post':
@@ -310,11 +305,6 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
         for key, value in request.POST.items():
             if value =='True':
                 correctAnswers+=1
-
-@login_required
-@user_passes_test(teacher_check)
-def classList(request, class_name_slug):
-    context_dict = {}
 
         #Creates a new quiztaker object
         quiz_taker= QuizTaker(user=request.user,quiz=quiz, correctAnswers=correctAnswers,is_completed=True,)
