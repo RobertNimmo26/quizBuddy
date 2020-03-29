@@ -19,17 +19,27 @@
 <div class="card" style="width: 40rem;" align="center">
     <div class="card-body bg-light">
         <form action="{% url 'createQuiz' %}" method="post">
-        <div class="form-group">
-            {% csrf_token %}
-            {{ quizCreationForm.as_p }} <br>
-        </div>
-        <div>
-        {{ questionForms.management_form }}
-        {% for question in questionForms %}
-        {{question.as_p}}
-        {% endfor %}
-        </div>
-        <input type="submit" value="submit" class="btn btn-block btn-primary" />
+            <div class="form-group">
+                {% csrf_token %}
+                {{ quizCreationForm.as_p }} <br>
+            </div>
+            {{ questionForms.management_form }}
+            <div id="form_set">
+                {% for question in questionForms.forms %}
+                    {{ question.non_field_errors }}
+                    {{ question.errors }}
+                    <table class="no_error">
+                        {{question.as_p}}
+                    </table>
+                {% endfor %}
+            </div>
+            <input type="button" value="Add Question" id="add_question" /> <hr>
+            <div id="empty_form" style="display:none">
+                <div class="no_error">
+                    {{ questionForms.empty_form.as_p }}
+                </div>
+            </div>
+            <input type="submit" value="submit" class="btn btn-block btn-primary" />
         </form>
     </div>
 </div>
@@ -39,6 +49,11 @@
         $("#id_due_date").datetimepicker({
             format: 'd/m/Y H:i',
         });
+    });
+    $('#add_question').click(function() {
+	    var form_idx = $('#id_form-TOTAL_FORMS').val();
+	    $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+	    $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
     });
 </script>
 {% endblock %}
