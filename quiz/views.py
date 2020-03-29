@@ -292,9 +292,13 @@ def createQuiz(request):
             quiz.course.add(course)
             quiz.save()
             # Get questions
+            print(questionForms.is_valid())
             if questionForms.is_valid():
+                print(questionForms)
                 # Get data from each form and save to DB
-                for q in questionForms:
+                for noOfQuestions, q in enumerate(questionForms):
+                    print(noOfQuestions)
+                    print(q)
                     question = Question(quiz=quiz, text=q.cleaned_data['question'])
                     question.save()
                     # Retrieve correct answer
@@ -321,9 +325,11 @@ def createQuiz(request):
     else:
         quizForm = quizCreationForm()
         questionForms = questionFormset()
+        quizForm.fields['course'].queryset=Class.objects.filter(teacher=request.user)
+
     context_dict = {
         'questionForms':questionForms,
-        'quizCreationForm':quizCreationForm,
+        'quizCreationForm':quizForm,
     }
     return render(request, 'create-quiz.html', context_dict)
 
