@@ -275,7 +275,10 @@ def dashboardStudent(request):
     return render(request, 'dashboard-student.html', context=context_dict)
 
 @login_required
+@user_passes_test(teacher_check)
 def createQuiz(request):
+    if request.method == "GET":
+        print(request.user)
     if request.method == "POST":
         # Input data sent from form
         quizForm = quizCreationForm(request.POST)
@@ -287,7 +290,8 @@ def createQuiz(request):
             quiz = Quiz.objects.get_or_create(
                 name=quizForm.cleaned_data['quiz_title'],
                 description=quizForm.cleaned_data['quiz_description'],
-                due_date=quizForm.cleaned_data['due_date'])[0]
+                due_date=quizForm.cleaned_data['due_date'],
+                teacher=request.user)[0]
             quiz.course.add(course)
             quiz.save()
             # Get questions

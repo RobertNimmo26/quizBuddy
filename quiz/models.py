@@ -70,8 +70,9 @@ class Class(models.Model):
 
 # Quiz Model
 class Quiz(models.Model):
-    quizId = models.AutoField(primary_key=True,verbose_name=_("id"))
+    quizId = models.AutoField(primary_key=True, verbose_name=_("id"))
     name = models.CharField(max_length=50)
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     # Course represents class model
     course = models.ManyToManyField(Class)
     description = models.CharField(max_length=255)

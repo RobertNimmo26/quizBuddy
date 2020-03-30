@@ -33,10 +33,7 @@
                     {% endfor %}
                 </ul>
             </div>
-
-
-
-            <div id="empty_form">
+            <div id="empty_form" style="display:none">
                 <table class='no_error'>
                      <ul class="list-group mt-1">
                         {% for field in questionForms.empty_form %}
@@ -52,8 +49,6 @@
                     </ul>
                 </table>
             </div>
-
-
             {{ questionForms.management_form }}
             <div id="form_set" class="mt-1">
                 {% for question in questionForms.forms %}
@@ -71,12 +66,6 @@
                         {% endfor %}
                 {% endfor %}
             </div>
-
-
-
-
-
-
             <input class="btn btn-quizBuddy-2 mt-1" type="button" value="Add Question" id="add_question" /> <hr>
             <input class="btn btn-quizBuddy-3 mt-1 btn-lg" type="submit" value="submit"/>
         </form>
@@ -91,7 +80,6 @@
     });
     $('#add_question').click(function() {
 	    var form_idx = $('#id_form-TOTAL_FORMS').val();
-
 	    $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
 	    $('#id_form-TOTAL_FORMS').val( parseInt(form_idx) + 1);
     });
