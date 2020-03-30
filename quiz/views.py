@@ -208,19 +208,23 @@ def dashboardTeacher(request):
 def sendEmail(request):
     context_dict = {}
     class_list = []
+    #get the classes that have this user as teacher and append them to classList
     for c in request.user.teachers.all():
         class_list.append(c)
+    #pass the classList to context dict
     context_dict['classes'] = class_list
     if request.method == 'POST':
         course = request.POST['class']
         subject = request.POST['subject']
         message = request.POST['message']
+        #get the students in the chosen class
         student_emails = []
         c = Class.objects.get(name = course)
         for s in c.student.all():
             student_emails.append(s.email)
         try:
-            EmailMessage(subject, message, request.user.email, student_emails)
+            email = EmailMessage(subject, message, request.user.email, student_emails)
+            email.send()
         except BadHeaderError:
             return HttpResponse('Invalid header found.')
         return redirect('dashboardTeacher')
