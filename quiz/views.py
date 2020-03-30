@@ -301,30 +301,59 @@ def dashboardStudent(request):
 
 @login_required
 def createQuiz(request):
-    context_dict= {}
-    if request.method == 'post':
+    if request.method == "POST":
         # Input data sent from form
-        form = quizCreationForm(request.POST)
+        quizForm = quizCreationForm(request.POST)
+        questionForms = questionFormset(request.POST)
         # Create quiz objects and then save them to DB
-        if form.is_valid():
-            course = get_object_or_404(Class, name=form.cleaned_data['course'])
-            quiz = Quiz.objects.get_or_create(name=form.cleaned_data['quiz_title'],
-                course=Class,
-                description=form.cleaned_data['quiz_description'],
-                due_date=form.cleaned_data['due_date'])
+        if quizForm.is_valid():
+            # Course is synonymous with class
+            course = Class.objects.filter(name=quizForm.cleaned_data['course'])[0]
+            quiz = Quiz.objects.get_or_create(
+                name=quizForm.cleaned_data['quiz_title'],
+                description=quizForm.cleaned_data['quiz_description'],
+                due_date=quizForm.cleaned_data['due_date'])[0]
+            quiz.course.add(course)
             quiz.save()
-            question = Question(quiz=quiz, text=form.cleaned_data['question'])
-            question.save()
-            first_option = Option(text=form.cleaned_data['first_question'], question=question, is_correct=false)
-            first_option.save()
-            second_option = Option(text=form.cleaned_data['second_option'], question=question, is_correct=false)
-            second_option.save()
-            third_option = Option(text=form.cleaned_data['third_option'], question=question, is_correct=false)
-            third_option.save()
-        return redirect(reverse('createQuiz'))
+            # Get questions
+            print(questionForms.is_valid())
+            if questionForms.is_valid():
+                print(questionForms)
+                # Get data from each form and save to DB
+                for noOfQuestions, q in enumerate(questionForms):
+                    print(noOfQuestions)
+                    print(q)
+                    question = Question(quiz=quiz, text=q.cleaned_data['question'])
+                    question.save()
+                    # Retrieve correct answer
+                    correct_answer = q.cleaned_data['correct_answer']
+                    # Set questions and save to database
+                    first_option = Option(text=q.cleaned_data['first_option'], question=question, is_correct=False)
+                    if(correct_answer == "first_option"):
+                        first_option.is_correct=True
+                    first_option.save()
+                    second_option = Option(text=q.cleaned_data['second_option'], question=question, is_correct=False)
+                    if(correct_answer == "second_option"):
+                        second_option.is_correct=True
+                    second_option.save()
+                    third_option = Option(text=q.cleaned_data['third_option'], question=question, is_correct=False)
+                    if(correct_answer == "third_option"):
+                        third_option.is_correct=True
+                    third_option.save()
+                quiz.question_count=(noOfQuestions+1)
+        return redirect(reverse('dashboardTeacher'))
+
     else:
+
         form = quizCreationForm()
-    return render(request, 'create-quiz.html', {'quizCreationForm':quizCreationForm})
+        form.fields['course'].queryset=Class.objects.filter(teacher=request.user)
+        questionForms = questionFormset()
+
+        context_dict = {
+            'questionForms':questionForms,
+            'quizCreationForm':form,
+        }
+    return render(request, 'create-quiz.html', context_dict)
 
 @login_required
 def quiz(request,class_name_slug=None,quiz_name_slug=None):
