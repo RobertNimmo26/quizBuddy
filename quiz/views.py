@@ -360,7 +360,7 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
     if request.method =='POST':
         #gets class object
-        course= get_object_or_404(Class,classId=class_name_slug)
+        course= get_object_or_404(Class,courseId=class_name_slug)
         print(course)
         #gets quiz object
         quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)
