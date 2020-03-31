@@ -5,8 +5,8 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('email','username','name','is_teacher','is_student','evolveScore')
 
 class ClassAdmin(admin.ModelAdmin):
-    list_display = ('classId','name','get_teachers','get_students')
-    prepopulated_fields = {'slug':('classId',)}
+    list_display = ('courseId','name','get_teachers','get_students')
+    prepopulated_fields = {'slug':('courseId',)}
 
 class QuizTakerAdmin(admin.ModelAdmin):
     list_display = ('correctAnswers','is_completed')

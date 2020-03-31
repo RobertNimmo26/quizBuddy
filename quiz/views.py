@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
-from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset
+from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset, classCreationForm
 from collections import defaultdict
 
 def registerStudent(request):
@@ -274,11 +274,35 @@ def dashboardStudent(request):
     print(context_dict)
     return render(request, 'dashboard-student.html', context=context_dict)
 
+
+@login_required
+@user_passes_test(teacher_check)
+def createClass(request):
+    if request.method == "POST":
+        # Input data sent from form
+        classForm = classCreationForm(request.POST)
+        # Create quiz objects and then save them to DB
+        if classForm.is_valid():
+            if classForm.cleaned_data['name']:
+                course = Class.objects.create(
+                    name = classForm.cleaned_data['name'],
+                )
+                course.save()
+                course.teacher.add(request.user)
+        # Clear forms for redirect
+        classForm = classCreationForm()
+    else:
+        classForm = classCreationForm()
+
+    context_dict = {
+        'classForm':classForm,
+    }
+    return render(request, 'create-class.html', context_dict)
+
+
 @login_required
 @user_passes_test(teacher_check)
 def createQuiz(request):
-    if request.method == "GET":
-        print(request.user)
     if request.method == "POST":
         # Input data sent from form
         quizForm = quizCreationForm(request.POST)

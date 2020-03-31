@@ -44,7 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 # Class Model
 class Class(models.Model):
-    classId = models.AutoField(primary_key=True,verbose_name=_("id"))
+    courseId = models.AutoField(primary_key=True, verbose_name=_("id"))
     name = models.CharField(_("name"), max_length=50)
     teacher = models.ManyToManyField(User, verbose_name=_("teacher"),related_name="teachers")
     student = models.ManyToManyField(User, verbose_name=_("student"),related_name="students")
@@ -60,8 +60,7 @@ class Class(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.classId 
-        self.slug = slugify(self.classId)
+        self.slug = slugify(self.courseId)
         super(Class, self).save(*args, **kwargs)
 
     class Meta:
@@ -86,7 +85,6 @@ class Quiz(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.quizId)
         super(Quiz, self).save(*args, **kwargs)
-        print("Saved!")
 
     class Meta:
         # Fix pluralization of model name

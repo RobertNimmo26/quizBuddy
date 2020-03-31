@@ -7,7 +7,8 @@ QuizBuddy is designed to motivate students to do class quizzes by giving them a 
 
 ## External Sources
 * Bootstrap 
-	 * Nothing is required to be done to set up 
+* JQuery
+	 * Nothing is required to be done to set these up 
 
 * Google Calendar API
 	* Instructions below on how to set up

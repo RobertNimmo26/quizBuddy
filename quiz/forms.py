@@ -19,6 +19,11 @@ class UserFormTeacher(forms.ModelForm):
         model = User
         fields = ('username', 'name', 'email', 'password')
 
+class classCreationForm(forms.ModelForm):
+    class Meta:
+        model = Class
+        fields = ['name']
+
 class quizCreationForm(forms.Form):
     quiz_title = forms.CharField(label="Quiz Title", max_length=50, required=True)
     quiz_description = forms.CharField(label="Quiz Description", max_length=255, required=True)
