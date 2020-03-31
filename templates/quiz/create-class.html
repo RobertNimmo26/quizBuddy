@@ -1,0 +1,42 @@
+{% extends 'dashboard-teacher.html' %}
+
+{% block head_block %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block title_block %}
+       Class Creation
+{% endblock %}
+
+{% block dash_button %}
+    <button class="btn btn-quizBuddy-3 mr-2" type="button" onclick="window.location.href={% url 'dashboardTeacher' %}">Dashboard</button>
+{% endblock %}
+
+{% block body_block%}
+<div class="container">
+<h3>Add Class</h3>
+<div class="row mt-4 mr-1">
+    <div class="col">
+        <form action="{% url 'createClass' %}" method="post">
+            <div class="form-group">
+                {% csrf_token %}
+                <ul class="list-group mb-1">
+                    {% for field in classForm %}
+                        <li class="list-group-item">
+                            <p style="text-align:left;">
+                                {{ field.label }}
+                            <span style="float:right;">
+                                {{ field }}
+                            </span>
+                            </p>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <input class="btn btn-quizBuddy-3 mt-1 btn-lg" type="submit" value="submit"/>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

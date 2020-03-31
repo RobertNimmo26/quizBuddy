@@ -39,12 +39,12 @@ def populate():
 
     #CREATE CLASSES AND ADD QUIZZES TO THE CLASSES
     #------------------------------------------------------------------------------------------------------------------------------------
-    math_quiz = [{'name':'MCQSet1', 'description':'A quiz that covers basic arithmetic operations','question_count':3},
-        {'name': 'MCQSet2' ,'description':'Covers basic geometry questions' , 'question_count':4}]
+    math_quiz = [{'name':'MCQSet1', 'description':'A quiz that covers basic arithmetic operations','question_count':3, 'teacher':teacher_users['Anna']},
+        {'name': 'MCQSet2' ,'description':'Covers basic geometry questions' , 'question_count':4, 'teacher':teacher_users['David']}]
 
-    computing_quiz = [{'name':'Programming' , 'description': 'Covers basics of programming', 'question_count': 3}]
+    computing_quiz = [{'name':'Programming' , 'description': 'Covers basics of programming', 'question_count': 3, 'teacher':teacher_users['Anna']}]
 
-    psyc_quiz = [{'name': 'Psych-Basics', 'description':'Covers the content covered in lectures','question_count':5}]
+    psyc_quiz = [{'name': 'Psych-Basics', 'description':'Covers the content covered in lectures','question_count':5, 'teacher':teacher_users['David']}]
 
     course = {'Maths': {'quiz':math_quiz, 'teacher':teacher_users['David'],'student': student_users['Alice']},
      'Computing': {'quiz':computing_quiz,'teacher':teacher_users['Anna'],'student':student_users['Tom']},

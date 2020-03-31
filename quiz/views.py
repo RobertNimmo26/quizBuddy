@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
-from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset, QuizLibrary
+from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset, QuizLibrary, classCreationForm
 from collections import defaultdict
 
 def registerStudent(request):
@@ -274,6 +274,32 @@ def dashboardStudent(request):
     print(context_dict)
     return render(request, 'dashboard-student.html', context=context_dict)
 
+
+@login_required
+@user_passes_test(teacher_check)
+def createClass(request):
+    if request.method == "POST":
+        # Input data sent from form
+        classForm = classCreationForm(request.POST)
+        # Create quiz objects and then save them to DB
+        if classForm.is_valid():
+            if classForm.cleaned_data['name']:
+                course = Class.objects.create(
+                    name = classForm.cleaned_data['name'],
+                )
+                course.save()
+                course.teacher.add(request.user)
+        # Clear forms for redirect
+        classForm = classCreationForm()
+    else:
+        classForm = classCreationForm()
+
+    context_dict = {
+        'classForm':classForm,
+    }
+    return render(request, 'create-class.html', context_dict)
+
+
 @login_required
 @user_passes_test(teacher_check)
 def quizLibary(request):
@@ -366,7 +392,7 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
     if request.method =='POST':
         #gets class object
-        course= get_object_or_404(Class,classId=class_name_slug)
+        course= get_object_or_404(Class,courseId=class_name_slug)
         print(course)
         #gets quiz object
         quiz = get_object_or_404(Quiz,quizId=quiz_name_slug)

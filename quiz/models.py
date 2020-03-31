@@ -44,7 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 # Class Model
 class Class(models.Model):
-    classId = models.AutoField(primary_key=True,verbose_name=_("id"))
+    courseId = models.AutoField(primary_key=True, verbose_name=_("id"))
     name = models.CharField(_("name"), max_length=50)
     teacher = models.ManyToManyField(User, verbose_name=_("teacher"),related_name="teachers")
     student = models.ManyToManyField(User, verbose_name=_("student"),related_name="students")
@@ -60,8 +60,7 @@ class Class(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.classId 
-        self.slug = slugify(self.classId)
+        self.slug = slugify(self.courseId)
         super(Class, self).save(*args, **kwargs)
 
     class Meta:
@@ -70,7 +69,7 @@ class Class(models.Model):
 
 # Quiz Model
 class Quiz(models.Model):
-    quizId = models.AutoField(primary_key=True,verbose_name=_("id"))
+    quizId = models.AutoField(primary_key=True, verbose_name=_("id"))
     name = models.CharField(max_length=50)
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     # Course represents class model
@@ -86,7 +85,6 @@ class Quiz(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.quizId)
         super(Quiz, self).save(*args, **kwargs)
-        print("Saved!")
 
     class Meta:
         # Fix pluralization of model name
@@ -95,7 +93,7 @@ class Quiz(models.Model):
 # Question Model
 class Question(models.Model):
     questionId = models.AutoField(primary_key=True,verbose_name=_("id"))
-    text = models.CharField(max_length=50)
+    text = models.CharField(max_length=255)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -104,7 +102,7 @@ class Question(models.Model):
 # Option Model
 class Option(models.Model):
     optionId = models.AutoField(primary_key=True,verbose_name=_("id"))
-    text = models.CharField(max_length=50)
+    text = models.CharField(max_length=255)
     is_correct = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
