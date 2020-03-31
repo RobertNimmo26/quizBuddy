@@ -181,7 +181,7 @@ def add_class(name, s, t):
 
 def add_quiz(c,name,desc,ques_count,teacher):
     randomDay=random.randint(5,20)
-    date_time = timezone.now() + timezone.timedelta(days=-10)
+    date_time = timezone.now() + timezone.timedelta(days=randomDay)
     get_teacher = User.objects.get(email = teacher)
 
     q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count,teacher=get_teacher)[0]
