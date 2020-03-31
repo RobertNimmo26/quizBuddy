@@ -57,7 +57,7 @@ def populate():
     for course, course_data in course.items():
         c = add_class(course,course_data['student']['email'],course_data['teacher']['email'])
         for q in course_data['quiz']:
-            add_quiz(c,q['name'],q['description'],q['question_count'])
+            add_quiz(c,q['name'],q['description'],q['question_count'],course_data['teacher']['email'])
 
     #Make students do quizzes
     for q,q_taker in quizTaker.items():
@@ -179,10 +179,12 @@ def add_class(name, s, t):
     c.teacher.add(User.objects.get(email = t))
     return c
 
-def add_quiz(c,name,desc,ques_count):
-    randomDay=random.randint(100,500)
-    date_time = timezone.now() + timezone.timedelta(days=randomDay)
-    q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count)[0]
+def add_quiz(c,name,desc,ques_count,teacher):
+    randomDay=random.randint(5,20)
+    date_time = timezone.now() + timezone.timedelta(days=-10)
+    get_teacher = User.objects.get(email = teacher)
+
+    q = Quiz.objects.get_or_create(name = name,description=desc,due_date=date_time,question_count=ques_count,teacher=get_teacher)[0]
     q.save()
     q.course.add(c)
     return q
@@ -208,7 +210,7 @@ def add_quizTaker(user,q,course,correctAns,complete):
     quiz = Quiz.objects.get(name = q)
     courseObj = Class.objects.get(name=course)
     student = User.objects.get(email = user)
-    quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = student,course=courseObj, correctAnswers = correctAns, is_completed = complete)[0]
+    quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = student,course=courseObj, correctAnswers = correctAns, is_completed = complete, quizDueDate=quiz.due_date)[0]
     quizTaker.save()
     return quizTaker
 

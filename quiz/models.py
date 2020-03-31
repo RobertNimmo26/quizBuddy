@@ -72,6 +72,7 @@ class Class(models.Model):
 class Quiz(models.Model):
     quizId = models.AutoField(primary_key=True,verbose_name=_("id"))
     name = models.CharField(max_length=50)
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     # Course represents class model
     course = models.ManyToManyField(Class)
     description = models.CharField(max_length=255)
@@ -117,6 +118,7 @@ class QuizTaker(models.Model):
     course = models.ForeignKey(Class, on_delete=models.CASCADE)
     correctAnswers = models.IntegerField(default=0)
     is_completed = models.BooleanField(default=False)
+    quizDueDate = models.DateTimeField(auto_now_add=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

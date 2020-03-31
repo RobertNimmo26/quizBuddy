@@ -6,7 +6,6 @@ class UserAdmin(admin.ModelAdmin):
 
 class ClassAdmin(admin.ModelAdmin):
     list_display = ('classId','name','get_teachers','get_students')
-    prepopulated_fields = {'slug':('classId',)}
 
 class QuizTakerAdmin(admin.ModelAdmin):
     list_display = ('correctAnswers','is_completed')
@@ -24,7 +23,6 @@ class OptionAdmin(admin.ModelAdmin):
     list_display = ('optionId','text', 'question', 'is_correct')
 
 # Register your models here.
-
 admin.site.register(User, UserAdmin)
 admin.site.register(QuizTaker, QuizTakerAdmin)
 admin.site.register(Character, CharacterAdmin)

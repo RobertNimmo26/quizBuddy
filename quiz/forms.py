@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import formset_factory
-from .models import User, Class
+from .models import User, Class, Quiz
 
 #took out character (and related lines) for now as im still not sure how we're gonna do it (and also the radiobuttons are ugly af so)
 class UserFormStudent(forms.ModelForm):
@@ -38,4 +38,10 @@ class questionCreationForm(forms.Form):
 # Formset Allows for adding multiple forms
 questionFormset = formset_factory(questionCreationForm)
 
+class QuizLibrary(forms.Form):
+    #quiz_title = forms.CharField(label="Quiz Title", max_length=50, required=True)
+    #quiz_description = forms.CharField(label="Quiz Description", max_length=255, required=True)
+    quiz = forms.ModelChoiceField(queryset=Quiz.objects.all(),label="Quiz", required=True)
+    course = forms.ModelChoiceField(queryset=Class.objects.all(),label="Class", required=True)
+    due_date = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'], required=True)
 
