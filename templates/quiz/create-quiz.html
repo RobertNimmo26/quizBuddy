@@ -1,8 +1,11 @@
 {% extends 'dashboard-teacher.html' %}
+{% load static %}
 
 {% block head_block %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{% static 'javascript/calendarDateTimePicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'javascript/addQuestion.js' %}"></script>
 {% endblock %}
 
 {% block title_block %}
@@ -66,22 +69,10 @@
                         {% endfor %}
                 {% endfor %}
             </div>
-            <input class="btn btn-quizBuddy-2 mt-1" type="button" value="Add Question" id="add_question" /> <hr>
+            <input class="btn btn-quizBuddy-2 mt-1" type="button" onclick="addQuestion()" value="Add Question" id="add_question" /> <hr>
             <input class="btn btn-quizBuddy-3 mt-1 btn-lg" type="submit" value="submit"/>
         </form>
     </div>
 </div>
 </div>
-<script>
-    $(function () {
-        $("#id_due_date").datetimepicker({
-            format: 'd/m/Y H:i',
-        });
-    });
-    $('#add_question').click(function() {
-	    var form_idx = $('#id_form-TOTAL_FORMS').val();
-	    $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
-	    $('#id_form-TOTAL_FORMS').val( parseInt(form_idx) + 1);
-    });
-</script>
 {% endblock %}

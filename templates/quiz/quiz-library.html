@@ -1,8 +1,10 @@
 {% extends 'dashboard-teacher.html' %}
+{% load static %}
 
 {% block head_block %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{% static 'javascript/calendarDateTimePicker.js' %}"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 {% endblock %}
@@ -53,7 +55,6 @@
                     <br>
                     <div class="card-body">
                         <h3 class="card-title">Your Available Quizzes:</h3>
-                        
                         {% if query %}
                             {% for quiz in query %}
                                 <h5 class="card-text">{{quiz.name}}</h5>
@@ -69,14 +70,6 @@
         </div>
     </div>
 </div>
-
-<script>
-    $(function () {
-        $("#id_due_date").datetimepicker({
-            format: 'd/m/Y H:i',
-        });
-    });
-</script>
 
 {% endblock %}
 
