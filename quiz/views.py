@@ -209,7 +209,7 @@ def sendEmail(request):
             student_emails.append(s.email)
         from_email = settings.EMAIL_HOST_USER
         try:
-            email = EmailMessage(subject, message, from_email, student_emails)
+            email = EmailMessage(subject, message, from_email, bcc=student_emails)
             email.send()
         except BadHeaderError:
             return HttpResponse('Invalid header found.')
