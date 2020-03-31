@@ -41,5 +41,6 @@ urlpatterns = [ path('', views.user_login, name='index'),
                 path('createClass/', views.createClass, name = 'createClass'),
                 path('quizResultsStudent/',views.quizResultsStudent, name = 'quizResultsStudent'),
                 path('quizResultsTeacher/',views.quizResultsTeacher, name = 'quizResultsTeacher'),
+                path('quizLibrary/',views.quizLibary, name= 'quizLibrary'),
 
 ]

@@ -24,7 +24,6 @@ class OptionAdmin(admin.ModelAdmin):
     list_display = ('optionId','text', 'question', 'is_correct')
 
 # Register your models here.
-
 admin.site.register(User, UserAdmin)
 admin.site.register(QuizTaker, QuizTakerAdmin)
 admin.site.register(Character, CharacterAdmin)

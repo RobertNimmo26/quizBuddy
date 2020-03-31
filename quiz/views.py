@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
-from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset, classCreationForm
+from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset, QuizLibrary, classCreationForm
 from collections import defaultdict
 
 def registerStudent(request):
@@ -136,9 +136,9 @@ def getCurrentQuizzesTeacher(userQuizzes,classObj,user):
 
     dontAddQuiz=False
     quizzes=[]
+
+    # Checks that the quiz is not due yet
     for quiz in userQuizzes:
-
-
         if quiz.due_date.replace(tzinfo=None) < (dt+td):
             dontAddQuiz=True
 
@@ -196,13 +196,13 @@ def getCurrentQuizzesStudent(userQuizzes,classObj,user):
 
     dontAddQuiz=False
     quizzes=[]
+
+    # Checks that the quiz is not due yet and also checks that the user has not already completed the quiz
     for quiz in userQuizzes:
-
-
         if quiz.due_date.replace(tzinfo=None) > (dt+td):
             quiz_takers=QuizTaker.objects.filter(course = classObj, quiz=quiz)
             for taker in quiz_takers:
-                if taker.user==user and taker.is_completed==True:
+                if taker.user==user and taker.quizDueDate==quiz.due_date:
                     dontAddQuiz=True
         else:
             dontAddQuiz=True
@@ -279,6 +279,37 @@ def createClass(request):
 
 @login_required
 @user_passes_test(teacher_check)
+def quizLibary(request):
+    print(request.method)
+    if request.method == "POST":
+
+        form = QuizLibrary(request.POST)
+        if form.is_valid():
+            # Assigns new values to the quiz model
+            due_date=form.cleaned_data['due_date']
+            course = Class.objects.filter(name=form.cleaned_data['course'])[0]
+            quiz = Quiz.objects.filter(name=form.cleaned_data['quiz'])[0]
+            quiz.due_date=due_date
+            quiz.course.set([course])
+            quiz.save()
+        return redirect(reverse('dashboardTeacher'))
+    else:
+        form = QuizLibrary()
+        # Gets the courses that the user is a member of
+        form.fields['course'].queryset=Class.objects.filter(teacher=request.user)
+        # Gets the quizzes that the user has created and have not already been assigned
+        query = Quiz.objects.filter(teacher=request.user, due_date__lte= datetime.now())
+        form.fields['quiz'].queryset=query
+
+        context_dict = {
+            'query':query,
+            'form':form,
+        }
+    return render(request, 'quiz-library.html', context_dict)
+
+
+@login_required
+@user_passes_test(teacher_check)
 def createQuiz(request):
     if request.method == "POST":
         # Input data sent from form
@@ -333,6 +364,7 @@ def createQuiz(request):
     return render(request, 'create-quiz.html', context_dict)
 
 @login_required
+@user_passes_test(student_check)
 def quiz(request,class_name_slug=None,quiz_name_slug=None):
 
     if request.method =='POST':
@@ -349,7 +381,7 @@ def quiz(request,class_name_slug=None,quiz_name_slug=None):
                 correctAnswers+=1
 
         #Creates a new quiztaker object
-        quiz_taker= QuizTaker(user=request.user,quiz=quiz, course=course, correctAnswers=correctAnswers,is_completed=True,)
+        quiz_taker= QuizTaker(user=request.user,quiz=quiz, course=course, correctAnswers=correctAnswers,is_completed=True,quizDueDate=quiz.due_date)
         quiz_taker.save()
 
         #calculates new user evolvescore
@@ -424,6 +456,7 @@ def show_classStudent(request, class_name_slug):
 
         #Getting relevant quiz object
         userQuizzes = Quiz.objects.filter(course = classObj)
+
 
         context_dict['quizzes'] = getCurrentQuizzesStudent(userQuizzes, classObj,request.user)
 
@@ -517,20 +550,29 @@ def quizResultsTeacher(request):
     for q in quizList:
         #get the quizTakers who have taken this quiz
         quizTaker = QuizTaker.objects.filter(quiz = q)
+
         #sum_ans and count used to calculate average
-        sum_ans = 0
-        count = 0
+        sum_ans ={}
+        count = {}
+        quiz_instances=[]
         #iterate over the querySet
         for q_taken in quizTaker:
-            quizTaken[q_taken.quiz].append(q_taken)
+            if q_taken.quizDueDate not in quiz_instances:
+                quiz_instances.append(q_taken.quizDueDate)
+                sum_ans[str(q_taken.quizDueDate)] =0
+                count[str(q_taken.quizDueDate)] =0
+
+            quizTaken[q_taken.quizDueDate].append(q_taken)
             if q_taken.is_completed:
-                sum_ans += q_taken.correctAnswers
-                count +=1
+                sum_ans[str(q_taken.quizDueDate)] += q_taken.correctAnswers
+                count[str(q_taken.quizDueDate)] +=1
         #portion of code to calculate average, but if no one has taken the quiz, prevent division by zero error
-        if count != 0:
-            average_Score[q.name] = sum_ans/count
-        else:
-            average_Score[q.name] = count
+
+        for quiz_instace in quiz_instances:
+            if count != 0:
+                average_Score[quiz_instace] = sum_ans[str(quiz_instace)]/count[str(quiz_instace)]
+            else:
+                average_Score[quiz_instace] = count[str(quiz_instace)]
 
     context_dict['quizTaken'] = dict(quizTaken)
     context_dict['avg_score'] = average_Score

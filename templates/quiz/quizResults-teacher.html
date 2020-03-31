@@ -32,8 +32,8 @@
                         {% endif %}
                     </tr>     
                     {% if forloop.last %}
-                        {% for q_name, score in avg_score.items %}
-                            {% if q_name == q.quiz.name %}
+                        {% for q_duedate, score in avg_score.items %}
+                            {% if q_duedate == q.quizDueDate %}
                             <tr>
                                 <td><strong>Total Mark:
                                 {{q.quiz.question_count}} </strong></td>

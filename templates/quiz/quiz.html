@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'dashboard-student.html' %}
 {% load quiz_template_tags %}
 
 {% block head_block %}
@@ -18,61 +18,33 @@
 
 {% block body_block%}
     <div class="container">
-    <h3>
-    {{quiz.name}}
-    <small class="text-muted"> {{quiz.question_count}} questions</small>
-    </h3>
+        <div class="col mt-1 mr-5">
+            <h3>
+            {{quiz.name}}
+            <small class="text-muted"> {{quiz.question_count}} questions</small>
+            </h3>
+        </div>
+        <div class="col mt-4 mr-5">
+            <form action="{% url 'quiz' class.slug quiz.slug %}" method="post">
+                {% csrf_token%}
+                {% for question, questionValues in questions.items %}
 
-    <form action="{% url 'quiz' class.slug quiz.slug %}" method="post">
-        {% csrf_token%}
-        {% for question, questionValues in questions.items %}
-
-            <h4>{{question}}</h4>
-            <div class="form-group">
-                {% for options in questionValues %}
-                    {% for option in options %}
-                    <div class="form-check">
-                        <input class="form-check-input" id="{{option.optionId}}" type="radio" name={{question.questionId}} value={{option.is_correct}}>
-                        <label class="form-check-label" for={{ question.questionId }}>
-                            {{option.text}}
-                        </label>
+                    <h4>{{question}}</h4>
+                    <div class="form-group">
+                        {% for options in questionValues %}
+                            {% for option in options %}
+                            <div class="form-check">
+                                <input class="form-check-input" id="{{option.optionId}}" type="radio" name={{question.questionId}} value={{option.is_correct}}>
+                                <label class="form-check-label" for={{ question.questionId }}>
+                                    {{option.text}}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 {% endfor %}
-            </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-primary" formmethod="post" formaction="{% url 'quiz' class.slug quiz.slug %}">Submit</button>
-    </form>
+                <button type="submit" class="btn btn-primary" formmethod="post" formaction="{% url 'quiz' class.slug quiz.slug %}">Submit</button>
+            </form>
+        </div>
     </div>
 {% endblock %}
-        {% comment %} {% for i in form.count.value|times %}
-        {% comment %} {{form.formQuestion+{{i|stringformat}}}} {% endcomment %}
-        {% comment %} {% for radio in (var()[form.formOption+{{i|stringformat}}]) %}
-
-            <label for="{{ radio.id_for_label }}">
-                {{ radio.choice_label }}
-                <span class="radio">{{ radio.tag }}</span>
-            </label>
-
-        {% endfor %}
-        {% endfor %} {% endcomment %}
-
-
-    {% comment %} <form id="quiz_taking" method="post">
-    {% csrf_token %}
-    {% for question in questions %}
-    <div class="form-group">
-        <label for={{option.text}}>{{question}}</label>
-        <ul<
-        <div class="form-check">
-            {% for option in options %}
-            <li>
-            <input class="form-check-input" type="radio" name={{option.text}} id="option" value={{ option.is_correct }}>
-            <label class="form-check-label" for="option"> {{ option.text }}</label>
-            {% endfor %}
-        </div>
-        </ul>
-    </div>
-    {% endfor %}
-    <button type="submit" class="btn btn-primary">Submit</button>
-    </form> {% endcomment %}

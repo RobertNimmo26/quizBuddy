@@ -1,0 +1,82 @@
+{% extends 'dashboard-teacher.html' %}
+
+{% block head_block %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.min.css" integrity="sha256-DOS9W6NR+NFe1fUhEE0PGKY/fubbUCnOfTje2JMDw3Y=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.20/jquery.datetimepicker.full.min.js" integrity="sha256-FEqEelWI3WouFOo2VWP/uJfs1y8KJ++FLh2Lbqc8SJk=" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+{% endblock %}
+
+{% block title_block %}
+       Quiz Library
+{% endblock %}
+
+{% block dash_button %}
+    <a href={% url 'dashboardStudent' %} class="btn btn-quizBuddy-4 mr-2" role="button">Dashboard</a>
+{% endblock %}
+
+{% block body_block%}
+<div class="container">
+    <div class="row mt-1 mr-15">
+        <h1>Quiz Library</h1>
+    </div>
+    <div class="row mt-4 mr-15">
+        <div class = "col-md-5">
+            <div class="row mb-2">
+                <h4>Assign Quiz:</h4>
+            </div>
+            <form id="quizLibrary" method="post" action="{% url 'quizLibrary' %}">
+
+                {% csrf_token %}
+
+                <ul class="list-group mb-1">
+                    {% for field in form %}
+                        <li class="list-group-item">
+                            <p style="text-align:left;">
+                                {{ field.label }}
+                            <span style="float:right;">
+                                {{ field }}
+                            </span>
+                            </p>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p>You can't assign a quiz to more than one class at a time</p>
+                <br>
+                <input class="btn btn-quizBuddy-3 btn-lg" type="submit" value="Assign Quiz" />
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <div class="float-right">
+                <div class="card" style="width: 23rem;">
+                    <br>
+                    <div class="card-body">
+                        <h3 class="card-title">Your Available Quizzes:</h3>
+                        
+                        {% if query %}
+                            {% for quiz in query %}
+                                <h5 class="card-text">{{quiz.name}}</h5>
+                                <p class="card-text">{{quiz.description}}</p>
+                            {% endfor %}
+                        {% else %}
+                            <h5 class="card-text">You have no quizzes to assign</h5>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $("#id_due_date").datetimepicker({
+            format: 'd/m/Y H:i',
+        });
+    });
+</script>
+
+{% endblock %}
+
