@@ -33,32 +33,52 @@
                     {% endfor %}
                 </ul>
             </div>
+
+
+
+            <div id="empty_form">
+                <table class='no_error'>
+                     <ul class="list-group mt-1">
+                        {% for field in questionForms.empty_form %}
+                        <li class="list-group-item">
+                            <p style="text-align:left;">
+                                {{ field.label }}
+                            <span style="float:right;">
+                                {{ field }}
+                            </span>
+                            </p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </table>
+            </div>
+
+
             {{ questionForms.management_form }}
-            <div id="form_set">
+            <div id="form_set" class="mt-1">
                 {% for question in questionForms.forms %}
-                    {% for field in question %}
-                    {{ question.non_field_errors }}
-                    {{ question.errors }}
-                    <li class="list-group-item">
-                        <p style="text-align:left;">
-                            {{ field.label }}
-                        <span style="float:right;">
-                            {{ field }}
-                        </span>
-                        </p>
-                    </li>
-                    {% endfor %}
+                {{ question.non_field_errors }}
+                {{ question.errors }}
+                        {% for field in question %}
+                            <li class="list-group-item">
+                                <p style="text-align:left;">
+                                    {{ field.label }}
+                                <span style="float:right;">
+                                    {{ field }}
+                                </span>
+                                </p>
+                            </li>
+                        {% endfor %}
                 {% endfor %}
             </div>
-            <div id="empty_form">
-                <div class="no_error list-group mb-1">
-                   <li class="list-group-item">
-                     {{ questionForms.empty_form.as_p }}
-                   </li>
-                </div>
-            </div>
-            <input type="button" value="Add Question" id="add_question" /> <hr>
-            <input class="btn btn-quizBuddy-3 btn-lg" type="submit" value="submit" />
+
+
+
+
+
+
+            <input class="btn btn-quizBuddy-2 mt-1" type="button" value="Add Question" id="add_question" /> <hr>
+            <input class="btn btn-quizBuddy-3 mt-1 btn-lg" type="submit" value="submit"/>
         </form>
     </div>
 </div>
