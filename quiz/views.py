@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
+from django.conf import settings
 from datetime import datetime, timedelta
 from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
 from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset
@@ -222,8 +223,9 @@ def sendEmail(request):
         c = Class.objects.get(name = course)
         for s in c.student.all():
             student_emails.append(s.email)
+        from_email = settings.EMAIL_HOST_USER
         try:
-            email = EmailMessage(subject, message, request.user.email, student_emails)
+            email = EmailMessage(subject, message, from_email, student_emails)
             email.send()
         except BadHeaderError:
             return HttpResponse('Invalid header found.')
