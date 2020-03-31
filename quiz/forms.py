@@ -4,17 +4,17 @@ from .models import User, Class, Quiz
 
 #took out character (and related lines) for now as im still not sure how we're gonna do it (and also the radiobuttons are ugly af so)
 class UserFormStudent(forms.ModelForm):
-  
-    password = forms.CharField(widget=forms.PasswordInput())
-    
+
+    password = forms.CharField(widget=forms.PasswordInput(), min_length=8)
+
     class Meta:
         model = User
         fields = ('username', 'name', 'email', 'password')
 
 class UserFormTeacher(forms.ModelForm):
 
-    password = forms.CharField(widget=forms.PasswordInput(), initial=True)
-    
+    password = forms.CharField(widget=forms.PasswordInput(), min_length=8)
+
     class Meta:
         model = User
         fields = ('username', 'name', 'email', 'password')
@@ -43,9 +43,6 @@ class questionCreationForm(forms.Form):
 questionFormset = formset_factory(questionCreationForm)
 
 class QuizLibrary(forms.Form):
-    #quiz_title = forms.CharField(label="Quiz Title", max_length=50, required=True)
-    #quiz_description = forms.CharField(label="Quiz Description", max_length=255, required=True)
     quiz = forms.ModelChoiceField(queryset=Quiz.objects.all(),label="Quiz", required=True)
     course = forms.ModelChoiceField(queryset=Class.objects.all(),label="Class", required=True)
     due_date = forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M'], required=True)
-

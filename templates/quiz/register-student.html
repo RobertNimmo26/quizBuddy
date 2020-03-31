@@ -1,6 +1,5 @@
-<!-- currently there's no difference between this and the teacher one until we add the character choosing -->
-
 {% extends 'base.html' %}
+{% load static%}
 
 {% block title_block %}
         Student registration
@@ -36,9 +35,9 @@
       {% for field in user_form.hidden_fields %}
         {{field}}
       {% endfor %}
-
-      <!-- Provide a button to click to submit the form. -->
-      <br>
+      <p>Your default character:</p>
+      <img src = "{%static 'images/character/char11.png'%}"  height=120px />
+      <p><i>You can change it later in Preferences.</i></p>
       {% if user_form.errors %}
       <!-- Error messaging -->
       <div id="errors">
@@ -52,8 +51,8 @@
           </ul>
         </div>
       </div>
-      <!-- /Error messaging -->
       {% endif %}
+      <!-- Provide a button to click to submit the form. -->
       <input type="submit" name="submit" value="Register" />
     </form>
     {% endif %}
