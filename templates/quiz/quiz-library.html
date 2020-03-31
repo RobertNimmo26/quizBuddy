@@ -53,7 +53,8 @@
                     <br>
                     <div class="card-body">
                         <h3 class="card-title">Your Available Quizzes:</h3>
-                        {% if quiz %}
+                        
+                        {% if query %}
                             {% for quiz in query %}
                                 <h5 class="card-text">{{quiz.name}}</h5>
                                 <p class="card-text">{{quiz.description}}</p>

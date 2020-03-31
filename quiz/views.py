@@ -146,9 +146,9 @@ def getCurrentQuizzesTeacher(userQuizzes,classObj,user):
 
     dontAddQuiz=False
     quizzes=[]
+
+    # Checks that the quiz is not due yet
     for quiz in userQuizzes:
-
-
         if quiz.due_date.replace(tzinfo=None) < (dt+td):
             dontAddQuiz=True
 
@@ -212,9 +212,9 @@ def getCurrentQuizzesStudent(userQuizzes,classObj,user):
 
     dontAddQuiz=False
     quizzes=[]
+
+    # Checks that the quiz is not due yet and also checks that the user has not already completed the quiz
     for quiz in userQuizzes:
-
-
         if quiz.due_date.replace(tzinfo=None) > (dt+td):
             print(quiz.name)
             quiz_takers=QuizTaker.objects.filter(course = classObj, quiz=quiz)
@@ -274,12 +274,15 @@ def dashboardStudent(request):
     print(context_dict)
     return render(request, 'dashboard-student.html', context=context_dict)
 
+@login_required
+@user_passes_test(teacher_check)
 def quizLibary(request):
     print(request.method)
     if request.method == "POST":
 
         form = QuizLibrary(request.POST)
         if form.is_valid():
+            # Assigns new values to the quiz model
             due_date=form.cleaned_data['due_date']
             course = Class.objects.filter(name=form.cleaned_data['course'])[0]
             quiz = Quiz.objects.filter(name=form.cleaned_data['quiz'])[0]
@@ -289,7 +292,9 @@ def quizLibary(request):
         return redirect(reverse('dashboardTeacher'))
     else:
         form = QuizLibrary()
+        # Gets the courses that the user is a member of
         form.fields['course'].queryset=Class.objects.filter(teacher=request.user)
+        # Gets the quizzes that the user has created and have not already been assigned
         query = Quiz.objects.filter(teacher=request.user, due_date__lte= datetime.now())
         form.fields['quiz'].queryset=query
 
@@ -314,7 +319,8 @@ def createQuiz(request):
             quiz = Quiz.objects.get_or_create(
                 name=quizForm.cleaned_data['quiz_title'],
                 description=quizForm.cleaned_data['quiz_description'],
-                due_date=quizForm.cleaned_data['due_date'])[0]
+                due_date=quizForm.cleaned_data['due_date'],
+                teacher=request.user)[0]
             quiz.course.add(course)
             quiz.save()
             # Get questions
