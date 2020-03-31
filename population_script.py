@@ -180,7 +180,7 @@ def add_class(name, s, t):
     return c
 
 def add_quiz(c,name,desc,ques_count,teacher):
-    randomDay=random.randint(5,20)
+    randomDay=random.randint(-5,20)
     date_time = timezone.now() + timezone.timedelta(days=randomDay)
     get_teacher = User.objects.get(email = teacher)
 
