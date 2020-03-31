@@ -4,17 +4,17 @@ from .models import User, Class
 
 #took out character (and related lines) for now as im still not sure how we're gonna do it (and also the radiobuttons are ugly af so)
 class UserFormStudent(forms.ModelForm):
-  
-    password = forms.CharField(widget=forms.PasswordInput())
-    
+
+    password = forms.CharField(widget=forms.PasswordInput(), min_length=8)
+
     class Meta:
         model = User
         fields = ('username', 'name', 'email', 'password')
 
 class UserFormTeacher(forms.ModelForm):
 
-    password = forms.CharField(widget=forms.PasswordInput(), initial=True)
-    
+    password = forms.CharField(widget=forms.PasswordInput(), min_length=8)
+
     class Meta:
         model = User
         fields = ('username', 'name', 'email', 'password')
@@ -41,5 +41,3 @@ class questionCreationForm(forms.Form):
     correct_answer = forms.ChoiceField(choices=ANSWERS, widget=forms.RadioSelect(attrs={}))
 # Formset Allows for adding multiple forms
 questionFormset = formset_factory(questionCreationForm)
-
-
