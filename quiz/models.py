@@ -18,7 +18,7 @@ class Character(models.Model):
 
 # User Model
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(_("user name"), max_length=50)
+    username = models.CharField(_("username"), max_length=50)
     email = models.EmailField(_('email address'), unique=True)
     name = models.CharField(_("name"), max_length=50)
     evolveScore = models.IntegerField(_("score"),default=0)
@@ -118,4 +118,4 @@ class QuizTaker(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user
+        return self.user.name
