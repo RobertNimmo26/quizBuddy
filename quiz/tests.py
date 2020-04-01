@@ -104,7 +104,108 @@ class QuizLibraryTest(TestCase):
         form = QuizLibrary()
         self.assertTrue(form.fields['due_date'].label == None or form.fields['due_date'].label == 'Due date')
 
+#VIEW TESTING
 
+class registerStudentTest(TestCase):
+    def setUp(self):
+        pass
+
+    def test_uses_correct_template(self):
+        response = self.client.get(reverse("registerStudent"))
+
+        #Correct template
+        self.assertTemplateUsed(response, 'register-student.html')
+
+class registerTeacherTest(TestCase):
+
+    def test_view_url_accessible_by_name(self):
+        response = self.client.get(reverse("registerTeacher"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_uses_correct_template(self):
+        response = self.client.get(reverse("registerTeacher"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "register-teacher.html")
+
+    def test_teacher_registration_sent(self):
+        form_data = {
+            'username': "A",
+            'name': "A",
+            'email': "a@a.com",
+            'password': "aaaaaaaa",
+            'is_teacher': True,
+            'is_staff': True
+        }
+        form = UserFormTeacher()
+        response = self.client.post(reverse("registerTeacher"), form_data)
+        self.assertEqual(response.status_code, 200)
+
+    def test_teacher_registration_worked(self):
+        form_data = {
+            'username': "A",
+            'name': "A",
+            'email': "a@a.com",
+            'password': "aaaaaaaa",
+            'is_teacher': True,
+        }
+        form = UserFormTeacher()
+        response = self.client.post(reverse("registerTeacher"), form_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.count(),1)
+        self.assertEqual(User.objects.get().username, "A")
+        self.assertTrue(User.objects.get().is_teacher)
+
+class registerStudentTest(TestCase):
+
+    def test_view_url_accessible_by_name(self):
+        response = self.client.get(reverse("registerStudent"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_uses_correct_template(self):
+        response = self.client.get(reverse("registerStudent"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "register-student.html")
+
+    def test_student_registration_sent(self):
+        form_data = {
+            'username': "A",
+            'name': "A",
+            'email': "a@a.com",
+            'password': "aaaaaaaa",
+            'is_student': True,
+        }
+        form = UserFormStudent()
+        response = self.client.post(reverse("registerStudent"), form_data)
+        self.assertEqual(response.status_code, 200)
+
+    def test_student_registration_worked(self):
+        form_data = {
+            'username': "A",
+            'name': "A",
+            'email': "a@a.com",
+            'password': "aaaaaaaa",
+            'is_student': True,
+        }
+        form = UserFormStudent()
+        response = self.client.post(reverse("registerStudent"), form_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.count(),1)
+        self.assertEqual(User.objects.get().username, "A")
+        self.assertTrue(User.objects.get().is_student)
+        #Student has the def character - which is type 1 at evolutionStage 1
+        self.assertEqual(User.objects.get().character.characterType, 1)
+        self.assertEqual(User.objects.get().character.evolutionStage, 1)
+
+class userLoginTest(TestCase):
+
+    def test_view_url_accessible_by_name(self):
+        response = self.client.get(reverse("index"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_uses_correct_template(self):
+        response = self.client.get(reverse("index"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "index.html")
 
 class dashboardTeacherViewTest(TestCase):
     def setUp(self):
