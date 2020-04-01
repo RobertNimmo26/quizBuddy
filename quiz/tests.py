@@ -226,9 +226,73 @@ class dashboardStudentViewTest(TestCase):
             #Correct template
             self.assertTemplateUsed(response, 'dashboard-student.html')
 
+class preferencesStudentViewTest(TestCase):
+    def setUp(self):
+        charac1 = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac1.save()
 
+        charac2 = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac2.save()
 
-                               
+        test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
+                                                    username = "student1 ",is_student = True, character = charac1 ,evolveScore = 1 )
+        test_student1.save()
 
+        test_student2 = User.objects.create_user(email = "student2@email.com", password = "1234", name = "student2",
+                                                            username = "student2 ",is_student = True, character = charac2 ,evolveScore = 10 )
+        test_student2.save()
 
+    def test_username_changed_and_redirected_to_dashboard(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'username': 'Billy12'})
+        #302 indicates a redirect which is the expected behaviour
+        self.assertEqual(response.status_code, 302)
+        #redirect response context cant be used to get user details
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertEqual(after_redirect_response.context['user'].username, 'Billy12')
+    
+    def test_name_changed_and_redirected_to_dashboard(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'name': 'Billy'})
+        self.assertEqual(response.status_code, 302)
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertEqual(after_redirect_response.context['user'].name, 'Billy')
+
+    def test_email_changed_and_redirected_to_dashboard(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'email':'billy@gla.ac.uk'})
+        self.assertEqual(response.status_code, 302)
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertEqual(after_redirect_response.context['user'].email, 'billy@gla.ac.uk')
+
+    def test_email_not_changed_if_already_exists_and_error_raised(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'email':'student2@email.com'})
+        #no redirect happened to the dashboard
+        self.assertEqual(response.status_code, 200)
+        #after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        #self.assertEqual(after_redirect_response.context['user'].email, 'billy@gla.ac.uk')
+
+    def test_password_changed_and_user_logged_out(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'password': '5698'})
+        self.assertEqual(response.status_code, 302)
+        #update was successful so user should have been logged out
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertRedirects(response, "/")
+
+    def test_character_changed_and_redirected_to_dashboard(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'characterType': 2})
+        self.assertEqual(response.status_code, 302)
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertEqual(after_redirect_response.context['user'].character.characterType, 2)
+
+    def test_nothing_changed_and_user_redirects_to_dashboard(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'))
+        self.assertEqual(response.status_code, 302)
+        #since nothing changed, email should be same as before 
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertEqual(after_redirect_response.context['user'].email,'student1@email.com')
 
