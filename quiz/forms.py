@@ -2,7 +2,6 @@ from django import forms
 from django.forms import formset_factory
 from .models import User, Class, Quiz
 
-#took out character (and related lines) for now as im still not sure how we're gonna do it (and also the radiobuttons are ugly af so)
 class UserFormStudent(forms.ModelForm):
 
     password = forms.CharField(widget=forms.PasswordInput(), min_length=8)
