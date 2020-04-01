@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block dash_button %}
-    <a href={% url 'dashboardStudent' %} class="btn btn-quizBuddy-4 mr-2" role="button">Dashboard</a>
+    <a href={% url 'dashboardTeacher' %} class="btn btn-quizBuddy-4 mr-2" role="button">Dashboard</a>
 {% endblock %}
 
 {% block body_block%}
@@ -43,7 +43,7 @@
                         </li>
                     {% endfor %}
                 </ul>
-                <p>You can't assign a quiz to more than one class at a time</p>
+                <p>You can't assign a quiz to more than one class at a time, if a quiz is already assigned to a class, it can be reassigned once the deadline has passed.</p>
                 <br>
                 <input class="btn btn-quizBuddy-3 btn-lg" type="submit" value="Assign Quiz" />
             </form>
@@ -72,4 +72,3 @@
 </div>
 
 {% endblock %}
-
