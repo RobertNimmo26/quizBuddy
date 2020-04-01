@@ -670,9 +670,9 @@ def preferencesStudent(request):
     if request.method == 'POST':
         ableToChange=True
 
-        if request.POST['username']:
+        if 'username' in request.POST:
             user.username = request.POST['username']
-        if request.POST['name']:
+        if 'name' in request.POST:
             user.name = request.POST['name']
         if 'email' in request.POST:
             new_email=request.POST['email']
@@ -688,7 +688,7 @@ def preferencesStudent(request):
             character = Character(characterType=request.POST['characterType'], can_change=request.user.character.can_change, evolutionStage=user.character.evolutionStage)
             character.save()
             user.character = character
-        if request.POST['password']:
+        if 'password' in request.POST:
             user.set_password(request.POST['password'])
             user.save()
             #ask user to login again
