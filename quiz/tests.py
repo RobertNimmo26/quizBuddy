@@ -10,6 +10,7 @@ from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Characte
 from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset, QuizLibrary, classCreationForm
 from quiz.models import Character,User,Class, Quiz, Question, Option, QuizTaker
 from quiz.managers import CustomUserManager
+from quiz.views import teacher_check, student_check
 import random
 
 #FORM TESTING - based on https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
@@ -105,7 +106,23 @@ class QuizLibraryTest(TestCase):
         self.assertTrue(form.fields['due_date'].label == None or form.fields['due_date'].label == 'Due date')
 
 
+class teacherCheckTest(TestCase):
+    def setUp(self):
+        teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
+                                           username="teacher", is_teacher=True, is_staff = True)
+    def test_teacher_check(self):
+        teacher = User.objects.get(email="testteacher@test.com")
+        self.assertTrue(teacher_check(teacher))
 
+class studentCheckTest(TestCase):
+    def setUp(self):
+        student = User.objects.create_user(email="teststudent@test.com", password="test",name="student",
+                                           username="student", is_student=True)
+    def test_student_check(self):
+        student = User.objects.get(email="teststudent@test.com")
+        self.assertTrue(student_check(student))
+
+        
 class dashboardTeacherViewTest(TestCase):
     def setUp(self):
         # Creating a teacher user
