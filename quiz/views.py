@@ -311,7 +311,6 @@ def createClass(request):
 @login_required
 @user_passes_test(teacher_check)
 def quizLibary(request):
-    print(request.method)
     if request.method == "POST":
 
         form = QuizLibrary(request.POST)
