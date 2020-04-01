@@ -25,9 +25,19 @@
         <header>
             <nav class="navbar navbar-light bg-light border-bottom border-dark">
 
+            {% if request.user.is_teacher %}
+            <form class="btn-toolbar">
+                <button class="btn btn-quizBuddy-4 btn-lg" onclick="window.location.href={% url 'dashboardTeacher' %}" type="button">quizBuddy</button>
+            </form>
+            {% elif request.user.is_student %}
+            <form class="btn-toolbar">
+                <button class="btn btn-quizBuddy-4 btn-lg" onclick="window.location.href={% url 'dashboardStudent' %}" type="button">quizBuddy</button>
+            </form>
+            {% else %}
             <form class="btn-toolbar">
                 <button class="btn btn-quizBuddy-4 btn-lg" onclick="window.location.href='/'" type="button">quizBuddy</button>
             </form>
+            {% endif %}
 
             <form class="btn-toolbar">
                 {% block header_buttons %}
