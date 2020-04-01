@@ -10,7 +10,7 @@ from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Characte
 from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset, QuizLibrary, classCreationForm
 from quiz.models import Character,User,Class, Quiz, Question, Option, QuizTaker
 from quiz.managers import CustomUserManager
-from quiz.views import teacher_check, student_check
+from quiz.views import teacher_check, student_check, nextQuizzes, getCurrentQuizzesTeacher
 import random
 
 #FORM TESTING - based on https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
@@ -105,6 +105,26 @@ class QuizLibraryTest(TestCase):
         form = QuizLibrary()
         self.assertTrue(form.fields['due_date'].label == None or form.fields['due_date'].label == 'Due date')
 
+class nextQuizzesTest(TestCase):
+    def setUp(self):
+        class1 = Class.objects.get_or_create(name = "class1")[0]
+        class2 = Class.objects.get_or_create(name = "class2")[0]
+        teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
+                                           username="teacher", is_teacher=True, is_staff = True)
+        class1.teacher.add(teacher)
+        class2.teacher.add(teacher)
+        
+    def testNextQuiz(self):
+        class1 = Class.objects.get(name="class1")
+        class2 = Class.objects.get(name="class2")
+        class_list = {
+            'class1':class1,
+            'class2':class2
+        }
+        user = User.objects.get(email="testteacher@test.com")
+        print(class_list)
+        
+        self.assertTrue(nextQuizzes(class_list, teacher))
 
 class teacherCheckTest(TestCase):
     def setUp(self):
