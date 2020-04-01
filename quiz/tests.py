@@ -108,6 +108,7 @@ class QuizLibraryTest(TestCase):
 
 class nextQuizzesTest(TestCase):
     def setUp(self):
+        # Setup classes
         class1 = Class.objects.create(name = "class1")
         class1.save()
         class2 = Class.objects.create(name = "class2")
@@ -116,6 +117,17 @@ class nextQuizzesTest(TestCase):
                                            username="teacher", is_teacher=True, is_staff = True)
         class1.teacher.add(teacher)
         class2.teacher.add(teacher)
+        
+        date_time_now = timezone.now()
+        date_time = timezone.now() + timezone.timedelta(days=5)
+        
+        # Create and add quiz to class
+        q1 = Quiz.objects.get_or_create(name = "quiz1", description="quiz1",due_date=date_time_now,question_count=3, teacher=teacher)[0]
+        q1.save()
+        q2 = Quiz.objects.get_or_create(name = "quiz1", description="quiz1",due_date=date_time,question_count=3, teacher=teacher)[0]
+        q2.save()
+        q1.course.add(class1)
+        q2.course.add(class2)
         
     def testNextQuiz(self):
         class1 = Class.objects.get(name="class1")
@@ -126,8 +138,9 @@ class nextQuizzesTest(TestCase):
         }
         user = User.objects.get(email="testteacher@test.com")
         
-        self.assertTrue(len(nextQuizzes(class_list, user)) == len(class_list))
-
+        next_quizzes = nextQuizzes(class_list, user)
+        self.assertTrue(next_quizzes.get(class1) == "There's no quizzes due")
+        
 class teacherCheckTest(TestCase):
     def setUp(self):
         teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
