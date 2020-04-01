@@ -117,7 +117,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-LOGIN_URL = "/"
+LOGIN_URL = 'index'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [STATIC_DIR, ]
@@ -131,4 +131,3 @@ EMAIL_USE_TLS = True
 EMAIL_PORT= 587
 EMAIL_HOST_USER = 'quizzBuddy@gmail.com'
 EMAIL_HOST_PASSWORD = 'quizbuddy123'
-
