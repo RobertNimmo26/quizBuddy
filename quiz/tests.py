@@ -106,56 +106,6 @@ class QuizLibraryTest(TestCase):
         form = QuizLibrary()
         self.assertTrue(form.fields['due_date'].label == None or form.fields['due_date'].label == 'Due date')
 
-class nextQuizzesTest(TestCase):
-    def setUp(self):
-        # Setup classes
-        class1 = Class.objects.create(name = "class1")
-        class1.save()
-        class2 = Class.objects.create(name = "class2")
-        class2.save()
-        teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
-                                           username="teacher", is_teacher=True, is_staff = True)
-        class1.teacher.add(teacher)
-        class2.teacher.add(teacher)
-        
-        date_time_now = timezone.now()
-        date_time = timezone.now() + timezone.timedelta(days=5)
-        
-        # Create and add quiz to class
-        q1 = Quiz.objects.get_or_create(name = "quiz1", description="quiz1",due_date=date_time_now,question_count=3, teacher=teacher)[0]
-        q1.save()
-        q2 = Quiz.objects.get_or_create(name = "quiz1", description="quiz1",due_date=date_time,question_count=3, teacher=teacher)[0]
-        q2.save()
-        q1.course.add(class1)
-        q2.course.add(class2)
-        
-    def testNextQuiz(self):
-        class1 = Class.objects.get(name="class1")
-        class2 = Class.objects.get(name="class2")
-        class_list = {
-            class1:class1,
-            class2:class2
-        }
-        user = User.objects.get(email="testteacher@test.com")
-        
-        next_quizzes = nextQuizzes(class_list, user)
-        self.assertTrue(next_quizzes.get(class1) == "There's no quizzes due")
-        
-class teacherCheckTest(TestCase):
-    def setUp(self):
-        teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
-                                           username="teacher", is_teacher=True, is_staff = True)
-    def test_teacher_check(self):
-        teacher = User.objects.get(email="testteacher@test.com")
-        self.assertTrue(teacher_check(teacher))
-
-class studentCheckTest(TestCase):
-    def setUp(self):
-        student = User.objects.create_user(email="teststudent@test.com", password="test",name="student",
-                                           username="student", is_student=True)
-    def test_student_check(self):
-        student = User.objects.get(email="teststudent@test.com")
-        self.assertTrue(student_check(student))
 #VIEW TESTING
 class registerStudentTest(TestCase):
     def setUp(self):
@@ -550,6 +500,101 @@ class show_classStudentViewTest(TestCase):
         for q in response.context['quizzes']:
             self.assertEquals(response.context['class'].courseId, q.course.get().courseId)
 
+
+#VIEW-HELPER METHODS TESTING
+class nextQuizzesTest(TestCase):
+    def setUp(self):
+        # Setup classes
+        class1 = Class.objects.create(name = "class1")
+        class1.save()
+        class2 = Class.objects.create(name = "class2")
+        class2.save()
+        teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
+                                           username="teacher", is_teacher=True, is_staff = True)
+        class1.teacher.add(teacher)
+        class2.teacher.add(teacher)
+        
+        # Set test dates
+        date_time_now = timezone.now()
+        date_time = timezone.now() + timezone.timedelta(days=5)
+        
+        # Create and add quiz to class
+        q1 = Quiz.objects.get_or_create(name = "quiz1", description="quiz1",due_date=date_time_now,question_count=3, teacher=teacher)[0]
+        q1.save()
+        q2 = Quiz.objects.get_or_create(name = "quiz2", description="quiz2",due_date=date_time,question_count=3, teacher=teacher)[0]
+        q2.save()
+        q1.course.add(class1)
+        q2.course.add(class2)
+        
+    def testNextQuiz(self):
+        class1 = Class.objects.get(name="class1")
+        class2 = Class.objects.get(name="class2")
+        class_list = {
+            class1:class1,
+            class2:class2
+        }
+        user = User.objects.get(email="testteacher@test.com")
+        
+        next_quizzes = nextQuizzes(class_list, user)
+        self.assertTrue(next_quizzes.get(class1) == "There's no quizzes due")
+
+class getCurrentQuizzesTeacherTest(TestCase):
+    def setUp(self):
+        # Create course
+        course = Class.objects.create(name = "class")
+        course.save()
+        # Create user
+        teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
+                                           username="teacher", is_teacher=True, is_staff = True)
+        course.teacher.add(teacher)
+        
+        # Create dates
+        date_time_now = timezone.now()
+        date_time_first = timezone.now() + timezone.timedelta(days=5)
+        date_time_last = timezone.now() + timezone.timedelta(days=10)
+        
+        # Create quizzes
+        q1 = Quiz.objects.get_or_create(name = "quiz1", description="quiz1",due_date=date_time_now,question_count=3, teacher=teacher)[0]
+        q1.save()
+        q2 = Quiz.objects.get_or_create(name = "quiz2", description="quiz2",due_date=date_time_first,question_count=3, teacher=teacher)[0]
+        q2.save()
+        q3 = Quiz.objects.get_or_create(name = "quiz3", description="quiz3",due_date=date_time_last,question_count=3, teacher=teacher)[0]
+        q3.save()
+        q1.course.add(course)
+        q2.course.add(course)
+        q2.course.add(course)
+    
+    def testGetCurrentQuizzesTeacher(self):
+        user = User.objects.get(email="testteacher@test.com")
+        course = Class.objects.get(name="class")
+        q1 = Quiz.objects.get(name="quiz1")
+        q2 = Quiz.objects.get(name="quiz2")
+        q3 = Quiz.objects.get(name="quiz3")
+        quiz_list = {
+            q1:q1,
+            q2:q2,
+            q3:q3
+        }
+        
+        # Should return quizzes 2 and 3, as first is overdue
+        current_quizzes = getCurrentQuizzesTeacher(quiz_list,course,user)
+
+        self.assertTrue(len(current_quizzes) == 2)
+class teacherCheckTest(TestCase):
+    def setUp(self):
+        teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
+                                           username="teacher", is_teacher=True, is_staff = True)
+    def test_teacher_check(self):
+        teacher = User.objects.get(email="testteacher@test.com")
+        self.assertTrue(teacher_check(teacher))
+
+class studentCheckTest(TestCase):
+    def setUp(self):
+        student = User.objects.create_user(email="teststudent@test.com", password="test",name="student",
+                                           username="student", is_student=True)
+    def test_student_check(self):
+        student = User.objects.get(email="teststudent@test.com")
+        self.assertTrue(student_check(student))
 
 #MODEL TESTING
 class UserModelTest(TestCase):
