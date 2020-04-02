@@ -1,15 +1,38 @@
-
 # quizBuddy
 QuizBuddy is an webapp created to help improve students learning while making it easier for teachers to test students in a fun atmosphere.
 
 ## Background
 QuizBuddy is designed to motivate students to do class quizzes by giving them a character whose development depends on their work ethic. On registration, the student can choose between 3 potential characters. The student can evolve their character in 3 stages by reaching certain score milestones after completing quizzes.
 
+## How to deploy the app:
+
+1.  Create your virtual environment using your preferred way with the python version 3.8.1
+2.  Activate your virtual environment
+3.  Clone the repository using the command into your desired folder
+`git clone https://github.com/RobertNimmo26/quizBuddy.git`
+
+4.  Open the quizBuddy folder in your command prompt
+`cd quizBuddy`
+
+5.  Install the required packages
+`pip install –r requirements.txt`
+
+6.  Set up the Google Calendar API with the instructions bellow
+7.  Populate the database using the commands 
+	`python manage.py makemigrations quiz` 
+	`python manage.py migrate`
+
+8.  Run the web app using the command
+`python manage.py runserver`
+
+9.  In your preferred browser, access the web app using the URL
+`http://localhost:8000/`
+
 ## External Sources
 * Bootstrap 
-* JQuery
-	 * Nothing is required to be done to set these up 
-
+	* Nothing is required to be done to set up
+* jQuery
+	* Nothing is required to be done to set up 
 * Google Calendar API
 	* Instructions below on how to set up
 
@@ -31,6 +54,7 @@ Due to Google API restrictions to run the Django webapp on your local device you
 * autopep8 1.5
 * certifi 2019.11.28
 * colorama 0.4.3
+* coverage 5.0.4
 * Django 3.0.3
 * isort 4.3.21
 * lazy-object-proxy 1.4.3
@@ -44,6 +68,6 @@ Due to Google API restrictions to run the Django webapp on your local device you
 * wincertstore 0.2
 * wrapt 1.11.2
 ## REFERENCES
-* FORM TESTING - based on https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
+* FORM & MODEL TESTING - based on https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing [Accessed 1 Apr. 2020]
 * Questions for psychology quiz taken from:
 https://quizpug.com. (2020). Can You Answer 12 Basic Psychology Questions?. [online] Available at: https://quizpug.com/can-you-answer-12-basic-psychology-questions/ [Accessed 7 Mar. 2020].
