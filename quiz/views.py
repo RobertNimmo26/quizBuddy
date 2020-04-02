@@ -614,7 +614,7 @@ def classList(request, class_name_slug):
 
     #request was sent either to add or to remove someone from class
     if request.method == 'POST':
-        #if the ass button was clicked on the page
+        #if the add button was clicked on the page
         #it gets the student's email from the form's input field
         #and adds the student to current class (if they exist)
         #if not, it will create an item in the context_dict indicating an error
@@ -646,7 +646,7 @@ def classList(request, class_name_slug):
         classObj = Class.objects.get(slug=class_name_slug)
         context_dict['class'] = classObj
 
-        #Getting relevant quiz object
+        #Getting relevant student object
         students = classObj.student.all()
         context_dict['students'] = students
 

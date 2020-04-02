@@ -107,16 +107,6 @@ class QuizLibraryTest(TestCase):
         self.assertTrue(form.fields['due_date'].label == None or form.fields['due_date'].label == 'Due date')
 
 #VIEW TESTING
-class registerStudentTest(TestCase):
-    def setUp(self):
-        pass
-
-    def test_uses_correct_template(self):
-        response = self.client.get(reverse("registerStudent"))
-
-        #Correct template
-        self.assertTemplateUsed(response, 'register-student.html')
-
 class registerTeacherTest(TestCase):
 
     def test_view_url_accessible_by_name(self):
@@ -208,7 +198,141 @@ class userLoginTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "index.html")
 
-        
+class aboutTest(TestCase):
+
+    def test_view_url_accessible_by_name(self):
+        response = self.client.get(reverse("about"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_uses_correct_template(self):
+        response = self.client.get(reverse("about"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "about.html")
+
+class manageStudentTest(TestCase):
+    def setUp(self):
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+        test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
+                                                    username = "student1 ",is_student = True)
+        test_student1.save()
+
+        test_student2 = User.objects.create_user(email = "student2@email.com", password = "1234", name = "student2",
+                                                    username = "student2 ",is_student = True)
+        test_student2.save()
+
+        #Creating Classes
+        class1 = Class.objects.get_or_create(name= "class1")[0]
+        class1.save()
+        class1.student.add(User.objects.get(email = "student1@email.com"))
+        class1.teacher.add(User.objects.get(email = "teacher1@email.com"))
+
+        class2 = Class.objects.get_or_create(name= "class2")[0]
+        class2.save()
+        class2.student.add(User.objects.get(email = "student2@email.com"))
+        class2.teacher.add(User.objects.get(email = "teacher1@email.com"))
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+
+    def test_view_url_accessible_by_name(self):
+        response = self.client.get(reverse("manageStudent"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_uses_correct_template(self):
+        response = self.client.get(reverse("manageStudent"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "manage-student.html")
+
+    def test_shows_correct_classes(self):
+        response = self.client.get(reverse("manageStudent"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "manage-student.html")
+        self.assertEqual(len(response.context['classes']), 2)
+        for i in response.context['classes']:
+            self.assertEquals(response.context['user'].email, i.get_teachers())
+
+    def test_shows_correct_students(self):
+        response = self.client.get(reverse("manageStudent"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "manage-student.html")
+        self.assertEqual(len(response.context['classes']), 2)
+        for i in response.context['classes']:
+            if(i.name == "class1"):
+                self.assertEqual(len(response.context['classes'][i]), 1)
+                self.assertEqual(response.context['classes'][i][0], "student1")
+            else:
+                self.assertEqual(len(response.context['classes'][i]), 1)
+                self.assertEqual(response.context['classes'][i][0], "student2")
+
+class classListTest(TestCase):
+
+    def setUp(self):
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+        test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
+                                                    username = "student1 ",is_student = True)
+        test_student1.save()
+        test_removestudent = User.objects.create_user(email = "removestudent@email.com", password = "1234", name = "removestudent",
+                                                    username = "removestudent",is_student = True)
+        test_removestudent.save()
+
+        #student to be added - hence we don't add them to the class yet
+        test_addstudent = User.objects.create_user(email = "addstudent@email.com", password = "1234", name = "addstudent",
+                                                    username = "addstudent",is_student = True)
+        test_addstudent.save()
+
+        #Creating Classes
+        class1 = Class.objects.get_or_create(name= "class1")[0]
+        class1.save()
+        class1.student.add(User.objects.get(email = "student1@email.com"))
+        class1.student.add(User.objects.get(email = "removestudent@email.com"))
+        class1.teacher.add(User.objects.get(email = "teacher1@email.com"))
+
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+
+    def test_view_url_accessible_by_name(self):
+        response = self.client.get(reverse("classList", args=["1"]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_uses_correct_template(self):
+        response = self.client.get(reverse("classList", args=["1"]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "classList.html")
+
+    def test_user_does_not_exist(self):
+        data = {
+            'button': "add",
+            'add_student': "notexist@notexist.com",
+            }
+        response = self.client.post(reverse("classList", args=["1"]), data)
+        self.assertTrue(response.context["remove_error"])
+
+    def test_remove_student(self):
+        form_data = {
+            'button': "removestudent@email.com",
+            }
+        self.assertEqual(Class.objects.get(courseId=1).student.all().count(),2)
+        response = self.client.post(reverse("classList", args=["1"]), form_data)
+        self.assertEqual(Class.objects.get(courseId=1).student.all().count(),1)
+        self.assertEqual(User.objects.get(email = "removestudent@email.com") in response.context['students'], False)
+        #adding back the student we just removed
+        student = User.objects.filter(email="removestudent@email.com").get()
+        student.students.add(Class.objects.get(slug=1))
+
+    def test_add_student(self):
+        form_data = {
+            'button': "add",
+            'add_student': "addstudent@email.com",
+            }
+        self.assertEqual(Class.objects.get(courseId=1).student.all().count(),2)
+        response = self.client.post(reverse("classList", args=["1"]), form_data)
+        self.assertEqual(Class.objects.get(courseId=1).student.all().count(),3)
+        self.assertTrue(User.objects.get(email = "addstudent@email.com") in response.context['students'])
+        #removing the student we just added
+        student = User.objects.filter(email="addstudent@email.com").get()
+        student.students.remove(Class.objects.get(slug=1))
+
 class dashboardTeacherViewTest(TestCase):
     def setUp(self):
         # Creating a teacher user
