@@ -767,6 +767,178 @@ class studentCheckTest(TestCase):
         student = User.objects.get(email="teststudent@test.com")
         self.assertTrue(student_check(student))
 
+class preferencesStudentViewTest(TestCase):
+    def setUp(self):
+        charac1 = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac1.save()
+
+        charac2 = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac2.save()
+
+        test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
+                                                    username = "student1 ",is_student = True, character = charac1 ,evolveScore = 1 )
+        test_student1.save()
+
+        test_student2 = User.objects.create_user(email = "student2@email.com", password = "1234", name = "student2",
+                                                            username = "student2 ",is_student = True, character = charac2 ,evolveScore = 10 )
+        test_student2.save()
+
+    def test_username_changed_and_redirected_to_dashboard(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'username': 'Billy12'})
+        #302 indicates a redirect which is the expected behaviour
+        self.assertEqual(response.status_code, 302)
+        #redirect response context cant be used to get user details
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertEqual(after_redirect_response.context['user'].username, 'Billy12')
+    
+    def test_name_changed_and_redirected_to_dashboard(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'name': 'Billy'})
+        self.assertEqual(response.status_code, 302)
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertEqual(after_redirect_response.context['user'].name, 'Billy')
+
+    def test_email_changed_and_redirected_to_dashboard(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'email':'billy@gla.ac.uk'})
+        self.assertEqual(response.status_code, 302)
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertEqual(after_redirect_response.context['user'].email, 'billy@gla.ac.uk')
+
+    def test_email_not_changed_if_already_exists_and_error_raised(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'email':'student2@email.com'})
+        #no redirect happened to the dashboard
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Email aready exists. Please try a different email.')
+
+    def test_password_changed_and_user_logged_out(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'password': '5698'})
+        self.assertEqual(response.status_code, 302)
+        #update was successful so user should have been logged out
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertRedirects(response, "/")
+
+    def test_character_changed_and_redirected_to_dashboard(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'), {'characterType': 2})
+        self.assertEqual(response.status_code, 302)
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertEqual(after_redirect_response.context['user'].character.characterType, 2)
+
+    def test_nothing_changed_and_user_redirects_to_dashboard(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesStudent'))
+        self.assertEqual(response.status_code, 302)
+        #since nothing changed, email should be same as before 
+        after_redirect_response = self.client.get(reverse('dashboardStudent'))
+        self.assertEqual(after_redirect_response.context['user'].email,'student1@email.com')
+
+class preferencesTeacherViewTest(TestCase):
+    def setUp(self):
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+
+        test_teacher2 = User.objects.create_user(email = "teacher2@email.com", password = "0289", name = "teacher",
+                                                            username = "test",is_teacher = True)
+        test_teacher2.save()
+
+    def test_username_changed_and_redirected_to_dashboard(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesTeacher'), {'username': 'Tom'})
+        #302 indicates a redirect which is the expected behaviour
+        self.assertEqual(response.status_code, 302)
+        #redirect response context cant be used to get user details
+        after_redirect_response = self.client.get(reverse('dashboardTeacher'))
+        self.assertEqual(after_redirect_response.context['user'].username, 'Tom')
+    
+    def test_name_changed_and_redirected_to_dashboard(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesTeacher'), {'name': 'Billy'})
+        self.assertEqual(response.status_code, 302)
+        after_redirect_response = self.client.get(reverse('dashboardTeacher'))
+        self.assertEqual(after_redirect_response.context['user'].name, 'Billy')
+
+    def test_email_changed_and_redirected_to_dashboard(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesTeacher'), {'email':'billy@gla.ac.uk'})
+        self.assertEqual(response.status_code, 302)
+        after_redirect_response = self.client.get(reverse('dashboardTeacher'))
+        self.assertEqual(after_redirect_response.context['user'].email, 'billy@gla.ac.uk')
+
+    def test_email_not_changed_if_already_exists_and_error_raised(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesTeacher'), {'email':'teacher2@email.com'})
+        #no redirect happened to the dashboard
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Email aready exists. Please try a different email.')
+
+    def test_password_changed_and_user_logged_out(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesTeacher'), {'password': '5698'})
+        self.assertEqual(response.status_code, 302)
+        #update was successful so user should have been logged out
+        after_redirect_response = self.client.get(reverse('dashboardTeacher'))
+        self.assertRedirects(response, "/")
+
+    def test_nothing_changed_and_user_redirects_to_dashboard(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.post(reverse('preferencesTeacher'))
+        self.assertEqual(response.status_code, 302)
+        #since nothing changed, email should be same as before 
+        after_redirect_response = self.client.get(reverse('dashboardTeacher'))
+        self.assertEqual(after_redirect_response.context['user'].email,'teacher1@email.com')
+
+class quizResutsStudentViewTest(TestCase):
+    def setUp(self):
+        charac1 = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac1.save()
+        test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
+                                                    username = "student1 ",is_student = True, character = charac1 ,evolveScore = 1 )
+        test_student1.save()
+
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+
+        class1 = Class.objects.get_or_create(name= "class1")[0]
+        class1.save()
+        class1.student.add(User.objects.get(email = "student1@email.com"))
+        class1.teacher.add(User.objects.get(email = "teacher1@email.com"))
+
+        randomDay=random.randint(-5,20)
+        date_time = timezone.now() + timezone.timedelta(days=randomDay)
+        quiz = Quiz.objects.get_or_create(name = 'Maths',teacher=test_teacher1,
+        description = 'A basic maths quiz',question_count = 4,due_date = date_time )[0]
+        quiz.save()
+        quiz.course.add(class1)
+
+        questions1 = [{'text': 'What is 3+8*11 ?',
+        'options':[{'text': '121','is_correct': False},{'text':'91','is_correct':True},{'text':'-91','is_correct':False}]},
+        {'text':'What is the next number in the series: 2, 9, 30, 93, …?',
+        'options':[{'text': '282','is_correct':True},{'text':'102','is_correct':False},{'text':'39','is_correct':False}]},
+        {'text':'What is nine-tenths of 2000?',
+        'options':[{'text':'2222','is_correct':False},{'text':'1800','is_correct':True},{'text':'20','is_correct':False}]}]
+
+        for q in questions1:
+            ques = Question.objects.get_or_create(quiz=quiz,text = q['text'])[0]
+            ques.save()
+            for opt in q['options']:
+                option = Option.objects.get_or_create(text = opt['text'],is_correct=opt['is_correct'],question = ques)[0]
+                option.save()
+
+        quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = test_student1,course = class1, correctAnswers = 2, is_completed = True, quizDueDate=quiz.due_date)[0]
+        quizTaker.save()
+
+    def test_correct_number_of_quiz_shown(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.get(reverse('quizResultsStudent'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['quiz_taken']),1)
+
 #MODEL TESTING
 class UserModelTest(TestCase):
     @classmethod
