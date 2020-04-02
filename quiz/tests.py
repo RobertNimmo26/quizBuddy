@@ -1188,6 +1188,142 @@ class studentCheckTest(TestCase):
         student = User.objects.get(email="teststudent@test.com")
         self.assertTrue(student_check(student))
 
+class createClassTest(TestCase):
+    def setUp(self):
+        charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac.save()
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse("createClass"))
+        self.assertRedirects(response, "/?next=/createClass/")
+
+    def test_logged_in_uses_correct_template(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.get(reverse("createClass"))
+
+        # Logged in?
+        self.assertEqual(str(response.context['user']), 'teacher1@email.com')
+
+        self.assertEqual(str(response.context['user'].is_teacher), "True")
+
+        #Correct template
+        self.assertTemplateUsed(response, 'create-class.html')
+
+
+class createQuizTest(TestCase):
+    def setUp(self):
+        charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac.save()
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse("createQuiz"))
+        self.assertRedirects(response, "/?next=/createQuiz/")
+
+    def test_logged_in_uses_correct_template(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.get(reverse("createQuiz"))
+
+        # Logged in?
+        self.assertEqual(str(response.context['user']), 'teacher1@email.com')
+
+        self.assertEqual(str(response.context['user'].is_teacher), "True")
+
+        #Correct template
+        self.assertTemplateUsed(response, 'create-quiz.html')
+
+
+class quizViewTest(TestCase):
+    def setUp(self):
+        # Creating a teacher user
+        charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac.save()
+
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+        test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
+                                                    username = "student1 ",is_student = True, character = charac ,evolveScore = 1 )
+        test_student1.save()
+
+        test_teacher2 = User.objects.create_user(email = "teacher2@email.com", password = "1234", name = "teacher2",
+                                                    username = "teacher2 ", is_teacher = True, is_staff = True )
+        test_teacher2.save()
+        test_student2 = User.objects.create_user(email = "student2@email.com", password = "1234", name = "student2",
+                                                    username = "student2 ",is_student = True, character = charac ,evolveScore = 1 )
+        test_student2.save()
+
+        #Creating Classes
+        class1 = Class.objects.get_or_create(name= "class1")[0]
+        class1.save()
+        class1.student.add(User.objects.get(email = "student1@email.com"))
+        class1.teacher.add(User.objects.get(email = "teacher1@email.com"))
+
+        class2 = Class.objects.get_or_create(name= "class2")[0]
+        class2.save()
+        class2.student.add(User.objects.get(email = "student1@email.com"))
+        class2.teacher.add(User.objects.get(email = "teacher1@email.com"))
+
+        #Creating Quizzes
+        date_time = timezone.now() + timezone.timedelta(days=5)
+        get_teacher = test_teacher1
+
+        q0 = Quiz.objects.get_or_create(name = "quiz1",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
+        q0.save()
+        q0.course.add(class1)
+
+
+
+        q1 = Quiz.objects.get_or_create(name = "quiz2",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
+        q1.save()
+        q1.course.add(class1)
+
+        q2 = Quiz.objects.get_or_create(name = "quiz3",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
+        q2.save()
+        q2.course.add(class1)
+
+        questions1 = [{'text': 'What is 3+8*11 ?',
+        'options':[{'text': '121','is_correct': False},{'text':'91','is_correct':True},{'text':'-91','is_correct':False}]},
+        {'text':'What is the next number in the series: 2, 9, 30, 93, …?',
+        'options':[{'text': '282','is_correct':True},{'text':'102','is_correct':False},{'text':'39','is_correct':False}]},
+        {'text':'What is nine-tenths of 2000?',
+        'options':[{'text':'2222','is_correct':False},{'text':'1800','is_correct':True},{'text':'20','is_correct':False}]}]
+
+        for q in questions1:
+            ques = Question.objects.get_or_create(quiz=q0,text = q['text'])[0]
+            ques.save()
+            for opt in q['options']:
+                option = Option.objects.get_or_create(text = opt['text'],is_correct=opt['is_correct'],question = ques)[0]
+                option.save()
+
+    def test_redirect_if_not_logged_in_Class(self):
+        response = self.client.get(reverse("quiz", args=["1", "1"]))
+        self.assertRedirects(response, "/?next=/dashboardStudent/classStudent/1/1/")
+
+    def test_logged_in_uses_correct_template_Class(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.get(reverse("quiz", args=["1","1"]))
+
+        # Logged in?
+        self.assertEqual(str(response.context['user']), 'student1@email.com')
+
+        self.assertEqual(str(response.context['user'].is_student), "True")
+
+        #Correct template
+        self.assertTemplateUsed(response, 'quiz.html')
+
+    def test_has_all_questions(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.get(reverse("quiz", args=["1","1"]))
+
+        self.assertEqual(str(len(response.context['questions'])), '3')
+
+
 #MODEL TESTING
 #--------------------------------------------------------------------------------------------------------------------------
 class UserModelTest(TestCase):
@@ -1497,137 +1633,28 @@ class QuizTakerModelTest(TestCase):
         field_label = taker._meta.get_field('timestamp').verbose_name
         self.assertEquals(field_label, 'timestamp')
 
-class createClassTest(TestCase):
-    def setUp(self):
-        charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
-        charac.save()
-        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
-                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
-        test_teacher1.save()
+class UserModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Set up non-modified objects used by all test methods
+        Character.objects.create()
 
-    def test_redirect_if_not_logged_in(self):
-        response = self.client.get(reverse("createClass"))
-        self.assertRedirects(response, "/?next=/createClass/")
+    def test_characterType_label(self):
+        character = Character.objects.get(characterType=1)
+        field_label = character._meta.get_field('characterType').verbose_name
+        self.assertEquals(field_label, 'type')
 
-    def test_logged_in_uses_correct_template(self):
-        login = self.client.login(email = "teacher1@email.com", password = "1234")
-        response = self.client.get(reverse("createClass"))
+    def test_evolutionstage_label(self):
+        character = Character.objects.get(characterType=1)
+        field_label = character._meta.get_field('evolutionStage').verbose_name
+        self.assertEquals(field_label, 'stage')
 
-        # Logged in?
-        self.assertEqual(str(response.context['user']), 'teacher1@email.com')
+    def test_can_change_label(self):
+        character = Character.objects.get(characterType=1)
+        field_label = character._meta.get_field('can_change').verbose_name
+        self.assertEquals(field_label, 'can change')
 
-        self.assertEqual(str(response.context['user'].is_teacher), "True")
-
-        #Correct template
-        self.assertTemplateUsed(response, 'create-class.html')
-
-
-class createQuizTest(TestCase):
-    def setUp(self):
-        charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
-        charac.save()
-        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
-                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
-        test_teacher1.save()
-
-    def test_redirect_if_not_logged_in(self):
-        response = self.client.get(reverse("createQuiz"))
-        self.assertRedirects(response, "/?next=/createQuiz/")
-
-    def test_logged_in_uses_correct_template(self):
-        login = self.client.login(email = "teacher1@email.com", password = "1234")
-        response = self.client.get(reverse("createQuiz"))
-
-        # Logged in?
-        self.assertEqual(str(response.context['user']), 'teacher1@email.com')
-
-        self.assertEqual(str(response.context['user'].is_teacher), "True")
-
-        #Correct template
-        self.assertTemplateUsed(response, 'create-quiz.html')
-
-
-class quizViewTest(TestCase):
-    def setUp(self):
-        # Creating a teacher user
-        charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
-        charac.save()
-
-        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
-                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
-        test_teacher1.save()
-        test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
-                                                    username = "student1 ",is_student = True, character = charac ,evolveScore = 1 )
-        test_student1.save()
-
-        test_teacher2 = User.objects.create_user(email = "teacher2@email.com", password = "1234", name = "teacher2",
-                                                    username = "teacher2 ", is_teacher = True, is_staff = True )
-        test_teacher2.save()
-        test_student2 = User.objects.create_user(email = "student2@email.com", password = "1234", name = "student2",
-                                                    username = "student2 ",is_student = True, character = charac ,evolveScore = 1 )
-        test_student2.save()
-
-        #Creating Classes
-        class1 = Class.objects.get_or_create(name= "class1")[0]
-        class1.save()
-        class1.student.add(User.objects.get(email = "student1@email.com"))
-        class1.teacher.add(User.objects.get(email = "teacher1@email.com"))
-
-        class2 = Class.objects.get_or_create(name= "class2")[0]
-        class2.save()
-        class2.student.add(User.objects.get(email = "student1@email.com"))
-        class2.teacher.add(User.objects.get(email = "teacher1@email.com"))
-
-        #Creating Quizzes
-        date_time = timezone.now() + timezone.timedelta(days=5)
-        get_teacher = test_teacher1
-
-        q0 = Quiz.objects.get_or_create(name = "quiz1",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
-        q0.save()
-        q0.course.add(class1)
-
-
-
-        q1 = Quiz.objects.get_or_create(name = "quiz2",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
-        q1.save()
-        q1.course.add(class1)
-
-        q2 = Quiz.objects.get_or_create(name = "quiz3",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
-        q2.save()
-        q2.course.add(class1)
-
-        questions1 = [{'text': 'What is 3+8*11 ?',
-        'options':[{'text': '121','is_correct': False},{'text':'91','is_correct':True},{'text':'-91','is_correct':False}]},
-        {'text':'What is the next number in the series: 2, 9, 30, 93, …?',
-        'options':[{'text': '282','is_correct':True},{'text':'102','is_correct':False},{'text':'39','is_correct':False}]},
-        {'text':'What is nine-tenths of 2000?',
-        'options':[{'text':'2222','is_correct':False},{'text':'1800','is_correct':True},{'text':'20','is_correct':False}]}]
-
-        for q in questions1:
-            ques = Question.objects.get_or_create(quiz=q0,text = q['text'])[0]
-            ques.save()
-            for opt in q['options']:
-                option = Option.objects.get_or_create(text = opt['text'],is_correct=opt['is_correct'],question = ques)[0]
-                option.save()
-
-    def test_redirect_if_not_logged_in_Class(self):
-        response = self.client.get(reverse("quiz", args=["1", "1"]))
-        self.assertRedirects(response, "/?next=/dashboardStudent/classStudent/1/1/")
-
-    def test_logged_in_uses_correct_template_Class(self):
-        login = self.client.login(email = "student1@email.com", password = "1234")
-        response = self.client.get(reverse("quiz", args=["1","1"]))
-
-        # Logged in?
-        self.assertEqual(str(response.context['user']), 'student1@email.com')
-
-        self.assertEqual(str(response.context['user'].is_student), "True")
-
-        #Correct template
-        self.assertTemplateUsed(response, 'quiz.html')
-
-    def test_has_all_questions(self):
-        login = self.client.login(email = "student1@email.com", password = "1234")
-        response = self.client.get(reverse("quiz", args=["1","1"]))
-
-        self.assertEqual(str(len(response.context['questions'])), '3')
+    def test_object_name_is_characterType(self):
+        character = Character.objects.get(characterType=1)
+        expected_object_name = f'{character.characterType}'
+        self.assertEquals(expected_object_name, str(character))
