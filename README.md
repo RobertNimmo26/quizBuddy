@@ -17,15 +17,19 @@ QuizBuddy is designed to motivate students to do class quizzes by giving them a 
 5.  Install the required packages
 `pip install –r requirements.txt`
 
-6.  Set up the Google Calendar API with the instructions bellow
-7.  Populate the database using the commands 
-	`python manage.py makemigrations quiz` 
-	`python manage.py migrate`
+6.  Set up the Google Calendar API with the instructions below
 
-8.  Run the web app using the command
+7.  Set up the database using the commands 
+	`python manage.py makemigrations quiz` and 
+	`python manage.py migrate`
+	
+8.  Populate the database using the command
+`python population_script.py`
+
+9.  Run the web app using the command
 `python manage.py runserver`
 
-9.  In your preferred browser, access the web app using the URL
+10.  In your preferred browser, access the web app using the URL
 `http://localhost:8000/`
 
 ## External Sources
