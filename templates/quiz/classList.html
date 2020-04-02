@@ -19,12 +19,13 @@
         </div>
       {% endif %}
     {% if students %}
+        <ul>
         {% for student in students %}
             <div class="row mt-5 mr-1 ml-3">
                 <div class="col -3">
                   <div class="row">
                   <div class=col>
-                    <p>{{ student.name }}</p>
+                    <li><p>{{ student.name }}</p></li>
                   </div>
                   <div class=col>
                     <!-- Button trigger modal -->
@@ -64,6 +65,7 @@
                 </div>
             </div>
         {% endfor %}
+        </ul>
     {% else %}
         <div class="alert alert-danger mt-1 mr-1 ml-3" role="alert">
             {{ class.name }} does not have any students yet.

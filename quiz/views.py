@@ -162,7 +162,6 @@ def nextQuizzes(class_list,user):
         else:
             quizzes[c]=nextQuiz
         nextQuiz=None
-
     return quizzes
 
 @login_required
@@ -618,11 +617,11 @@ def classList(request, class_name_slug):
         if request.POST.get('button') =="add":
             try:
                 email = request.POST.get('add_student')
-                student = User.objects.filter(email=email).get()
+                student = User.objects.filter(email=email, is_student=True).get()
                 student.students.add(Class.objects.get(slug=class_name_slug))
 
             except User.DoesNotExist:
-                    context_dict["remove_error"] = [True];
+                    context_dict["remove_error"] = [True]
 
         #if the remove button was clicked on the page
         #it gets the student's email from the form (the remove button) and removes it
@@ -686,10 +685,12 @@ def preferencesStudent(request):
             character.save()
             user.character = character
         if 'password' in request.POST:
-            user.set_password(request.POST['password'])
-            user.save()
-            #ask user to login again
-            return redirect('/')
+            newPassword=request.POST['password']
+            if newPassword != '':
+                user.set_password(newPassword)
+                user.save()
+                #ask user to login again
+                return redirect('/')
 
         user.save()
 
@@ -723,9 +724,12 @@ def preferencesTeacher(request):
             if ableToChange==True:
                 user.email = new_email
         if 'password' in request.POST:
-            user.set_password(request.POST['password'])
-            user.save()
-            return redirect('/')
+            newPassword=request.POST['password']
+            if newPassword != '':
+                user.set_password(newPassword)
+                user.save()
+                #ask user to login again
+                return redirect('/')
         user.save()
 
         if ableToChange:

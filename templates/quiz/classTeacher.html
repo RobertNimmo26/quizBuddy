@@ -28,7 +28,16 @@
 
 {% endblock %}
 {% block next_quizzes %}
-    {% for key, value in quizzesDue.items %}
-        <p class="card-text">{{key}}: {{value.due_date}}</p>
-    {% endfor %}
+    <h5 class="card-title">Next Quiz Due:</h5>
+    {% if quizzesDue %}
+        {% for key, value in quizzesDue.items %}
+            {%if value != "There's no quizzes due" %}
+                <p class="card-text mb-1 ">{{key}}: {{value.due_date}}</p>
+            {% else %}
+                <p class="card-text mb-1 ">{{key}}: There's no quizzes due</p>
+            {%endif%}
+        {% endfor %}
+    {% else %}
+        <p class="card-text">You have no classes</p>
+    {% endif %}
 {% endblock %}
