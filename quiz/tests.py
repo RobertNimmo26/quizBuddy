@@ -9,6 +9,7 @@ from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, quest
 from quiz.managers import CustomUserManager
 from quiz.views import teacher_check, student_check, nextQuizzes, getCurrentQuizzesTeacher, getCurrentQuizzesStudent
 from datetime import datetime
+import pytz
 
 #FORM TESTING
 #--------------------------------------------------------------------------------------------------------------------------
@@ -197,6 +198,44 @@ class userLoginTest(TestCase):
         self.assertTemplateUsed(response, "index.html")
 
 class aboutTest(TestCase):
+    def setUp(self):
+        # Creating a teacher user
+        charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac.save()
+
+
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+        test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
+                                                    username = "student1 ",is_student = True, character = charac ,evolveScore = 1 )
+        test_student1.save()
+
+        test_teacher2 = User.objects.create_user(email = "teacher2@email.com", password = "1234", name = "teacher2",
+                                                    username = "teacher2 ", is_teacher = True, is_staff = True )
+        test_teacher2.save()
+        test_student2 = User.objects.create_user(email = "student2@email.com", password = "1234", name = "student2",
+                                                    username = "student2 ",is_student = True, character = charac ,evolveScore = 1 )
+        test_student2.save()
+
+        #Creating Classes
+        class1 = Class.objects.get_or_create(name= "class1")[0]
+        class1.save()
+        class1.student.add(User.objects.get(email = "student1@email.com"))
+        class1.teacher.add(User.objects.get(email = "teacher1@email.com"))
+
+        class2 = Class.objects.get_or_create(name= "class2")[0]
+        class2.save()
+        class2.student.add(User.objects.get(email = "student1@email.com"))
+        class2.teacher.add(User.objects.get(email = "teacher1@email.com"))
+
+        #Creating Quizzes
+        date_time = datetime(2022, 10, 5, 18, 0, 0, 0, pytz.UTC)
+        get_teacher = test_teacher1
+
+        q = Quiz.objects.get_or_create(name = "quiz1",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
+        q.save()
+        q.course.add(class1)
 
     def test_view_url_accessible_by_name(self):
         response = self.client.get(reverse("about"))
@@ -206,6 +245,30 @@ class aboutTest(TestCase):
         response = self.client.get(reverse("about"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "about.html")
+
+    def test_classes(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.get(reverse("about"))
+
+        #right Classes
+        self.assertEqual(len(response.context['classes']), 2)
+
+        for i in response.context['classes']:
+            self.assertEquals(response.context['user'].email, i.get_students())
+
+    def test_next_quiz(self):
+        login = self.client.login(email = "student2@email.com", password = "1234")
+        response = self.client.get(reverse("about"))
+        self.assertEqual(response.context['nextQuiz'], "You have no quizzes!")
+
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.get(reverse("about"))
+        date_time = datetime(2022, 10, 5, 18, 0, 0, 0, pytz.UTC)
+        self.assertEqual(response.context['nextQuiz'], date_time)
+
+
+
+
 
 class manageStudentTest(TestCase):
     def setUp(self):
@@ -428,7 +491,7 @@ class dashboardStudentViewTest(TestCase):
 
         class2 = Class.objects.get_or_create(name= "class2")[0]
         class2.save()
-        class2.student.add(User.objects.get(email = "student2@email.com"))
+        class2.student.add(User.objects.get(email = "student1@email.com"))
         class2.teacher.add(User.objects.get(email = "teacher1@email.com"))
 
         #Creating Quizzes
@@ -454,6 +517,16 @@ class dashboardStudentViewTest(TestCase):
 
         #Correct template
         self.assertTemplateUsed(response, 'dashboard-student.html')
+
+    def test_classes(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.get(reverse("dashboardStudent"))
+
+        #right Classes
+        self.assertEqual(len(response.context['classes']), 2)
+
+        for i in response.context['classes']:
+            self.assertEquals(response.context['user'].email, i.get_students())
 
 
 class show_classTeacherViewTest(TestCase):
