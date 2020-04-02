@@ -6,3 +6,4 @@
 /quiz/templatetags/__pycache__
 /quiz_buddy/.env
 /staticfiles/
+/.coverage

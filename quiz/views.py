@@ -77,15 +77,12 @@ def user_login(request):
         user = authenticate(email=email, password=password)
         # If there's a match
         if user:
-            if user.is_active:
-                login(request, user)
-                if user.is_student:
-                    return redirect(reverse('dashboardStudent'))
-                else:
-                    return redirect('dashboardTeacher')
+            login(request, user)
+            if user.is_student:
+                return redirect(reverse('dashboardStudent'))
             else:
-                context_dict['error'] = "Your account is disabled."
-                return render(request, 'index.html', context=context_dict)
+                return redirect('dashboardTeacher')
+
         else:
             # Bad login details were provided
             context_dict['error'] = "Invalid login details supplied."
