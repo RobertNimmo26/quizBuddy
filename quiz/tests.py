@@ -75,7 +75,7 @@ class quizCreationFormTest(TestCase):
         form = quizCreationForm()
         self.assertTrue(form.fields['due_date'].label == None or form.fields['due_date'].label == 'Quiz Description')
 
-class QuizLibraryTest(TestCase):
+class QuizLibraryFormTest(TestCase):
     def test_quiz_label(self):
         form = QuizLibrary()
         self.assertTrue(form.fields['quiz'].label == None or form.fields['quiz'].label == 'Quiz')
@@ -295,6 +295,35 @@ class aboutTest(TestCase):
         response = self.client.get(reverse("about"))
         date_time = datetime(2022, 10, 5, 18, 0, 0, 0, pytz.UTC)
         self.assertEqual(response.context['nextQuiz'], date_time)
+
+class quizLibraryTest(TestCase):
+    def setUp(self):
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse("quizLibrary"))
+        self.assertRedirects(response, "/?next=/quizLibrary/")
+
+    def test_logged_in_uses_correct_template(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.get(reverse("quizLibrary"))
+
+        # Logged in?
+        self.assertEqual(str(response.context['user']), 'teacher1@email.com')
+
+        self.assertEqual(str(response.context['user'].is_teacher), "True")
+
+        #Correct template
+        self.assertTemplateUsed(response, 'quiz-library.html')
+
+    def test_logged_in_uses_correct_redirect_after_submitting(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.post(reverse("quizLibrary"))
+
+        self.assertRedirects(response, "/dashboardTeacher/")
+
 
 class manageStudentTest(TestCase):
     def setUp(self):
