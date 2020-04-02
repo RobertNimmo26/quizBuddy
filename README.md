@@ -43,6 +43,7 @@ Due to Google API restrictions to run the Django webapp on your local device you
 * sqlparse 0.3.0
 * wincertstore 0.2
 * wrapt 1.11.2
-## REFERENCES  
+## REFERENCES
+* FORM TESTING - based on https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
 * Questions for psychology quiz taken from:
 https://quizpug.com. (2020). Can You Answer 12 Basic Psychology Questions?. [online] Available at: https://quizpug.com/can-you-answer-12-basic-psychology-questions/ [Accessed 7 Mar. 2020].
