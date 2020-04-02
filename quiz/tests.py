@@ -640,6 +640,16 @@ class preferencesStudentViewTest(TestCase):
                                                             username = "student2 ",is_student = True, character = charac2 ,evolveScore = 10 )
         test_student2.save()
 
+    def test_uses_correct_template(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.get(reverse("preferencesStudent"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "preferences-student.html")
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse("preferencesStudent"))
+        self.assertRedirects(response, "/?next=/preferencesStudent/")
+
     def test_username_changed_and_redirected_to_dashboard(self):
         login = self.client.login(email = "student1@email.com", password = "1234")
         response = self.client.post(reverse('preferencesStudent'), {'username': 'Billy12'})
@@ -702,6 +712,16 @@ class preferencesTeacherViewTest(TestCase):
         test_teacher2 = User.objects.create_user(email = "teacher2@email.com", password = "0289", name = "teacher",
                                                             username = "test",is_teacher = True)
         test_teacher2.save()
+    
+    def test_uses_correct_template(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.get(reverse("preferencesTeacher"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "preferences-teacher.html")
+    
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse("preferencesTeacher"))
+        self.assertRedirects(response, "/?next=/preferencesTeacher/")
 
     def test_username_changed_and_redirected_to_dashboard(self):
         login = self.client.login(email = "teacher1@email.com", password = "1234")
@@ -749,7 +769,7 @@ class preferencesTeacherViewTest(TestCase):
         after_redirect_response = self.client.get(reverse('dashboardTeacher'))
         self.assertEqual(after_redirect_response.context['user'].email,'teacher1@email.com')
 
-class quizResutsStudentViewTest(TestCase):
+class quizResultsStudentViewTest(TestCase):
     def setUp(self):
         charac1 = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
         charac1.save()
@@ -789,6 +809,21 @@ class quizResutsStudentViewTest(TestCase):
 
         quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = test_student1,course = class1, correctAnswers = 2, is_completed = True, quizDueDate=quiz.due_date)[0]
         quizTaker.save()
+    
+    def test_uses_correct_template(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.get(reverse("quizResultsStudent"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "quizResults-student.html")
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse("quizResultsStudent"))
+        self.assertRedirects(response, "/?next=/quizResultsStudent/")
+
+    def test_redirect_if_user_is_teacher(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.get(reverse("quizResultsStudent"))
+        self.assertRedirects(response, "/?next=/quizResultsStudent/")
 
     def test_correct_number_of_quiz_shown(self):
         login = self.client.login(email = "student1@email.com", password = "1234")
@@ -836,6 +871,16 @@ class quizResultsTeacherViewTest(TestCase):
 
         quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = test_student1,course = class1, correctAnswers = 2, is_completed = True, quizDueDate=quiz.due_date)[0]
         quizTaker.save()
+
+    def test_uses_correct_template(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.get(reverse("quizResultsTeacher"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "quizResults-teacher.html")
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse("quizResultsTeacher"))
+        self.assertRedirects(response, "/?next=/quizResultsTeacher/")
 
     def test_correct_number_of_quiz_shown(self):
         login = self.client.login(email = "teacher1@email.com", password = "1234")
