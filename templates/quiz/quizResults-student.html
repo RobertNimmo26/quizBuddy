@@ -5,12 +5,12 @@
     Quiz Results
 {% endblock %}
 {% block dash_button %}
-    <a href={% url 'dashboardStudent' %} class="btn btn-quizBuddy-4 mr-2" role="button">Dashboard</a>
+    <a href={% url 'dashboardStudent' %} class="btn btn-quizBuddy-4 mr-2 mt-1" role="button">Dashboard</a>
 
 {% endblock %}
 
 {% block body_block %}
-<div class="container">
+<div class="container-fluid">
     <div class="row mt-5 mr-1 ml-3">
         <div class="col -3">
             <h1>Quiz Results</h1>
@@ -37,16 +37,6 @@
                     No Quizzes completed.
                 </div>
             {% endif %}
-        </div>
-        <div class="col-4 ">
-            <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src= "{% static "images/character/char" %}{{user.character.characterType}}{{user.character.evolutionStage}}.png" alt="Card image cap"/>
-                <div class="card-body">
-                    <h5 class="card-title">{{user.username}} </h5>
-                    <p class="card-text">Level: {{user.character.evolutionStage}}</p>
-                    <p class="card-text">Points: {{user.evolveScore}}
-                </div>
-            </div>
         </div>
     </div>
 </div>
