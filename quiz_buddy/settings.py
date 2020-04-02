@@ -13,6 +13,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates/quiz')
 STATIC_DIR = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = "/home/QuizBuddy/quizBuddy/assets"
 
 
 # Quick-start development settings - unsuitable for production
