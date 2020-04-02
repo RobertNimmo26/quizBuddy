@@ -711,11 +711,11 @@ def preferencesTeacher(request):
     if request.method == 'POST':
         ableToChange=True
 
-        if request.POST['username']:
+        if 'username' in request.POST:
             user.username = request.POST['username']
-        if request.POST['name']:
+        if 'name' in request.POST:
             user.name = request.POST['name']
-        if request.POST['email']:
+        if 'email' in request.POST:
             new_email=request.POST['email']
 
             for otherUser in User.objects.all():
@@ -725,7 +725,7 @@ def preferencesTeacher(request):
                     ableToChange=False
             if ableToChange==True:
                 user.email = new_email
-        if request.POST['password']:
+        if 'password' in request.POST:
             user.set_password(request.POST['password'])
             user.save()
             return redirect('/')
