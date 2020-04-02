@@ -197,6 +197,37 @@ class userLoginTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "index.html")
 
+    def test_check_if_not_user(self):
+        form_data = {
+            'email': "bademail@email.com",
+            'password': "badpassword",
+        }
+        response = self.client.post(reverse("index"), form_data)
+        self.assertTemplateUsed(response, "index.html")
+        self.assertEqual(response.context['error'], "Invalid login details supplied.")
+
+    def test_check_if_student(self):
+        form_data = {
+            'email': "student1@email.com",
+            'password': "1234",
+        }
+        test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
+                                                    username = "student1", is_student = True)
+        test_student1.save()
+        response = self.client.post(reverse("index"), form_data)
+        self.assertRedirects(response, "/dashboardStudent/")
+
+    def test_check_if_teacher(self):
+        form_data = {
+            'email': "teacher1@email.com",
+            'password': "1234",
+        }
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+        response = self.client.post(reverse("index"), form_data)
+        self.assertRedirects(response, "/dashboardTeacher/")
+
 class aboutTest(TestCase):
     def setUp(self):
         # Creating a teacher user
@@ -273,10 +304,10 @@ class aboutTest(TestCase):
 class manageStudentTest(TestCase):
     def setUp(self):
         test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
-                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+                                                    username = "teacher1", is_teacher = True, is_staff = True )
         test_teacher1.save()
         test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
-                                                    username = "student1 ",is_student = True)
+                                                    username = "student1",is_student = True)
         test_student1.save()
 
         test_student2 = User.objects.create_user(email = "student2@email.com", password = "1234", name = "student2",
