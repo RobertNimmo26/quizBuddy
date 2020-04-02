@@ -10,7 +10,7 @@ from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Characte
 from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset, QuizLibrary, classCreationForm
 from quiz.models import Character,User,Class, Quiz, Question, Option, QuizTaker
 from quiz.managers import CustomUserManager
-from quiz.views import teacher_check, student_check, nextQuizzes, getCurrentQuizzesTeacher
+from quiz.views import teacher_check, student_check, nextQuizzes, getCurrentQuizzesTeacher, getCurrentQuizzesStudent
 from datetime import datetime
 import random
 
@@ -580,6 +580,53 @@ class getCurrentQuizzesTeacherTest(TestCase):
         current_quizzes = getCurrentQuizzesTeacher(quiz_list,course,user)
 
         self.assertTrue(len(current_quizzes) == 2)
+
+class getCurrentQuizzesStudentTest(TestCase):
+    def setUp(self):
+        # Create course
+        course = Class.objects.create(name = "class")
+        course.save()
+        # Create users
+        student = User.objects.create_user(email="teststudent@test.com", password="test",name="student",
+                                           username="student", is_teacher=False, is_staff = False)
+        teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
+                                           username="teacher", is_teacher=True, is_staff = True)
+        course.teacher.add(teacher)
+        course.student.add(student)
+        
+        # Create dates
+        date_time_now = timezone.now()
+        date_time_first = timezone.now() + timezone.timedelta(days=5)
+        date_time_last = timezone.now() + timezone.timedelta(days=10)
+        
+        # Create quizzes
+        q1 = Quiz.objects.get_or_create(name = "quiz1", description="quiz1",due_date=date_time_now,question_count=3, teacher=teacher)[0]
+        q1.save()
+        q2 = Quiz.objects.get_or_create(name = "quiz2", description="quiz2",due_date=date_time_first,question_count=3, teacher=teacher)[0]
+        q2.save()
+        q3 = Quiz.objects.get_or_create(name = "quiz3", description="quiz3",due_date=date_time_last,question_count=3, teacher=teacher)[0]
+        q3.save()
+        q1.course.add(course)
+        q2.course.add(course)
+        q2.course.add(course)
+    
+    def testGetCurrentQuizzesTeacher(self):
+        user = User.objects.get(email="teststudent@test.com")
+        course = Class.objects.get(name="class")
+        q1 = Quiz.objects.get(name="quiz1")
+        q2 = Quiz.objects.get(name="quiz2")
+        q3 = Quiz.objects.get(name="quiz3")
+        quiz_list = {
+            q1:q1,
+            q2:q2,
+            q3:q3
+        }
+        
+        # Should return quizzes 2 and 3, as first is overdue
+        current_quizzes = getCurrentQuizzesStudent(quiz_list,course,user)
+
+        self.assertTrue(len(current_quizzes) == 2)
+        
 class teacherCheckTest(TestCase):
     def setUp(self):
         teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
