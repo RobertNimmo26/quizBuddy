@@ -385,6 +385,8 @@ class dashboardTeacherViewTest(TestCase):
         # Logged in?
         self.assertEqual(str(response.context['user']), 'teacher1@email.com')
 
+        self.assertEqual(str(response.context['user'].is_teacher), "True")
+
         #Correct template
         self.assertTemplateUsed(response, 'dashboard-teacher.html')
 
@@ -450,6 +452,8 @@ class dashboardStudentViewTest(TestCase):
         # Logged in?
         self.assertEqual(str(response.context['user']), 'student1@email.com')
 
+        self.assertEqual(str(response.context['user'].is_student), "True")
+
         #Correct template
         self.assertTemplateUsed(response, 'dashboard-student.html')
 
@@ -513,6 +517,8 @@ class show_classTeacherViewTest(TestCase):
 
         # Logged in?
         self.assertEqual(str(response.context['user']), 'teacher1@email.com')
+
+        self.assertEqual(str(response.context['user'].is_teacher), "True")
 
         #Correct template
         self.assertTemplateUsed(response, 'classTeacher.html')
@@ -599,6 +605,8 @@ class show_classStudentViewTest(TestCase):
         # Logged in?
         self.assertEqual(str(response.context['user']), 'student1@email.com')
 
+        self.assertEqual(str(response.context['user'].is_student), "True")
+
         #Correct template
         self.assertTemplateUsed(response, 'classStudent.html')
 
@@ -637,11 +645,11 @@ class nextQuizzesTest(TestCase):
                                            username="teacher", is_teacher=True, is_staff = True)
         class1.teacher.add(teacher)
         class2.teacher.add(teacher)
-        
+
         # Set test dates
         date_time_now = timezone.now()
         date_time = timezone.now() + timezone.timedelta(days=5)
-        
+
         # Create and add quiz to class
         q1 = Quiz.objects.get_or_create(name = "quiz1", description="quiz1",due_date=date_time_now,question_count=3, teacher=teacher)[0]
         q1.save()
@@ -649,7 +657,7 @@ class nextQuizzesTest(TestCase):
         q2.save()
         q1.course.add(class1)
         q2.course.add(class2)
-        
+
     def testNextQuiz(self):
         class1 = Class.objects.get(name="class1")
         class2 = Class.objects.get(name="class2")
@@ -658,7 +666,7 @@ class nextQuizzesTest(TestCase):
             class2:class2
         }
         user = User.objects.get(email="testteacher@test.com")
-        
+
         next_quizzes = nextQuizzes(class_list, user)
         self.assertTrue(next_quizzes.get(class1) == "There's no quizzes due")
 
@@ -671,12 +679,12 @@ class getCurrentQuizzesTeacherTest(TestCase):
         teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
                                            username="teacher", is_teacher=True, is_staff = True)
         course.teacher.add(teacher)
-        
+
         # Create dates
         date_time_now = timezone.now()
         date_time_first = timezone.now() + timezone.timedelta(days=5)
         date_time_last = timezone.now() + timezone.timedelta(days=10)
-        
+
         # Create quizzes
         q1 = Quiz.objects.get_or_create(name = "quiz1", description="quiz1",due_date=date_time_now,question_count=3, teacher=teacher)[0]
         q1.save()
@@ -687,7 +695,7 @@ class getCurrentQuizzesTeacherTest(TestCase):
         q1.course.add(course)
         q2.course.add(course)
         q2.course.add(course)
-    
+
     def testGetCurrentQuizzesTeacher(self):
         user = User.objects.get(email="testteacher@test.com")
         course = Class.objects.get(name="class")
@@ -699,7 +707,7 @@ class getCurrentQuizzesTeacherTest(TestCase):
             q2:q2,
             q3:q3
         }
-        
+
         # Should return quizzes 2 and 3, as first is overdue
         current_quizzes = getCurrentQuizzesTeacher(quiz_list,course,user)
 
@@ -717,12 +725,12 @@ class getCurrentQuizzesStudentTest(TestCase):
                                            username="teacher", is_teacher=True, is_staff = True)
         course.teacher.add(teacher)
         course.student.add(student)
-        
+
         # Create dates
         date_time_now = timezone.now()
         date_time_first = timezone.now() + timezone.timedelta(days=5)
         date_time_last = timezone.now() + timezone.timedelta(days=10)
-        
+
         # Create quizzes
         q1 = Quiz.objects.get_or_create(name = "quiz1", description="quiz1",due_date=date_time_now,question_count=3, teacher=teacher)[0]
         q1.save()
@@ -733,7 +741,7 @@ class getCurrentQuizzesStudentTest(TestCase):
         q1.course.add(course)
         q2.course.add(course)
         q2.course.add(course)
-    
+
     def testGetCurrentQuizzesTeacher(self):
         user = User.objects.get(email="teststudent@test.com")
         course = Class.objects.get(name="class")
@@ -745,12 +753,12 @@ class getCurrentQuizzesStudentTest(TestCase):
             q2:q2,
             q3:q3
         }
-        
+
         # Should return quizzes 2 and 3, as first is overdue
         current_quizzes = getCurrentQuizzesStudent(quiz_list,course,user)
 
         self.assertTrue(len(current_quizzes) == 2)
-        
+
 class teacherCheckTest(TestCase):
     def setUp(self):
         teacher = User.objects.create_user(email="testteacher@test.com", password="test",name="teacher",
@@ -791,7 +799,7 @@ class preferencesStudentViewTest(TestCase):
         #redirect response context cant be used to get user details
         after_redirect_response = self.client.get(reverse('dashboardStudent'))
         self.assertEqual(after_redirect_response.context['user'].username, 'Billy12')
-    
+
     def test_name_changed_and_redirected_to_dashboard(self):
         login = self.client.login(email = "student1@email.com", password = "1234")
         response = self.client.post(reverse('preferencesStudent'), {'name': 'Billy'})
@@ -832,7 +840,7 @@ class preferencesStudentViewTest(TestCase):
         login = self.client.login(email = "student1@email.com", password = "1234")
         response = self.client.post(reverse('preferencesStudent'))
         self.assertEqual(response.status_code, 302)
-        #since nothing changed, email should be same as before 
+        #since nothing changed, email should be same as before
         after_redirect_response = self.client.get(reverse('dashboardStudent'))
         self.assertEqual(after_redirect_response.context['user'].email,'student1@email.com')
 
@@ -854,7 +862,7 @@ class preferencesTeacherViewTest(TestCase):
         #redirect response context cant be used to get user details
         after_redirect_response = self.client.get(reverse('dashboardTeacher'))
         self.assertEqual(after_redirect_response.context['user'].username, 'Tom')
-    
+
     def test_name_changed_and_redirected_to_dashboard(self):
         login = self.client.login(email = "teacher1@email.com", password = "1234")
         response = self.client.post(reverse('preferencesTeacher'), {'name': 'Billy'})
@@ -888,7 +896,7 @@ class preferencesTeacherViewTest(TestCase):
         login = self.client.login(email = "teacher1@email.com", password = "1234")
         response = self.client.post(reverse('preferencesTeacher'))
         self.assertEqual(response.status_code, 302)
-        #since nothing changed, email should be same as before 
+        #since nothing changed, email should be same as before
         after_redirect_response = self.client.get(reverse('dashboardTeacher'))
         self.assertEqual(after_redirect_response.context['user'].email,'teacher1@email.com')
 
@@ -1019,7 +1027,7 @@ class ClassModelTest(TestCase):
         course = Class.objects.get(courseId=1)
         field_label = course._meta.get_field('teacher').verbose_name
         self.assertEquals(field_label, 'teacher')
-    
+
     def test_teacher_label(self):
         course = Class.objects.get(courseId=1)
         field_label = course._meta.get_field('student').verbose_name
@@ -1034,7 +1042,7 @@ class ClassModelTest(TestCase):
         course = Class.objects.get(courseId=1)
         teacher = User.objects.get(email='testtuser@test.com')
         self.assertEquals(course.get_teachers(), str(teacher))
-    
+
     def test_get_students(self):
         course = Class.objects.get(courseId=1)
         student = User.objects.get(email='testsuser@test.com')
@@ -1044,11 +1052,11 @@ class ClassModelTest(TestCase):
         course = Class.objects.get(courseId=1)
         expected_object_name = f'{course.name}'
         self.assertEquals(expected_object_name, str(course))
-    
+
     def test_save(self):
         course = Class.objects.get(courseId=1)
         self.assertEquals(course.slug, str(course.courseId))
-    
+
 class QuizModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -1073,7 +1081,7 @@ class QuizModelTest(TestCase):
         quiz = Quiz.objects.get(quizId=1)
         max_length = quiz._meta.get_field('name').max_length
         self.assertEquals(max_length, 50)
-    
+
     def test_name_label(self):
         quiz = Quiz.objects.get(quizId=1)
         field_label = quiz._meta.get_field('name').verbose_name
@@ -1088,7 +1096,7 @@ class QuizModelTest(TestCase):
         quiz = Quiz.objects.get(quizId=1)
         field_label = quiz._meta.get_field('description').verbose_name
         self.assertEquals(field_label, 'description')
-    
+
     def test_due_date_autoadd(self):
         quiz = Quiz.objects.get(quizId=1)
         auto_now_add = quiz._meta.get_field('due_date').auto_now_add
@@ -1221,7 +1229,7 @@ class QuizTakerModelTest(TestCase):
         taker = QuizTaker.objects.all()[0]
         field_label = taker._meta.get_field('user').verbose_name
         self.assertEquals(field_label, 'user')
-    
+
     def test_quiz_label(self):
         taker = QuizTaker.objects.all()[0]
         field_label = taker._meta.get_field('quiz').verbose_name
@@ -1236,7 +1244,7 @@ class QuizTakerModelTest(TestCase):
         taker = QuizTaker.objects.all()[0]
         field_label = taker._meta.get_field('correctAnswers').verbose_name
         self.assertEquals(field_label, 'correctAnswers')
-    
+
     def test_quizDueDate_label(self):
         taker = QuizTaker.objects.all()[0]
         field_label = taker._meta.get_field('quizDueDate').verbose_name
@@ -1246,3 +1254,138 @@ class QuizTakerModelTest(TestCase):
         taker = QuizTaker.objects.all()[0]
         field_label = taker._meta.get_field('timestamp').verbose_name
         self.assertEquals(field_label, 'timestamp')
+
+class createClassTest(TestCase):
+    def setUp(self):
+        charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac.save()
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse("createClass"))
+        self.assertRedirects(response, "/?next=/createClass/")
+
+    def test_logged_in_uses_correct_template(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.get(reverse("createClass"))
+
+        # Logged in?
+        self.assertEqual(str(response.context['user']), 'teacher1@email.com')
+
+        self.assertEqual(str(response.context['user'].is_teacher), "True")
+
+        #Correct template
+        self.assertTemplateUsed(response, 'create-class.html')
+
+
+class createQuizTest(TestCase):
+    def setUp(self):
+        charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac.save()
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+
+    def test_redirect_if_not_logged_in(self):
+        response = self.client.get(reverse("createQuiz"))
+        self.assertRedirects(response, "/?next=/createQuiz/")
+
+    def test_logged_in_uses_correct_template(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.get(reverse("createQuiz"))
+
+        # Logged in?
+        self.assertEqual(str(response.context['user']), 'teacher1@email.com')
+
+        self.assertEqual(str(response.context['user'].is_teacher), "True")
+
+        #Correct template
+        self.assertTemplateUsed(response, 'create-quiz.html')
+
+
+class quizViewTest(TestCase):
+    def setUp(self):
+        # Creating a teacher user
+        charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac.save()
+
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+        test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
+                                                    username = "student1 ",is_student = True, character = charac ,evolveScore = 1 )
+        test_student1.save()
+
+        test_teacher2 = User.objects.create_user(email = "teacher2@email.com", password = "1234", name = "teacher2",
+                                                    username = "teacher2 ", is_teacher = True, is_staff = True )
+        test_teacher2.save()
+        test_student2 = User.objects.create_user(email = "student2@email.com", password = "1234", name = "student2",
+                                                    username = "student2 ",is_student = True, character = charac ,evolveScore = 1 )
+        test_student2.save()
+
+        #Creating Classes
+        class1 = Class.objects.get_or_create(name= "class1")[0]
+        class1.save()
+        class1.student.add(User.objects.get(email = "student1@email.com"))
+        class1.teacher.add(User.objects.get(email = "teacher1@email.com"))
+
+        class2 = Class.objects.get_or_create(name= "class2")[0]
+        class2.save()
+        class2.student.add(User.objects.get(email = "student1@email.com"))
+        class2.teacher.add(User.objects.get(email = "teacher1@email.com"))
+
+        #Creating Quizzes
+        date_time = timezone.now() + timezone.timedelta(days=5)
+        get_teacher = test_teacher1
+
+        q0 = Quiz.objects.get_or_create(name = "quiz1",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
+        q0.save()
+        q0.course.add(class1)
+
+
+
+        q1 = Quiz.objects.get_or_create(name = "quiz2",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
+        q1.save()
+        q1.course.add(class1)
+
+        q2 = Quiz.objects.get_or_create(name = "quiz3",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
+        q2.save()
+        q2.course.add(class1)
+
+        questions1 = [{'text': 'What is 3+8*11 ?',
+        'options':[{'text': '121','is_correct': False},{'text':'91','is_correct':True},{'text':'-91','is_correct':False}]},
+        {'text':'What is the next number in the series: 2, 9, 30, 93, …?',
+        'options':[{'text': '282','is_correct':True},{'text':'102','is_correct':False},{'text':'39','is_correct':False}]},
+        {'text':'What is nine-tenths of 2000?',
+        'options':[{'text':'2222','is_correct':False},{'text':'1800','is_correct':True},{'text':'20','is_correct':False}]}]
+
+        for q in questions1:
+            ques = Question.objects.get_or_create(quiz=q0,text = q['text'])[0]
+            ques.save()
+            for opt in q['options']:
+                option = Option.objects.get_or_create(text = opt['text'],is_correct=opt['is_correct'],question = ques)[0]
+                option.save()
+
+    def test_redirect_if_not_logged_in_Class(self):
+        response = self.client.get(reverse("quiz", args=["1", "1"]))
+        self.assertRedirects(response, "/?next=/dashboardStudent/classStudent/1/1/")
+
+    def test_logged_in_uses_correct_template_Class(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.get(reverse("quiz", args=["1","1"]))
+
+        # Logged in?
+        self.assertEqual(str(response.context['user']), 'student1@email.com')
+
+        self.assertEqual(str(response.context['user'].is_student), "True")
+
+        #Correct template
+        self.assertTemplateUsed(response, 'quiz.html')
+
+    def test_has_all_questions(self):
+        login = self.client.login(email = "student1@email.com", password = "1234")
+        response = self.client.get(reverse("quiz", args=["1","1"]))
+
+        self.assertEqual(str(len(response.context['questions'])), '3')
