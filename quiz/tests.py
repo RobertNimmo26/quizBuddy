@@ -297,10 +297,6 @@ class aboutTest(TestCase):
         date_time = datetime(2022, 10, 5, 18, 0, 0, 0, pytz.UTC)
         self.assertEqual(response.context['nextQuiz'], date_time)
 
-
-
-
-
 class manageStudentTest(TestCase):
     def setUp(self):
         test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
