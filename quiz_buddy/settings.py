@@ -123,11 +123,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [STATIC_DIR, ]
 
 # User model
-
 AUTH_USER_MODEL = 'quiz.User'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST='smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT= 587
+#had to hardcode credentials because else there are authentication problems
 EMAIL_HOST_USER = 'quizzBuddy@gmail.com'
 EMAIL_HOST_PASSWORD = 'quizbuddy123'
