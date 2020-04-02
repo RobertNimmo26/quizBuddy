@@ -4,7 +4,7 @@ QuizBuddy is an webapp created to help improve students learning while making it
 ## Background
 QuizBuddy is designed to motivate students to do class quizzes by giving them a character whose development depends on their work ethic. On registration, the student can choose between 3 potential characters. The student can evolve their character in 3 stages by reaching certain score milestones after completing quizzes.
 
-## How to deploy the app:
+## How to deploy the app
 
 1.  Create your virtual environment using your preferred way with the python version 3.8.1
 2.  Activate your virtual environment
