@@ -1,20 +1,17 @@
+import os
+import random
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils import timezone
-import os
-import random
-
-from quiz.models import Quiz, Question, Option, Class, User, QuizTaker, Character
-
+from quiz.models import User, Class, Quiz, Question, Option, QuizTaker, Character
 from quiz.forms import UserFormStudent, UserFormTeacher, quizCreationForm, questionFormset, QuizLibrary, classCreationForm
-from quiz.models import Character,User,Class, Quiz, Question, Option, QuizTaker
 from quiz.managers import CustomUserManager
 from quiz.views import teacher_check, student_check, nextQuizzes, getCurrentQuizzesTeacher, getCurrentQuizzesStudent
 from datetime import datetime
-import random
 
-#FORM TESTING - based on https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Testing
+#FORM TESTING
+#--------------------------------------------------------------------------------------------------------------------------
 class UserFormStudentTest(TestCase):
     def test_password_label(self):
         form = UserFormStudent()
@@ -106,7 +103,8 @@ class QuizLibraryTest(TestCase):
         form = QuizLibrary()
         self.assertTrue(form.fields['due_date'].label == None or form.fields['due_date'].label == 'Due date')
 
-#VIEW TESTING
+#VIEWS TESTING
+#--------------------------------------------------------------------------------------------------------------------------
 class registerTeacherTest(TestCase):
 
     def test_view_url_accessible_by_name(self):
@@ -1040,6 +1038,7 @@ class studentCheckTest(TestCase):
         self.assertTrue(student_check(student))
 
 #MODEL TESTING
+#--------------------------------------------------------------------------------------------------------------------------
 class UserModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
