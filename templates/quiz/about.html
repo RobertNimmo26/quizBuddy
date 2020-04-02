@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block header_buttons %}
-<button class="btn btn-quizBuddy-4 mr-2 mt-1" type="button" onclick="window.location.href={% url 'about' %}">About</button>
+<button class="btn btn-quizBuddy-4 mr-2" type="button" onclick="window.location.href={% url 'about' %}">About</button>
 {% if request.user.is_student %}
 {% block next_quiz %}
     <button class="btn btn-quizBuddy-5 mr-2 mt-1" type="button">Next deadline: {{nextQuiz}}</button>
