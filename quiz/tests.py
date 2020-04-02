@@ -234,7 +234,6 @@ class aboutTest(TestCase):
         charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
         charac.save()
 
-
         test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
                                                     username = "teacher1 ", is_teacher = True, is_staff = True )
         test_teacher1.save()
@@ -427,7 +426,6 @@ class dashboardTeacherViewTest(TestCase):
         charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
         charac.save()
 
-
         test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
                                                     username = "teacher1 ", is_teacher = True, is_staff = True )
         test_teacher1.save()
@@ -494,7 +492,6 @@ class dashboardStudentViewTest(TestCase):
         # Creating a teacher user
         charac = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
         charac.save()
-
 
         test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
                                                     username = "teacher1 ", is_teacher = True, is_staff = True )
@@ -595,8 +592,6 @@ class show_classTeacherViewTest(TestCase):
         q.save()
         q.course.add(class1)
 
-
-
         q1 = Quiz.objects.get_or_create(name = "quiz2",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
         q1.save()
         q1.course.add(class1)
@@ -681,8 +676,6 @@ class show_classStudentViewTest(TestCase):
         q = Quiz.objects.get_or_create(name = "quiz1",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
         q.save()
         q.course.add(class1)
-
-
 
         q1 = Quiz.objects.get_or_create(name = "quiz2",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
         q1.save()
@@ -1090,8 +1083,6 @@ class quizViewTest(TestCase):
         q0 = Quiz.objects.get_or_create(name = "quiz1",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
         q0.save()
         q0.course.add(class1)
-
-
 
         q1 = Quiz.objects.get_or_create(name = "quiz2",description="quiz1",due_date=date_time,question_count=3, teacher=get_teacher)[0]
         q1.save()
