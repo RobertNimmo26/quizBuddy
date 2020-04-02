@@ -796,6 +796,61 @@ class quizResutsStudentViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['quiz_taken']),1)
 
+class quizResultsTeacherViewTest(TestCase):
+    def setUp(self):
+        charac1 = Character.objects.get_or_create(characterType= 1, evolutionStage = 1)[0]
+        charac1.save()
+        test_student1 = User.objects.create_user(email = "student1@email.com", password = "1234", name = "student1",
+                                                    username = "student1 ",is_student = True, character = charac1 ,evolveScore = 1 )
+        test_student1.save()
+
+        test_teacher1 = User.objects.create_user(email = "teacher1@email.com", password = "1234", name = "teacher1",
+                                                    username = "teacher1 ", is_teacher = True, is_staff = True )
+        test_teacher1.save()
+
+        class1 = Class.objects.get_or_create(name= "class1")[0]
+        class1.save()
+        class1.student.add(User.objects.get(email = "student1@email.com"))
+        class1.teacher.add(User.objects.get(email = "teacher1@email.com"))
+
+        randomDay=random.randint(-5,20)
+        date_time = timezone.now() + timezone.timedelta(days=randomDay)
+        quiz = Quiz.objects.get_or_create(name = 'Maths',teacher=test_teacher1,
+        description = 'A basic maths quiz',question_count = 4,due_date = date_time )[0]
+        quiz.save()
+        quiz.course.add(class1)
+
+        questions1 = [{'text': 'What is 3+8*11 ?',
+        'options':[{'text': '121','is_correct': False},{'text':'91','is_correct':True},{'text':'-91','is_correct':False}]},
+        {'text':'What is the next number in the series: 2, 9, 30, 93, …?',
+        'options':[{'text': '282','is_correct':True},{'text':'102','is_correct':False},{'text':'39','is_correct':False}]},
+        {'text':'What is nine-tenths of 2000?',
+        'options':[{'text':'2222','is_correct':False},{'text':'1800','is_correct':True},{'text':'20','is_correct':False}]}]
+
+        for q in questions1:
+            ques = Question.objects.get_or_create(quiz=quiz,text = q['text'])[0]
+            ques.save()
+            for opt in q['options']:
+                option = Option.objects.get_or_create(text = opt['text'],is_correct=opt['is_correct'],question = ques)[0]
+                option.save()
+
+        quizTaker = QuizTaker.objects.get_or_create(quiz = quiz, user = test_student1,course = class1, correctAnswers = 2, is_completed = True, quizDueDate=quiz.due_date)[0]
+        quizTaker.save()
+
+    def test_correct_number_of_quiz_shown(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.get(reverse('quizResultsTeacher'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['quizTaken']),1)
+        
+    def test_correct_average_score_shown(self):
+        login = self.client.login(email = "teacher1@email.com", password = "1234")
+        response = self.client.get(reverse('quizResultsTeacher'))
+        self.assertEqual(response.status_code, 200)
+        #convert the dict to a list and index it. Quiz date is the key so had to access it in this way.
+        average_score = list(response.context['avg_score'].values())[0]
+        self.assertEqual(average_score,2.0)
+
 
 #VIEW-HELPER METHODS TESTING
 class nextQuizzesTest(TestCase):
